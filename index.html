@@ -31,6 +31,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .lbtn:hover{background:var(--blue-txt)}
 .hint{font-size:11px;color:var(--text3);margin-top:10px}
 
+/* drag handle */
+.drag-handle{cursor:grab;color:var(--text3);font-size:12px;padding:0 2px;flex-shrink:0;opacity:0;user-select:none}
+.t-row:hover .drag-handle{opacity:1}
+.t-row.dragging{opacity:.4;background:var(--blue-lt)!important}
+.t-row.drag-over{border-top:2px solid var(--blue)!important}
+/* subtask sequence number */
+.sub-seq{font-size:9px;font-weight:700;color:var(--blue-txt);background:var(--blue-lt);border-radius:4px;padding:1px 4px;flex-shrink:0;min-width:18px;text-align:center}
+/* inherited badge */
+.inherited{opacity:.55;font-style:italic}
+/* parent computed fields */
+.computed{font-size:10px;color:var(--text2);font-style:italic}
+
+
 /* APP */
 #app{display:none;min-height:100vh}
 .topbar{background:var(--bg);border-bottom:0.5px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:50;flex-wrap:wrap}
@@ -79,8 +92,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 /* TABLE — chk | dot | name | owner | start | due | status | priority | note | actions */
 .tlist{display:none;border-top:0.5px solid var(--border)}
 .tlist.open{display:block}
-.t-head{display:grid;grid-template-columns:18px 13px minmax(0,1fr) 130px 58px 58px 112px 88px minmax(0,160px) 86px;gap:5px;padding:4px 14px;background:var(--bg2);border-bottom:0.5px solid var(--border)}
-.t-row{display:grid;grid-template-columns:18px 13px minmax(0,1fr) 130px 58px 58px 112px 88px minmax(0,160px) 86px;gap:5px;align-items:start;padding:7px 14px;border-bottom:0.5px solid var(--border);transition:background .1s}
+.t-head{display:grid;grid-template-columns:18px 13px 24px minmax(0,1fr) 130px 58px 58px 112px 88px minmax(0,150px) 100px;gap:5px;padding:4px 14px;background:var(--bg2);border-bottom:0.5px solid var(--border)}
+.t-row{display:grid;grid-template-columns:18px 13px 24px minmax(0,1fr) 130px 58px 58px 112px 88px minmax(0,150px) 100px;gap:5px;align-items:start;padding:7px 14px;border-bottom:0.5px solid var(--border);transition:background .1s}
 .t-row:last-child{border-bottom:none}
 .t-row:hover{background:var(--bg2)}
 .th{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.3px;font-weight:700;align-self:center}
@@ -852,7 +865,7 @@ function render(){
       </div>
       <div class="tlist${isOpen?' open':''}" id="tlist-${sec.id}">
         <div class="t-head">
-          <span></span><span></span>
+          <span></span><span></span><span class="th">#</span>
           <span class="th">Task</span>
           <span class="th">Owner</span>
           <span class="th">Start</span>
@@ -866,42 +879,76 @@ function render(){
           const isSub=!!t.parent;
           const hasKids=tasks.some(c=>c.parent===t.id);
           const editable=canEdit(t);
-          const notePreview=t.note?(t.note.length>55?t.note.substring(0,55)+'…':t.note):'';
-          return `<div class="t-row">
+          const notePreview=t.note?(t.note.length>50?t.note.substring(0,50)+'…':t.note):'';
+
+          // computed values for parents
+          const dispDue   = hasKids ? computedDue(t)      : (t.due||'');
+          const dispStatus= hasKids ? computedStatus(t)    : t.status;
+          const dispPrio  = hasKids ? computedPriority(t)  : t.priority;
+          const dispOwner = hasKids ? computedOwner(t)     : (t.owner||'');
+          const isComputed= hasKids;
+
+          // subtask sequence number among siblings
+          const siblings  = isSub ? tasks.filter(z=>z.parent===t.parent) : [];
+          const seqNum    = isSub ? (siblings.indexOf(t)+1) : 0;
+
+          return `<div class="t-row" id="tr-${t.id}"
+            draggable="${isSub?'true':'false'}"
+            ondragstart="${isSub?`onDragStart(event,${t.id})`:''}"
+            ondragend="${isSub?`onDragEnd(event,${t.id})`:''}"
+            ondragover="${isSub?`onDragOver(event,${t.id})`:''}"
+            ondrop="${isSub?`onDrop(event,${t.id})`:''}"
+            >
             <input type="checkbox" class="chk"
-              ${t.status==='completed'?'checked':''}
+              ${dispStatus==='completed'?'checked':''}
               ${!editable?'disabled':''}
               onchange="toggleDone(${t.id})">
             <div class="subdot-w">${isSub?'<div class="subdot"></div>':''}</div>
+            <div style="display:flex;align-items:center;justify-content:center">
+              ${isSub?`<span class="sub-seq">${seqNum}</span>`:''}
+            </div>
 
             <div class="icell" id="ic-name-${t.id}">
-              <span class="ival${t.status==='completed'?' done':''}${!isSub&&hasKids?' bold':''}${!editable?' ro':''}"
+              ${isSub?`<span class="drag-handle" title="Drag to reorder">⠿</span>`:''}
+              <span class="ival${dispStatus==='completed'?' done':''}${!isSub&&hasKids?' bold':''}${!editable?' ro':''}"
                 onclick="${editable?`inlineEdit(${t.id},'name')`:'void(0)'}"
                 title="${x(t.name)}">${x(t.name)}</span>
               ${editable?`<span class="pencil" onclick="inlineEdit(${t.id},'name')">✏</span>`:''}
             </div>
 
             <div class="icell" id="ic-owner-${t.id}">
-              <span class="ival${!editable?' ro':''}"
-                onclick="${editable?`inlineEdit(${t.id},'owner')`:'void(0)'}"
-                title="${x(t.owner||'')}">${x(t.owner||'—')}</span>
-              ${editable?`<span class="pencil" onclick="inlineEdit(${t.id},'owner')">✏</span>`:''}
+              ${isComputed&&!t.owner
+                ? `<span class="ival computed" title="${x(dispOwner)}">${x(dispOwner)||'—'}</span>`
+                : `<span class="ival${!editable?' ro':''}"
+                    onclick="${editable?`inlineEdit(${t.id},'owner')`:'void(0)'}"
+                    title="${x(t.owner||dispOwner)}">${x(t.owner||dispOwner||'—')}</span>
+                  ${editable?`<span class="pencil" onclick="inlineEdit(${t.id},'owner')">✏</span>`:''}`
+              }
             </div>
 
             <span style="font-size:11px;color:var(--text2);align-self:center">${fd(t.start)}</span>
-            <span style="font-size:11px;color:var(--text2);align-self:center">${fd(t.due)}</span>
+            <span style="font-size:11px;color:var(--text2);align-self:center${isComputed&&!t.due?';font-style:italic':''}"
+              title="${isComputed&&!t.due?'Derived from latest subtask due date':''}">${fd(dispDue)}</span>
 
-            <select id="dsel-s-${t.id}" class="dsel ${t.status}"
-              onchange="chStatus(${t.id},this.value)"
-              ${!editable?'disabled':''}>
-              ${STATUS_OPTS.map(s=>`<option value="${s}"${t.status===s?' selected':''}>${STATUS_LBL[s]}</option>`).join('')}
-            </select>
+            ${isComputed
+              ? `<span class="dsel ${dispStatus} computed" style="display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;border-radius:8px;padding:3px 4px"
+                  title="Inherited from subtasks">${STATUS_LBL[dispStatus]}</span>`
+              : `<select id="dsel-s-${t.id}" class="dsel ${t.status}"
+                  onchange="chStatus(${t.id},this.value)"
+                  ${!editable?'disabled':''}>
+                  ${STATUS_OPTS.map(s=>`<option value="${s}"${t.status===s?' selected':''}>${STATUS_LBL[s]}</option>`).join('')}
+                </select>`
+            }
 
-            <select id="dsel-p-${t.id}" class="dsel ${t.priority}"
-              onchange="chPriority(${t.id},this.value)"
-              ${!editable?'disabled':''}>
-              ${PRIO_OPTS.map(p=>`<option value="${p}"${t.priority===p?' selected':''}>${p.charAt(0).toUpperCase()+p.slice(1)}</option>`).join('')}
-            </select>
+            ${isComputed
+              ? `<span class="dsel ${dispPrio} computed" style="display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;border-radius:8px;padding:3px 4px"
+                  title="Inherited from subtasks">${dispPrio.charAt(0).toUpperCase()+dispPrio.slice(1)}</span>`
+              : `<select id="dsel-p-${t.id}" class="dsel ${t.priority}"
+                  onchange="chPriority(${t.id},this.value)"
+                  ${!editable?'disabled':''}>
+                  ${PRIO_OPTS.map(p=>`<option value="${p}"${t.priority===p?' selected':''}>${p.charAt(0).toUpperCase()+p.slice(1)}</option>`).join('')}
+                </select>`
+            }
 
             <div class="note-cell" onclick="${editable?`openNote(${t.id})`:''}" style="cursor:${editable?'pointer':'default'};align-self:center">
               <span class="note-val${!notePreview?' empty':''}${!editable?' ro':''}" title="${x(t.note||'')}">
@@ -913,6 +960,7 @@ function render(){
             <div class="racts">
               ${editable?`<button class="ract" onclick="openEditTask(${t.id})">Edit</button>`:''}
               <button class="ract" onclick="openAddTask('${sec.id}',${t.id})">+ Sub</button>
+              ${isSub&&editable?`<button class="ract" onclick="moveUp(${t.id})" title="Move up">↑</button><button class="ract" onclick="moveDown(${t.id})" title="Move down">↓</button>`:''}
               ${isAdmin?`<button class="ract del" onclick="delTask(${t.id})">✕</button>`:''}
             </div>
           </div>`;
