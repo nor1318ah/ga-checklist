@@ -528,6 +528,7 @@ function doLogin(){
   document.getElementById('user-badge').textContent=isAdmin?'⭐ Admin: '+name:'👤 '+name;
   ['add-task-btn','add-cat-btn','users-btn'].forEach(id=>
     document.getElementById(id).style.display=isAdmin?'':'none');
+  loadData();
   SECTIONS.forEach(s=>sectionOpen[s.id]=true);
   render();
 }
