@@ -7,125 +7,166 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#ffffff;--bg2:#f7f7f5;--bg3:#f0efeb;
+  --bg:#fff;--bg2:#f7f7f5;--bg3:#f0efeb;
   --text:#1a1a18;--text2:#5a5a56;--text3:#9a9a94;
   --border:#e2e1db;--border2:#c8c7c0;
   --blue:#185FA5;--blue-lt:#E6F1FB;--blue-txt:#0C447C;
   --green:#3B6D11;--green-lt:#EAF3DE;--green-txt:#27500A;
   --amber:#854F0B;--amber-lt:#FAEEDA;--amber-txt:#633806;
   --red:#A32D2D;--red-lt:#FCEBEB;--red-txt:#791F1F;
+  --purple:#533AB7;--purple-lt:#EEEDFE;--purple-txt:#26215C;
   --gray-lt:#F1EFE8;--gray-txt:#5F5E5A;
-  --radius:8px;--radius-lg:12px;
+  --r:8px;--rl:12px;
 }
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;color:var(--text);background:var(--bg3);min-height:100vh}
 
 /* LOGIN */
-#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg3)}
-.login-card{background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--radius-lg);padding:2.5rem 2rem;width:min(420px,90vw);text-align:center}
-.login-card h1{font-size:22px;font-weight:600;margin-bottom:6px;letter-spacing:-0.3px}
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh}
+.login-card{background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--rl);padding:2.5rem 2rem;width:min(420px,90vw);text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.07)}
+.login-card h1{font-size:22px;font-weight:700;margin-bottom:6px}
 .login-card p{font-size:13px;color:var(--text2);margin-bottom:1.5rem}
-.login-input{width:100%;font-size:14px;padding:10px 14px;border:0.5px solid var(--border2);border-radius:var(--radius);margin-bottom:10px;color:var(--text);background:var(--bg)}
-.login-input:focus{outline:none;border-color:var(--blue)}
-.login-btn{width:100%;padding:10px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:500;cursor:pointer}
-.login-btn:hover{background:var(--blue-txt)}
-.admin-hint{font-size:11px;color:var(--text3);margin-top:12px}
+.li{width:100%;font-size:14px;padding:10px 14px;border:0.5px solid var(--border2);border-radius:var(--r);margin-bottom:10px;color:var(--text);background:var(--bg)}
+.li:focus{outline:none;border-color:var(--blue)}
+.lbtn{width:100%;padding:11px;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-size:14px;font-weight:600;cursor:pointer}
+.lbtn:hover{background:var(--blue-txt)}
+.hint{font-size:11px;color:var(--text3);margin-top:10px}
 
 /* APP */
 #app{display:none;min-height:100vh}
-.topbar{background:var(--bg);border-bottom:0.5px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50}
-.topbar h1{font-size:16px;font-weight:600;flex:1;letter-spacing:-0.2px}
+.topbar{background:var(--bg);border-bottom:0.5px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:50;flex-wrap:wrap}
+.topbar h1{font-size:15px;font-weight:700;flex:1}
 .topbar-meta{font-size:12px;color:var(--text2)}
-.user-badge{font-size:12px;padding:4px 10px;background:var(--blue-lt);color:var(--blue-txt);border-radius:20px;font-weight:500;white-space:nowrap}
-.admin-badge{background:#E6F1FB;color:#0C447C}
-.logout-btn{font-size:12px;padding:4px 10px;border:0.5px solid var(--border2);border-radius:20px;cursor:pointer;background:transparent;color:var(--text2)}
-.logout-btn:hover{background:var(--bg2)}
-
-.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:16px 24px;background:var(--bg);border-bottom:0.5px solid var(--border)}
-.metric{background:var(--bg2);border-radius:var(--radius);padding:10px 12px}
-.metric-label{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
-.metric-val{font-size:20px;font-weight:600}
-.pbar-wrap{height:3px;background:var(--border);border-radius:3px;margin-top:5px}
-.pbar{height:100%;border-radius:3px;background:var(--blue);transition:width .4s}
-
-.toolbar{display:flex;gap:6px;padding:10px 24px;background:var(--bg);border-bottom:0.5px solid var(--border);flex-wrap:wrap;align-items:center}
-.toolbar input,.toolbar select{font-size:12px;padding:6px 10px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);height:32px}
-.toolbar input{flex:1;min-width:150px}
-.tbtn{font-size:12px;padding:0 14px;height:32px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);cursor:pointer;white-space:nowrap}
+.ubadge{font-size:11px;padding:3px 10px;background:var(--blue-lt);color:var(--blue-txt);border-radius:20px;font-weight:700}
+.tbtn{font-size:12px;padding:0 12px;height:28px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--text);cursor:pointer;white-space:nowrap;font-weight:500}
 .tbtn:hover{background:var(--bg2)}
 .tbtn.pri{background:var(--blue);color:#fff;border-color:var(--blue)}
 .tbtn.pri:hover{background:var(--blue-txt)}
+.tbtn.grn{background:var(--green);color:#fff;border-color:var(--green)}
+.tbtn.grn:hover{background:var(--green-txt)}
+.tbtn.pur{background:var(--purple);color:#fff;border-color:var(--purple)}
 
-.body{padding:16px 24px 80px}
-.section{margin-bottom:12px;background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
-.sec-hdr{display:flex;align-items:center;gap:8px;padding:10px 14px;cursor:pointer;user-select:none}
-.sec-hdr:hover{background:var(--bg2)}
-.sec-num{font-size:11px;font-weight:600;color:var(--blue-txt);background:var(--blue-lt);padding:2px 7px;border-radius:10px;white-space:nowrap}
-.sec-title{font-weight:600;font-size:13px;flex:1}
-.sec-meta{font-size:11px;color:var(--text2)}
-.sec-chev{font-size:10px;color:var(--text3);transition:transform .2s}
+/* METRICS */
+.metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;padding:12px 20px;background:var(--bg);border-bottom:0.5px solid var(--border)}
+.metric{background:var(--bg2);border-radius:var(--r);padding:9px 10px}
+.mlabel{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;font-weight:600}
+.mval{font-size:18px;font-weight:700}
+.pbar-w{height:3px;background:var(--border);border-radius:3px;margin-top:4px}
+.pbar{height:100%;border-radius:3px;background:var(--blue);transition:width .4s}
+
+/* TOOLBAR */
+.toolbar{display:flex;gap:5px;padding:8px 20px;background:var(--bg);border-bottom:0.5px solid var(--border);flex-wrap:wrap;align-items:center}
+.toolbar input,.toolbar select{font-size:12px;padding:4px 8px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--text);height:28px}
+.toolbar input{flex:1;min-width:130px}
+
+/* SECTIONS */
+.body{padding:12px 20px 80px}
+.section{margin-bottom:10px;background:var(--bg);border:0.5px solid var(--border);border-radius:var(--rl)}
+.sec-hdr{display:flex;align-items:center;gap:7px;padding:9px 14px;user-select:none}
+.sec-num{font-size:10px;font-weight:700;color:var(--blue-txt);background:var(--blue-lt);padding:2px 7px;border-radius:8px;white-space:nowrap;flex-shrink:0}
+.sec-title-area{flex:1;min-width:0;display:flex;align-items:center;gap:5px}
+.sec-title{font-weight:700;font-size:13px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sec-title:hover{color:var(--blue)}
+.sec-inp{font-size:13px;font-weight:700;border:1.5px solid var(--blue);border-radius:5px;padding:3px 8px;outline:none;background:var(--bg);color:var(--text);width:260px}
+.sec-meta{font-size:11px;color:var(--text2);white-space:nowrap;flex-shrink:0}
+.sec-acts{display:flex;gap:3px;flex-shrink:0}
+.sab{font-size:10px;padding:2px 7px;border:0.5px solid var(--border2);border-radius:5px;background:transparent;cursor:pointer;color:var(--text2);white-space:nowrap}
+.sab:hover{background:var(--bg2)}
+.sab.red:hover{background:var(--red-lt);color:var(--red-txt)}
+.sab.amber:hover{background:var(--amber-lt);color:var(--amber-txt)}
+.sec-chev{font-size:10px;color:var(--text3);transition:transform .2s;cursor:pointer;padding:3px;flex-shrink:0}
 .sec-chev.open{transform:rotate(90deg)}
 
-.task-list{display:none}
-.task-list.open{display:block}
-.t-head{display:grid;grid-template-columns:20px 16px 1fr 120px 72px 72px 110px 80px 90px;gap:6px;padding:5px 14px;border-top:0.5px solid var(--border);border-bottom:0.5px solid var(--border);background:var(--bg2)}
-.th{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;font-weight:600}
-.t-row{display:grid;grid-template-columns:20px 16px 1fr 120px 72px 72px 110px 80px 90px;gap:6px;align-items:center;padding:8px 14px;border-bottom:0.5px solid var(--border);transition:background .1s}
+/* TABLE — chk | dot | name | owner | start | due | status | priority | note | actions */
+.tlist{display:none;border-top:0.5px solid var(--border)}
+.tlist.open{display:block}
+.t-head{display:grid;grid-template-columns:18px 13px minmax(0,1fr) 130px 58px 58px 112px 88px minmax(0,160px) 86px;gap:5px;padding:4px 14px;background:var(--bg2);border-bottom:0.5px solid var(--border)}
+.t-row{display:grid;grid-template-columns:18px 13px minmax(0,1fr) 130px 58px 58px 112px 88px minmax(0,160px) 86px;gap:5px;align-items:start;padding:7px 14px;border-bottom:0.5px solid var(--border);transition:background .1s}
 .t-row:last-child{border-bottom:none}
 .t-row:hover{background:var(--bg2)}
-.t-row.locked{opacity:.7}
-.t-row.new-item{animation:flashIn 1.8s ease forwards}
-@keyframes flashIn{0%{background:#E6F1FB}100%{background:transparent}}
-.chk{width:14px;height:14px;border-radius:3px;border:1.5px solid var(--border2);cursor:pointer;appearance:none;flex-shrink:0}
-.chk:checked{background:var(--green);border-color:var(--green);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2 5l2.5 2.5L8 3' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-size:100%}
-.chk:disabled{opacity:.4;cursor:not-allowed}
-.sub-dot-wrap{display:flex;align-items:center;justify-content:center;width:14px}
-.sub-dot{width:5px;height:5px;border-radius:50%;background:var(--border2)}
-.tname{font-size:12px;line-height:1.35;cursor:pointer;color:var(--text)}
-.tname:hover{color:var(--blue)}
-.tname.done{text-decoration:line-through;color:var(--text3)}
-.tname.parent{font-weight:600}
-.tname.locked-name{cursor:default;color:var(--text2)}
-.tname.locked-name:hover{color:var(--text2)}
-.owner-cell{font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.date-cell{font-size:11px;color:var(--text2);white-space:nowrap}
-.badge{font-size:10px;padding:2px 7px;border-radius:8px;font-weight:600;white-space:nowrap;display:inline-block}
-.badge.critical{background:var(--red-lt);color:var(--red-txt)}
-.badge.high{background:var(--amber-lt);color:var(--amber-txt)}
-.badge.medium{background:var(--blue-lt);color:var(--blue-txt)}
-.badge.low{background:var(--gray-lt);color:var(--gray-txt)}
-.spill{font-size:10px;padding:2px 8px;border-radius:8px;font-weight:600;border:none;cursor:pointer;white-space:nowrap}
-.spill.not-started{background:var(--gray-lt);color:var(--gray-txt)}
-.spill.in-progress{background:var(--blue-lt);color:var(--blue-txt)}
-.spill.blocked{background:var(--red-lt);color:var(--red-txt)}
-.spill.done{background:var(--green-lt);color:var(--green-txt)}
-.spill:disabled{cursor:not-allowed;opacity:.6}
-.row-actions{display:flex;gap:4px;align-items:center}
-.ract{font-size:10px;padding:3px 6px;border:0.5px solid var(--border);border-radius:6px;background:transparent;cursor:pointer;color:var(--text2);white-space:nowrap}
-.ract:hover{background:var(--bg2);color:var(--text)}
-.ract.del:hover{background:var(--red-lt);color:var(--red-txt);border-color:var(--red-lt)}
-.ract:disabled{opacity:.3;cursor:not-allowed}
+.th{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.3px;font-weight:700;align-self:center}
 
-/* MODAL */
+.chk{width:13px;height:13px;border-radius:3px;border:1.5px solid var(--border2);cursor:pointer;appearance:none;flex-shrink:0;margin-top:3px}
+.chk:checked{background:var(--green);border-color:var(--green);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2 5l2.5 2.5L8 3' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-size:100%}
+.chk:disabled{opacity:.3;cursor:not-allowed}
+.subdot-w{display:flex;align-items:flex-start;justify-content:center;width:12px;padding-top:5px;flex-shrink:0}
+.subdot{width:4px;height:4px;border-radius:50%;background:var(--border2)}
+
+/* INLINE CELLS */
+.icell{display:flex;align-items:flex-start;gap:3px;min-width:0}
+.ival{font-size:12px;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;cursor:text;border-bottom:1px dashed transparent;transition:border-color .15s}
+.ival:hover{border-color:var(--border2)}
+.ival.done{text-decoration:line-through;color:var(--text3)}
+.ival.bold{font-weight:700}
+.ival.ro{cursor:default!important;border-color:transparent!important}
+.pencil{font-size:9px;color:var(--text3);cursor:pointer;flex-shrink:0;opacity:0;transition:opacity .12s;margin-top:3px}
+.t-row:hover .pencil{opacity:1}
+.pencil:hover{color:var(--blue)}
+.ii{font-size:12px;padding:2px 6px;border:1.5px solid var(--blue);border-radius:5px;outline:none;background:var(--bg);color:var(--text);width:100%}
+
+/* STATUS & PRIORITY */
+.dsel{font-size:10px;padding:3px 4px;border-radius:8px;font-weight:700;border:none;cursor:pointer;appearance:none;-webkit-appearance:none;outline:none;width:100%;text-align:center}
+.dsel:disabled{opacity:.4;cursor:not-allowed}
+.dsel.not-started{background:var(--gray-lt);color:var(--gray-txt)}
+.dsel.in-progress{background:var(--blue-lt);color:var(--blue-txt)}
+.dsel.delayed{background:var(--amber-lt);color:var(--amber-txt)}
+.dsel.blocked{background:var(--red-lt);color:var(--red-txt)}
+.dsel.completed{background:var(--green-lt);color:var(--green-txt)}
+.dsel.critical{background:var(--red-lt);color:var(--red-txt)}
+.dsel.high{background:var(--amber-lt);color:var(--amber-txt)}
+.dsel.medium{background:var(--blue-lt);color:var(--blue-txt)}
+.dsel.low{background:var(--gray-lt);color:var(--gray-txt)}
+
+/* NOTE */
+.note-cell{display:flex;align-items:flex-start;gap:3px;min-width:0;cursor:pointer}
+.note-val{font-size:11px;line-height:1.4;color:var(--text2);flex:1;word-break:break-word;white-space:normal;min-height:16px}
+.note-val.empty{color:var(--text3);font-style:italic}
+.note-val.ro{cursor:default}
+
+/* ROW ACTIONS */
+.racts{display:flex;gap:3px;align-items:flex-start;padding-top:2px;flex-wrap:wrap}
+.ract{font-size:10px;padding:2px 6px;border:0.5px solid var(--border);border-radius:5px;background:transparent;cursor:pointer;color:var(--text2);white-space:nowrap}
+.ract:hover{background:var(--bg2)}
+.ract.del:hover{background:var(--red-lt);color:var(--red-txt)}
+
+/* MODALS */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:200}
-.modal{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(--border2);padding:1.5rem;width:min(520px,92vw);max-height:90vh;overflow-y:auto}
-.modal h2{font-size:15px;font-weight:600;margin-bottom:1rem}
-.frow{margin-bottom:12px}
-.frow label{font-size:11px;color:var(--text2);display:block;margin-bottom:4px}
-.finput{width:100%;font-size:13px;padding:7px 10px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text)}
+.modal{background:var(--bg);border-radius:var(--rl);border:0.5px solid var(--border2);padding:1.5rem;width:min(540px,93vw);max-height:92vh;overflow-y:auto}
+.modal h2{font-size:15px;font-weight:700;margin-bottom:1rem}
+.frow{margin-bottom:11px}
+.frow label{font-size:11px;color:var(--text2);display:block;margin-bottom:4px;font-weight:600}
+.finput{width:100%;font-size:13px;padding:7px 10px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--text)}
 .finput:focus{outline:none;border-color:var(--blue)}
-.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:11px}
 .mactions{display:flex;gap:8px;justify-content:flex-end;margin-top:1rem;padding-top:1rem;border-top:0.5px solid var(--border)}
 .hidden{display:none!important}
+.warn-box{background:var(--amber-lt);color:var(--amber-txt);border-radius:var(--r);padding:9px 12px;font-size:12px;margin-bottom:12px;line-height:1.5}
+
+/* USER TABLE */
+.user-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.user-table th{background:var(--bg2);padding:7px 10px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.3px;font-weight:700;color:var(--text2);border-bottom:0.5px solid var(--border)}
+.user-table td{padding:8px 10px;border-bottom:0.5px solid var(--border);vertical-align:middle}
+.user-table tr:last-child td{border-bottom:none}
+.user-table tr:hover td{background:var(--bg2)}
+.owner-sel{font-size:12px;padding:5px 8px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--text);width:100%;max-width:220px}
+.sdot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.sdot.admin{background:var(--blue)}
+.sdot.mapped{background:var(--green)}
+.sdot.pending{background:var(--amber)}
 
 /* TOAST */
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a18;color:#fff;font-size:12px;padding:8px 18px;border-radius:20px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a18;color:#fff;font-size:12px;padding:8px 18px;border-radius:20px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1}
 
-@media(max-width:700px){
-  .metrics{grid-template-columns:repeat(3,1fr)}
-  .t-head,.t-row{grid-template-columns:20px 16px 1fr 90px 110px 80px 80px}
-  .t-head .th:nth-child(5),.t-row>*:nth-child(5),
+@media(max-width:1050px){
+  .t-head,.t-row{grid-template-columns:18px 13px minmax(0,1fr) 110px 58px 112px 88px minmax(0,130px) 80px}
   .t-head .th:nth-child(6),.t-row>*:nth-child(6){display:none}
+}
+@media(max-width:720px){
+  .metrics{grid-template-columns:repeat(3,1fr)}
+  .t-head,.t-row{grid-template-columns:18px 13px minmax(0,1fr) 100px 112px 88px 75px}
+  .t-head .th:nth-child(5),.t-row>*:nth-child(5),
+  .t-head .th:nth-child(6),.t-row>*:nth-child(6),
+  .t-head .th:nth-child(9),.t-row>*:nth-child(9){display:none}
 }
 </style>
 </head>
@@ -134,13 +175,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 <!-- LOGIN -->
 <div id="login-screen">
   <div class="login-card">
-    <div style="font-size:28px;margin-bottom:12px">🚀</div>
+    <div style="font-size:32px;margin-bottom:10px">🚀</div>
     <h1>GA Launch Checklist</h1>
-    <p>Enter your name to access and update your tasks</p>
-    <input class="login-input" id="login-name" type="text" placeholder="Your full name or role (e.g. John Smith)" autocomplete="off">
-    <input class="login-input" id="login-admin-pass" type="password" placeholder="Admin password (leave blank if owner)" autocomplete="off">
-    <button class="login-btn" onclick="doLogin()">Continue</button>
-    <p class="admin-hint">Admin password: <strong>ga-admin-2026</strong> — share only with leads</p>
+    <p>Enter your name to access and update your assigned tasks</p>
+    <input class="li" id="login-name" type="text" placeholder="Your full name" autocomplete="off">
+    <input class="li" id="login-pass" type="password" placeholder="Admin password (leave blank if owner)">
+    <button class="lbtn" onclick="doLogin()">Continue →</button>
+    <p class="hint">Admin password: <strong>ga-admin-2026</strong> — share only with leads</p>
   </div>
 </div>
 
@@ -149,26 +190,31 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
   <div class="topbar">
     <h1>🚀 GA Launch Checklist</h1>
     <span class="topbar-meta" id="days-left"></span>
-    <span class="user-badge" id="user-badge"></span>
-    <button class="logout-btn" onclick="doLogout()">Sign out</button>
+    <span class="ubadge" id="user-badge"></span>
+    <button class="tbtn pur" id="users-btn" onclick="openUsers()" style="display:none">👥 Users</button>
+    <button class="tbtn grn" id="add-cat-btn" onclick="openAddCat()" style="display:none">+ Category</button>
+    <button class="tbtn pri" id="add-task-btn" onclick="openAddTask(null,null)" style="display:none">+ Add task</button>
+    <button class="tbtn" onclick="doLogout()">Sign out</button>
   </div>
 
   <div class="metrics">
-    <div class="metric"><div class="metric-label">Total</div><div class="metric-val" style="color:var(--blue-txt)" id="m-total">0</div></div>
-    <div class="metric"><div class="metric-label">Done</div><div class="metric-val" style="color:var(--green-txt)" id="m-done">0</div><div class="pbar-wrap"><div class="pbar" id="m-bar"></div></div></div>
-    <div class="metric"><div class="metric-label">In progress</div><div class="metric-val" style="color:var(--blue-txt)" id="m-prog">0</div></div>
-    <div class="metric"><div class="metric-label">Blocked</div><div class="metric-val" style="color:var(--red-txt)" id="m-blk">0</div></div>
-    <div class="metric"><div class="metric-label">Not started</div><div class="metric-val" style="color:var(--gray-txt)" id="m-ns">0</div></div>
+    <div class="metric"><div class="mlabel">Total</div><div class="mval" style="color:var(--blue-txt)" id="m-total">0</div></div>
+    <div class="metric"><div class="mlabel">Completed</div><div class="mval" style="color:var(--green-txt)" id="m-done">0</div><div class="pbar-w"><div class="pbar" id="m-bar"></div></div></div>
+    <div class="metric"><div class="mlabel">In progress</div><div class="mval" style="color:var(--blue-txt)" id="m-prog">0</div></div>
+    <div class="metric"><div class="mlabel">Delayed</div><div class="mval" style="color:var(--amber-txt)" id="m-del">0</div></div>
+    <div class="metric"><div class="mlabel">Blocked</div><div class="mval" style="color:var(--red-txt)" id="m-blk">0</div></div>
+    <div class="metric"><div class="mlabel">Not started</div><div class="mval" style="color:var(--gray-txt)" id="m-ns">0</div></div>
   </div>
 
   <div class="toolbar">
-    <input type="text" id="s-search" placeholder="Search tasks…" oninput="render()">
+    <input type="text" id="s-q" placeholder="Search tasks, owners, or notes…" oninput="render()">
     <select id="s-status" onchange="render()">
       <option value="">All statuses</option>
       <option value="not-started">Not started</option>
       <option value="in-progress">In progress</option>
+      <option value="delayed">Delayed</option>
       <option value="blocked">Blocked</option>
-      <option value="done">Done</option>
+      <option value="completed">Completed</option>
     </select>
     <select id="s-priority" onchange="render()">
       <option value="">All priorities</option>
@@ -181,34 +227,38 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
     <button class="tbtn" onclick="collapseAll()">Collapse all</button>
     <button class="tbtn" onclick="expandAll()">Expand all</button>
     <button class="tbtn" onclick="exportCSV()">Export CSV</button>
-    <button class="tbtn pri" id="add-task-btn" onclick="openAdd(null,null)">+ Add task</button>
   </div>
 
   <div class="body" id="main-body"></div>
 </div>
 
-<!-- MODAL -->
-<div class="overlay hidden" id="modal-overlay" onclick="closeModalClick(event)">
+<!-- TASK MODAL -->
+<div class="overlay hidden" id="task-modal" onclick="bgClose(event,'task-modal')">
   <div class="modal" onclick="event.stopPropagation()">
-    <h2 id="modal-title">Add task</h2>
-    <div class="frow">
-      <label>Task name *</label>
-      <input class="finput" id="f-name" type="text" placeholder="Describe the task…">
+    <h2 id="task-modal-title">Add task</h2>
+    <div class="frow"><label>Task name *</label><input class="finput" id="f-name" type="text" placeholder="Describe the task…"></div>
+    <div class="fgrid">
+      <div><label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px;font-weight:600">Section *</label><select class="finput" id="f-section" onchange="refreshParents()"></select></div>
+      <div><label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px;font-weight:600">Parent task</label><select class="finput" id="f-parent"></select></div>
+    </div>
+    <div class="frow"><label>Owner *</label><input class="finput" id="f-owner" type="text" placeholder="e.g. Head of Engineering"></div>
+    <div class="fgrid">
+      <div><label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px;font-weight:600">Start date</label><input class="finput" id="f-start" type="date"></div>
+      <div><label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px;font-weight:600">Due date</label><input class="finput" id="f-due" type="date"></div>
     </div>
     <div class="fgrid">
-      <div class="frow" style="margin:0"><label>Section *</label><select class="finput" id="f-section" onchange="refreshParentSelect()"></select></div>
-      <div class="frow" style="margin:0"><label>Parent task</label><select class="finput" id="f-parent"></select></div>
-    </div>
-    <div class="frow">
-      <label>Owner *</label>
-      <input class="finput" id="f-owner" type="text" placeholder="e.g. Head of Engineering">
-    </div>
-    <div class="fgrid">
-      <div class="frow" style="margin:0"><label>Start date</label><input class="finput" id="f-start" type="date"></div>
-      <div class="frow" style="margin:0"><label>Due date</label><input class="finput" id="f-due" type="date"></div>
-    </div>
-    <div class="fgrid">
-      <div class="frow" style="margin:0"><label>Priority</label>
+      <div>
+        <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px;font-weight:600">Status</label>
+        <select class="finput" id="f-status">
+          <option value="not-started">Not started</option>
+          <option value="in-progress">In progress</option>
+          <option value="delayed">Delayed</option>
+          <option value="blocked">Blocked</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px;font-weight:600">Priority</label>
         <select class="finput" id="f-priority">
           <option value="critical">Critical</option>
           <option value="high" selected>High</option>
@@ -216,30 +266,98 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
           <option value="low">Low</option>
         </select>
       </div>
-      <div class="frow" style="margin:0"><label>Status</label>
-        <select class="finput" id="f-status">
-          <option value="not-started">Not started</option>
-          <option value="in-progress">In progress</option>
-          <option value="blocked">Blocked</option>
-          <option value="done">Done</option>
-        </select>
-      </div>
+    </div>
+    <div class="frow">
+      <label>Note / update</label>
+      <textarea class="finput" id="f-note" rows="2" placeholder="Optional note, delay justification, or update…" style="resize:vertical;font-family:inherit;font-size:13px;line-height:1.5"></textarea>
     </div>
     <div class="mactions">
-      <button class="tbtn" onclick="closeModal()">Cancel</button>
-      <button class="tbtn pri" onclick="saveModal()">Save task</button>
+      <button class="tbtn" onclick="closeM('task-modal')">Cancel</button>
+      <button class="tbtn pri" onclick="saveTask()">Save task</button>
     </div>
+  </div>
+</div>
+
+<!-- NOTE MODAL -->
+<div class="overlay hidden" id="note-modal" onclick="bgClose(event,'note-modal')">
+  <div class="modal" style="width:min(460px,93vw)" onclick="event.stopPropagation()">
+    <h2>📝 Note / update</h2>
+    <p id="note-task-name" style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5"></p>
+    <div class="frow">
+      <label>Note, update, or delay justification</label>
+      <textarea class="finput" id="note-ta" rows="5" placeholder="Type your note here…" style="resize:vertical;font-family:inherit;font-size:13px;line-height:1.5"></textarea>
+    </div>
+    <div class="mactions">
+      <button class="tbtn" onclick="closeM('note-modal')">Cancel</button>
+      <button class="tbtn pri" onclick="saveNote()">Save note</button>
+    </div>
+  </div>
+</div>
+
+<!-- CATEGORY MODAL -->
+<div class="overlay hidden" id="cat-modal" onclick="bgClose(event,'cat-modal')">
+  <div class="modal" style="width:min(400px,93vw)" onclick="event.stopPropagation()">
+    <h2>Add category</h2>
+    <div class="frow"><label>Category name *</label><input class="finput" id="cat-name" type="text" placeholder="e.g. Partner Readiness"></div>
+    <div class="mactions">
+      <button class="tbtn" onclick="closeM('cat-modal')">Cancel</button>
+      <button class="tbtn pri" onclick="saveCat()">Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- MERGE MODAL -->
+<div class="overlay hidden" id="merge-modal" onclick="bgClose(event,'merge-modal')">
+  <div class="modal" style="width:min(440px,93vw)" onclick="event.stopPropagation()">
+    <h2>Merge category</h2>
+    <div class="warn-box">⚠️ All tasks in <strong id="merge-from-name"></strong> will be moved into the selected category. Cannot be undone.</div>
+    <div class="frow"><label>Move all tasks into:</label><select class="finput" id="merge-target"></select></div>
+    <div class="mactions">
+      <button class="tbtn" onclick="closeM('merge-modal')">Cancel</button>
+      <button class="tbtn" onclick="confirmMerge()" style="background:var(--amber);color:#fff;border-color:var(--amber)">Merge</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CATEGORY MODAL -->
+<div class="overlay hidden" id="delcat-modal" onclick="bgClose(event,'delcat-modal')">
+  <div class="modal" style="width:min(440px,93vw)" onclick="event.stopPropagation()">
+    <h2>Delete category</h2>
+    <div class="warn-box">⚠️ Deleting <strong id="delcat-name"></strong>. What should happen to its tasks?</div>
+    <div class="frow"><label>Tasks in this category:</label>
+      <select class="finput" id="delcat-target">
+        <option value="__delete__">— Delete all tasks permanently —</option>
+      </select>
+    </div>
+    <div class="mactions">
+      <button class="tbtn" onclick="closeM('delcat-modal')">Cancel</button>
+      <button class="tbtn" onclick="confirmDelCat()" style="background:var(--red);color:#fff;border-color:var(--red)">Delete category</button>
+    </div>
+  </div>
+</div>
+
+<!-- USERS MODAL -->
+<div class="overlay hidden" id="users-modal" onclick="bgClose(event,'users-modal')">
+  <div class="modal" style="width:min(720px,95vw)" onclick="event.stopPropagation()">
+    <h2>👥 User registry</h2>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6">
+      Everyone who has logged in appears below. Assign each person to the <strong>owner name</strong> that appears on their tasks — this grants them edit access to those tasks. Owners can update status, priority, notes, and add subtasks.
+    </p>
+    <div id="user-table-wrap"></div>
+    <div class="mactions"><button class="tbtn" onclick="closeM('users-modal')">Close</button></div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ── DATA ──────────────────────────────────────────────────────────────────────
-const ADMIN_PASS = 'ga-admin-2026';
-const STORAGE_KEY = 'ga_checklist_v3';
+const ADMIN_PASS='ga-admin-2026';
+const SK='ga_cl_v5';
+const STATUS_OPTS=['not-started','in-progress','delayed','blocked','completed'];
+const STATUS_LBL={'not-started':'Not started','in-progress':'In progress','delayed':'Delayed','blocked':'Blocked','completed':'Completed'};
+const PRIO_OPTS=['critical','high','medium','low'];
 
-const SECTIONS = [
+const DEF_SECTIONS=[
   {id:'product',num:'1',title:'Product Readiness'},
   {id:'infra',num:'2',title:'Infrastructure'},
   {id:'svcmgmt',num:'3',title:'Service Management & Operations'},
@@ -253,243 +371,483 @@ const SECTIONS = [
   {id:'compliance',num:'11',title:'Compliance Certificates'},
 ];
 
-const DEFAULT_TASKS = [
-  {id:1,section:'product',parent:null,name:'GA features — confirm scope based on roadmap and release status',owner:'CPO / Head of Product',start:'2026-04-06',due:'2026-04-15',priority:'critical',status:'in-progress'},
-  {id:2,section:'product',parent:1,name:'Validate critical user journeys end-to-end in production environment',owner:'QA Lead / PM',start:'2026-04-06',due:'2026-04-15',priority:'critical',status:'not-started'},
-  {id:3,section:'product',parent:1,name:'Document any excluded scope and obtain approval',owner:'PM',start:'2026-04-08',due:'2026-04-18',priority:'high',status:'not-started'},
-  {id:4,section:'product',parent:1,name:'Obtain sign-off from Product, Engineering, and GTM',owner:'CPO',start:'2026-04-15',due:'2026-04-25',priority:'critical',status:'not-started'},
-  {id:5,section:'product',parent:null,name:'Limitations — list all known product, scale, region, language, integration, and support limitations',owner:'PM + Eng Lead',start:'2026-04-06',due:'2026-04-20',priority:'high',status:'not-started'},
-  {id:6,section:'product',parent:5,name:'Classify each limitation as blocker vs accepted',owner:'PM',start:'2026-04-10',due:'2026-04-20',priority:'high',status:'not-started'},
-  {id:7,section:'product',parent:5,name:'Get cyber and legal alignment on disclosures',owner:'Legal + Security',start:'2026-04-15',due:'2026-04-30',priority:'high',status:'not-started'},
-  {id:8,section:'product',parent:null,name:'Feature flags — configure per sub-product (Advisor, Assistant)',owner:'Engineering Lead',start:'2026-04-10',due:'2026-05-01',priority:'high',status:'not-started'},
-  {id:9,section:'product',parent:null,name:'Defect threshold — agree severity thresholds for GA',owner:'VP Engineering + PM',start:'2026-04-06',due:'2026-04-15',priority:'critical',status:'not-started'},
-  {id:10,section:'product',parent:9,name:'Review all open defects by severity and business impact',owner:'QA Lead',start:'2026-04-15',due:'2026-05-15',priority:'critical',status:'not-started'},
-  {id:11,section:'product',parent:9,name:'Close or formally waive anything above threshold',owner:'VP Engineering',start:'2026-05-15',due:'2026-06-01',priority:'critical',status:'not-started'},
-  {id:12,section:'product',parent:9,name:'Confirm no blocker or critical defects remain in GA scope',owner:'QA Lead',start:'2026-06-01',due:'2026-06-15',priority:'critical',status:'not-started'},
-  {id:13,section:'product',parent:null,name:'UX compliance — review core flows against design standards and accessibility',owner:'UX Lead',start:'2026-04-10',due:'2026-05-01',priority:'high',status:'not-started'},
-  {id:14,section:'product',parent:13,name:'Align user stories with UX standards',owner:'PM + UX',start:'2026-04-10',due:'2026-04-25',priority:'medium',status:'not-started'},
-  {id:15,section:'product',parent:13,name:'Fix high-impact accessibility issues',owner:'Frontend Lead',start:'2026-04-20',due:'2026-05-15',priority:'high',status:'not-started'},
-  {id:16,section:'product',parent:null,name:'Guided tutorials — identify first-time user flows',owner:'PM + UX',start:'2026-04-15',due:'2026-05-01',priority:'medium',status:'not-started'},
-  {id:17,section:'product',parent:16,name:'Create onboarding tours, empty states, and contextual help',owner:'Product + Engineering',start:'2026-04-20',due:'2026-05-20',priority:'medium',status:'not-started'},
-  {id:18,section:'product',parent:16,name:'Test completion and usefulness with pilot users',owner:'PM',start:'2026-05-10',due:'2026-05-31',priority:'medium',status:'not-started'},
-  {id:19,section:'product',parent:16,name:'Track onboarding analytics',owner:'PM + Analytics',start:'2026-05-20',due:'2026-06-10',priority:'low',status:'not-started'},
-  {id:20,section:'product',parent:null,name:'Documentation — publish admin, user, support, and technical docs',owner:'Head of Support / Tech Writer',start:'2026-04-15',due:'2026-06-01',priority:'critical',status:'not-started'},
-  {id:21,section:'product',parent:20,name:'Include FAQs and troubleshooting guides',owner:'Tech Writer',start:'2026-05-01',due:'2026-06-01',priority:'high',status:'not-started'},
-  {id:22,section:'product',parent:null,name:'Competitive differentiation — define clear value points vs competitors',owner:'PM + Marketing',start:'2026-04-06',due:'2026-04-30',priority:'high',status:'not-started'},
-  {id:23,section:'product',parent:22,name:'Validate claims with product truth and evidence',owner:'PM',start:'2026-04-15',due:'2026-05-01',priority:'high',status:'not-started'},
-  {id:24,section:'product',parent:22,name:'Align messaging in demos, site, and collateral',owner:'Marketing',start:'2026-04-20',due:'2026-05-10',priority:'high',status:'not-started'},
-  {id:25,section:'product',parent:22,name:'Train sales teams on competitive positioning',owner:'Sales Enablement',start:'2026-05-01',due:'2026-05-31',priority:'high',status:'not-started'},
-  {id:26,section:'product',parent:null,name:'Application — verify production domain and routing (e.g. app.domain.com)',owner:'Infra / DevOps',start:'2026-04-06',due:'2026-04-20',priority:'critical',status:'not-started'},
-  {id:27,section:'product',parent:26,name:'Ensure SSL certificates are configured and valid',owner:'DevOps',start:'2026-04-06',due:'2026-04-15',priority:'critical',status:'not-started'},
-  {id:28,section:'product',parent:26,name:'Validate login and authentication flows (SSO, MFA)',owner:'Security + Engineering',start:'2026-04-10',due:'2026-04-30',priority:'critical',status:'not-started'},
-  {id:29,section:'product',parent:26,name:'Validate user onboarding flow (account creation, invitations, permissions)',owner:'Engineering + PM',start:'2026-04-10',due:'2026-05-01',priority:'critical',status:'not-started'},
-  {id:30,section:'product',parent:26,name:'Test all core platform workflows (meetings, agents, documents, etc.)',owner:'QA Lead',start:'2026-04-15',due:'2026-05-15',priority:'critical',status:'not-started'},
-  {id:31,section:'product',parent:26,name:'Validate cross-browser compatibility (Chrome, Edge, Safari)',owner:'QA / Frontend',start:'2026-05-01',due:'2026-05-20',priority:'high',status:'not-started'},
-  {id:32,section:'product',parent:26,name:'Verify responsiveness across screen sizes (desktop and laptop)',owner:'Frontend Lead',start:'2026-05-01',due:'2026-05-20',priority:'high',status:'not-started'},
-  {id:33,section:'product',parent:26,name:'Test performance under expected user load',owner:'Infra / QA',start:'2026-05-01',due:'2026-05-25',priority:'high',status:'not-started'},
-  {id:34,section:'product',parent:26,name:'Ensure logging and monitoring enabled for platform usage',owner:'SRE / DevOps',start:'2026-04-15',due:'2026-05-10',priority:'high',status:'not-started'},
-  {id:35,section:'product',parent:26,name:'Verify platform security protections (session management, etc.)',owner:'Security Engineer',start:'2026-04-15',due:'2026-05-15',priority:'critical',status:'not-started'},
-  {id:101,section:'product',parent:null,name:'Tenant management — define and validate multi-tenant architecture and isolation model',owner:'VP Engineering + PM',start:'2026-04-10',due:'2026-05-01',priority:'critical',status:'not-started'},
-  {id:102,section:'product',parent:101,name:'Verify tenant data isolation — no cross-tenant data leakage in any flow',owner:'Security Engineer',start:'2026-04-15',due:'2026-05-10',priority:'critical',status:'not-started'},
-  {id:103,section:'product',parent:101,name:'Validate tenant provisioning and de-provisioning flows end-to-end',owner:'Engineering Lead',start:'2026-04-15',due:'2026-05-10',priority:'critical',status:'not-started'},
-  {id:104,section:'product',parent:101,name:'Confirm tenant-level configuration and customisation (branding, settings)',owner:'PM + Engineering',start:'2026-04-20',due:'2026-05-15',priority:'high',status:'not-started'},
-  {id:105,section:'product',parent:101,name:'Test tenant admin roles — permissions, user management, audit visibility',owner:'QA Lead',start:'2026-04-20',due:'2026-05-20',priority:'high',status:'not-started'},
-  {id:106,section:'product',parent:101,name:'Validate tenant-level usage reporting and billing attribution',owner:'Engineering + Finance',start:'2026-04-25',due:'2026-05-25',priority:'high',status:'not-started'},
-  {id:107,section:'product',parent:101,name:'Document tenant onboarding and offboarding runbook',owner:'Head of Support + PM',start:'2026-05-01',due:'2026-05-31',priority:'medium',status:'not-started'},
-  {id:36,section:'infra',parent:null,name:'Scalability — define expected GA load, concurrency, storage, and growth assumptions',owner:'VP Engineering + Infra Lead',start:'2026-04-06',due:'2026-04-20',priority:'critical',status:'not-started'},
-  {id:37,section:'infra',parent:36,name:'Run load tests against target thresholds',owner:'Infra Lead',start:'2026-04-20',due:'2026-05-10',priority:'critical',status:'not-started'},
-  {id:38,section:'infra',parent:36,name:'Document bottlenecks and scaling plan',owner:'Infra Lead',start:'2026-05-10',due:'2026-05-25',priority:'high',status:'not-started'},
-  {id:39,section:'infra',parent:36,name:'Secure engineering sign-off on capacity',owner:'VP Engineering',start:'2026-05-25',due:'2026-06-05',priority:'critical',status:'not-started'},
-  {id:40,section:'infra',parent:null,name:'High availability — confirm redundancy across critical components',owner:'SRE Lead',start:'2026-04-10',due:'2026-05-01',priority:'critical',status:'not-started'},
-  {id:41,section:'infra',parent:40,name:'Test failover and recovery scenarios',owner:'SRE Lead',start:'2026-05-01',due:'2026-05-20',priority:'critical',status:'not-started'},
-  {id:42,section:'infra',parent:40,name:'Validate uptime design against target SLA',owner:'VP Engineering',start:'2026-05-15',due:'2026-06-01',priority:'critical',status:'not-started'},
-  {id:43,section:'infra',parent:40,name:'Document single points of failure and mitigations',owner:'SRE Lead',start:'2026-04-20',due:'2026-05-10',priority:'high',status:'not-started'},
-  {id:44,section:'infra',parent:null,name:'Performance — set target response times for critical workflows',owner:'VP Engineering + PM',start:'2026-04-10',due:'2026-04-25',priority:'high',status:'not-started'},
-  {id:45,section:'infra',parent:44,name:'Run performance tests under normal and peak conditions',owner:'QA / Infra',start:'2026-04-25',due:'2026-05-15',priority:'high',status:'not-started'},
-  {id:46,section:'infra',parent:44,name:'Confirm metrics meet agreed thresholds before release',owner:'VP Engineering',start:'2026-05-15',due:'2026-06-01',priority:'critical',status:'not-started'},
-  {id:47,section:'infra',parent:null,name:'CI/CD pipeline configured and validated for production deployments',owner:'DevOps Lead',start:'2026-04-06',due:'2026-04-30',priority:'high',status:'not-started'},
-  {id:48,section:'infra',parent:null,name:'Observability stack — logs, metrics, traces, and alerts for critical services',owner:'SRE Lead',start:'2026-04-10',due:'2026-05-10',priority:'critical',status:'not-started'},
-  {id:49,section:'infra',parent:48,name:'Ensure dashboards are usable by on-call teams',owner:'SRE Lead',start:'2026-05-01',due:'2026-05-15',priority:'high',status:'not-started'},
-  {id:50,section:'infra',parent:48,name:'Validate alert thresholds and on-call routing',owner:'SRE Lead',start:'2026-05-10',due:'2026-05-25',priority:'high',status:'not-started'},
-  {id:51,section:'infra',parent:48,name:'Confirm retention policies and access controls for logs',owner:'Security + SRE',start:'2026-05-01',due:'2026-05-20',priority:'medium',status:'not-started'},
-  {id:52,section:'infra',parent:null,name:'Backup and DR — define backup scope, frequency, retention, and restore owners',owner:'Infra Lead',start:'2026-04-10',due:'2026-04-30',priority:'critical',status:'not-started'},
-  {id:53,section:'infra',parent:52,name:'Test restore for critical data and configs',owner:'Infra Lead',start:'2026-04-30',due:'2026-05-20',priority:'critical',status:'not-started'},
-  {id:54,section:'infra',parent:52,name:'Document disaster recovery plan; confirm runbooks are current',owner:'SRE Lead',start:'2026-05-01',due:'2026-05-25',priority:'critical',status:'not-started'},
-  {id:55,section:'infra',parent:null,name:'Security hardening — harden production environment before GA',owner:'Head of Security',start:'2026-04-15',due:'2026-05-31',priority:'critical',status:'not-started'},
-  {id:56,section:'svcmgmt',parent:null,name:'Incident response process and playbook documented',owner:'SRE Lead + Head of Support',start:'2026-04-10',due:'2026-05-15',priority:'critical',status:'not-started'},
-  {id:57,section:'svcmgmt',parent:null,name:'Monitoring and alerting triggers production support workflow',owner:'SRE Lead',start:'2026-04-15',due:'2026-05-10',priority:'critical',status:'not-started'},
-  {id:58,section:'svcmgmt',parent:null,name:'Service health dashboards live and accessible to stakeholders',owner:'SRE Lead',start:'2026-04-15',due:'2026-05-15',priority:'high',status:'not-started'},
-  {id:59,section:'svcmgmt',parent:null,name:'Maintenance and upgrades process defined and communicated',owner:'VP Engineering',start:'2026-04-20',due:'2026-05-15',priority:'medium',status:'not-started'},
-  {id:60,section:'svcmgmt',parent:null,name:'API versioning strategy agreed — managing multiple API versions in parallel',owner:'Platform Lead + PM',start:'2026-04-10',due:'2026-05-01',priority:'high',status:'not-started'},
-  {id:61,section:'svcmgmt',parent:null,name:'Escalation paths defined and communicated across support tiers',owner:'Head of Support',start:'2026-04-15',due:'2026-05-10',priority:'high',status:'not-started'},
-  {id:62,section:'data',parent:null,name:'Encryption proven and confirmed for data at rest and in transit',owner:'Security Engineer',start:'2026-04-06',due:'2026-04-30',priority:'critical',status:'not-started'},
-  {id:63,section:'data',parent:null,name:'Access controls in place — role-based, least privilege enforced',owner:'Security + Engineering',start:'2026-04-06',due:'2026-04-30',priority:'critical',status:'not-started'},
-  {id:64,section:'data',parent:null,name:'Audit logs enabled and retained per policy',owner:'Security Engineer',start:'2026-04-10',due:'2026-05-01',priority:'critical',status:'not-started'},
-  {id:65,section:'data',parent:null,name:'Data retention and deletion policies documented and enforced',owner:'Legal + Engineering',start:'2026-04-10',due:'2026-05-01',priority:'critical',status:'not-started'},
-  {id:66,section:'data',parent:null,name:'Export and backup options for customers defined and tested',owner:'PM + Engineering',start:'2026-04-15',due:'2026-05-15',priority:'medium',status:'not-started'},
-  {id:67,section:'billing',parent:null,name:'Packages defined — all enabled features per product/package listed',owner:'CPO + Finance',start:'2026-04-06',due:'2026-04-25',priority:'critical',status:'not-started'},
-  {id:68,section:'billing',parent:null,name:'Usage metering captured in-app including overage tracking',owner:'Engineering + Finance',start:'2026-04-10',due:'2026-05-10',priority:'critical',status:'not-started'},
-  {id:69,section:'billing',parent:null,name:'Usage data export to billing system tested end-to-end',owner:'RevOps + Engineering',start:'2026-04-15',due:'2026-05-15',priority:'critical',status:'not-started'},
-  {id:70,section:'billing',parent:null,name:'Ability to issue free credits configured and tested',owner:'Engineering + Finance',start:'2026-04-15',due:'2026-05-01',priority:'medium',status:'not-started'},
-  {id:71,section:'billing',parent:null,name:'Overage flows defined, implemented, and customer alerts tested',owner:'PM + Engineering',start:'2026-04-15',due:'2026-05-15',priority:'high',status:'not-started'},
-  {id:72,section:'billing',parent:null,name:'Trial definition agreed — duration, limitations, conversion flow',owner:'CPO + Finance',start:'2026-04-06',due:'2026-04-20',priority:'high',status:'not-started'},
-  {id:73,section:'billing',parent:null,name:'Invoicing system configured and tested',owner:'Finance + Engineering',start:'2026-04-15',due:'2026-05-20',priority:'critical',status:'not-started'},
-  {id:74,section:'billing',parent:null,name:'Credit notes process documented and tested in system',owner:'Finance',start:'2026-04-20',due:'2026-05-15',priority:'medium',status:'not-started'},
-  {id:75,section:'support',parent:null,name:'Help center and knowledge base published with GA content',owner:'Head of Support',start:'2026-04-15',due:'2026-06-01',priority:'critical',status:'not-started'},
-  {id:76,section:'support',parent:null,name:'Ticketing system configured — queues, routing, SLA rules set',owner:'Head of Support',start:'2026-04-10',due:'2026-04-30',priority:'critical',status:'not-started'},
-  {id:77,section:'support',parent:null,name:'SLA management — tiers defined and enforced in tooling',owner:'Head of Support',start:'2026-04-15',due:'2026-05-10',priority:'high',status:'not-started'},
-  {id:78,section:'legal',parent:null,name:'Terms of Use updated for GA and approved by legal counsel',owner:'General Counsel',start:'2026-04-06',due:'2026-05-01',priority:'critical',status:'not-started'},
-  {id:79,section:'legal',parent:null,name:'Contract templates (MSA, order forms) finalized',owner:'Legal',start:'2026-04-10',due:'2026-05-01',priority:'critical',status:'not-started'},
-  {id:80,section:'legal',parent:null,name:'Data Processing Agreements (DPA) templates ready',owner:'Legal',start:'2026-04-10',due:'2026-05-01',priority:'critical',status:'not-started'},
-  {id:81,section:'legal',parent:null,name:'IP ownership and liability provisions reviewed and signed off',owner:'General Counsel',start:'2026-04-10',due:'2026-04-30',priority:'high',status:'not-started'},
-  {id:82,section:'marketing',parent:null,name:'Branding finalized — logo, brand guide, visual identity approved',owner:'Head of Marketing',start:'2026-04-06',due:'2026-04-30',priority:'critical',status:'not-started'},
-  {id:83,section:'marketing',parent:null,name:'Website updated — GA landing page, pricing, features, and CTA live',owner:'Marketing / Web',start:'2026-04-15',due:'2026-05-20',priority:'critical',status:'not-started'},
-  {id:84,section:'analytics',parent:null,name:'Product analytics implemented — events, funnels, retention tracked',owner:'PM + Engineering',start:'2026-04-10',due:'2026-05-15',priority:'high',status:'not-started'},
-  {id:85,section:'analytics',parent:null,name:'NPS surveys configured and scheduled post-launch',owner:'PM / Customer Success',start:'2026-04-20',due:'2026-05-31',priority:'medium',status:'not-started'},
-  {id:86,section:'analytics',parent:null,name:'Feature request process and tooling in place',owner:'PM',start:'2026-04-10',due:'2026-04-30',priority:'medium',status:'not-started'},
-  {id:87,section:'analytics',parent:null,name:'Upsell and cross-sell capability defined in product and CRM',owner:'CPO + RevOps',start:'2026-04-15',due:'2026-05-15',priority:'high',status:'not-started'},
-  {id:88,section:'analytics',parent:null,name:'Technical and business KPIs defined and dashboarded (product performance)',owner:'CPO + CTO',start:'2026-04-06',due:'2026-04-25',priority:'critical',status:'not-started'},
-  {id:89,section:'analytics',parent:null,name:'Sales KPIs defined — pipeline, win rate, ACV targets set',owner:'Head of Sales',start:'2026-04-06',due:'2026-04-20',priority:'high',status:'not-started'},
-  {id:90,section:'analytics',parent:null,name:'Customer KPIs defined — activation, NPS, churn, expansion',owner:'Head of CS',start:'2026-04-10',due:'2026-04-25',priority:'high',status:'not-started'},
-  {id:91,section:'analytics',parent:null,name:'Financial KPIs defined — ARR, MRR, CAC, LTV targets',owner:'CFO',start:'2026-04-06',due:'2026-04-20',priority:'high',status:'not-started'},
-  {id:92,section:'analytics',parent:null,name:'Operational KPIs defined — uptime, MTTR, support ticket volume',owner:'VP Engineering + Head of Support',start:'2026-04-10',due:'2026-04-25',priority:'high',status:'not-started'},
-  {id:93,section:'security',parent:null,name:'Third-party penetration test completed — all critical findings remediated',owner:'Head of Security',start:'2026-04-06',due:'2026-05-15',priority:'critical',status:'in-progress'},
-  {id:94,section:'security',parent:null,name:'Internal vulnerability assessment completed',owner:'Security Engineer',start:'2026-04-06',due:'2026-05-01',priority:'critical',status:'not-started'},
-  {id:95,section:'security',parent:null,name:'Incident response plan tested with tabletop exercise',owner:'Head of Security + SRE',start:'2026-05-01',due:'2026-05-31',priority:'high',status:'not-started'},
-  {id:96,section:'security',parent:null,name:'Bug bounty program scoped and launched',owner:'Head of Security',start:'2026-05-01',due:'2026-06-01',priority:'medium',status:'not-started'},
-  {id:97,section:'compliance',parent:null,name:'SOC 2 Type II audit in-flight or completed',owner:'Head of Security + Compliance',start:'2026-04-06',due:'2026-06-01',priority:'critical',status:'not-started'},
-  {id:98,section:'compliance',parent:null,name:'GDPR / data privacy impact assessment signed off',owner:'Legal + Security',start:'2026-04-10',due:'2026-05-01',priority:'critical',status:'not-started'},
-  {id:99,section:'compliance',parent:null,name:'ISO 27001 or equivalent certification status confirmed',owner:'Head of Security',start:'2026-04-10',due:'2026-05-15',priority:'high',status:'not-started'},
-  {id:100,section:'compliance',parent:null,name:'Regional compliance requirements verified (CCPA, PDPA, etc.)',owner:'Legal',start:'2026-04-10',due:'2026-05-01',priority:'high',status:'not-started'},
+const DEF_TASKS=[
+  {id:1,section:'product',parent:null,name:'GA features — confirm scope based on roadmap and release status',owner:'CPO / Head of Product',start:'2026-04-06',due:'2026-04-15',priority:'critical',status:'in-progress',note:''},
+  {id:2,section:'product',parent:1,name:'Validate critical user journeys end-to-end in production environment',owner:'QA Lead / PM',start:'2026-04-06',due:'2026-04-15',priority:'critical',status:'not-started',note:''},
+  {id:3,section:'product',parent:1,name:'Document any excluded scope and obtain approval',owner:'PM',start:'2026-04-08',due:'2026-04-18',priority:'high',status:'not-started',note:''},
+  {id:4,section:'product',parent:1,name:'Obtain sign-off from Product, Engineering, and GTM',owner:'CPO',start:'2026-04-15',due:'2026-04-25',priority:'critical',status:'not-started',note:''},
+  {id:5,section:'product',parent:null,name:'Limitations — list all known product, scale, region, language, integration, and support limitations',owner:'PM + Eng Lead',start:'2026-04-06',due:'2026-04-20',priority:'high',status:'not-started',note:''},
+  {id:6,section:'product',parent:5,name:'Classify each limitation as blocker vs accepted',owner:'PM',start:'2026-04-10',due:'2026-04-20',priority:'high',status:'not-started',note:''},
+  {id:7,section:'product',parent:5,name:'Get cyber and legal alignment on disclosures',owner:'Legal + Security',start:'2026-04-15',due:'2026-04-30',priority:'high',status:'not-started',note:''},
+  {id:8,section:'product',parent:null,name:'Feature flags — configure per sub-product (Advisor, Assistant)',owner:'Engineering Lead',start:'2026-04-10',due:'2026-05-01',priority:'high',status:'not-started',note:''},
+  {id:9,section:'product',parent:null,name:'Defect threshold — agree severity thresholds for GA',owner:'VP Engineering + PM',start:'2026-04-06',due:'2026-04-15',priority:'critical',status:'not-started',note:''},
+  {id:10,section:'product',parent:9,name:'Review all open defects by severity and business impact',owner:'QA Lead',start:'2026-04-15',due:'2026-05-15',priority:'critical',status:'not-started',note:''},
+  {id:11,section:'product',parent:9,name:'Close or formally waive anything above threshold',owner:'VP Engineering',start:'2026-05-15',due:'2026-06-01',priority:'critical',status:'not-started',note:''},
+  {id:12,section:'product',parent:9,name:'Confirm no blocker or critical defects remain in GA scope',owner:'QA Lead',start:'2026-06-01',due:'2026-06-15',priority:'critical',status:'not-started',note:''},
+  {id:13,section:'product',parent:null,name:'UX compliance — review core flows against design standards and accessibility',owner:'UX Lead',start:'2026-04-10',due:'2026-05-01',priority:'high',status:'not-started',note:''},
+  {id:14,section:'product',parent:13,name:'Align user stories with UX standards',owner:'PM + UX',start:'2026-04-10',due:'2026-04-25',priority:'medium',status:'not-started',note:''},
+  {id:15,section:'product',parent:13,name:'Fix high-impact accessibility issues',owner:'Frontend Lead',start:'2026-04-20',due:'2026-05-15',priority:'high',status:'not-started',note:''},
+  {id:16,section:'product',parent:null,name:'Guided tutorials — identify first-time user flows',owner:'PM + UX',start:'2026-04-15',due:'2026-05-01',priority:'medium',status:'not-started',note:''},
+  {id:17,section:'product',parent:16,name:'Create onboarding tours, empty states, and contextual help',owner:'Product + Engineering',start:'2026-04-20',due:'2026-05-20',priority:'medium',status:'not-started',note:''},
+  {id:18,section:'product',parent:16,name:'Test completion and usefulness with pilot users',owner:'PM',start:'2026-05-10',due:'2026-05-31',priority:'medium',status:'not-started',note:''},
+  {id:19,section:'product',parent:16,name:'Track onboarding analytics',owner:'PM + Analytics',start:'2026-05-20',due:'2026-06-10',priority:'low',status:'not-started',note:''},
+  {id:20,section:'product',parent:null,name:'Documentation — publish admin, user, support, and technical docs',owner:'Head of Support / Tech Writer',start:'2026-04-15',due:'2026-06-01',priority:'critical',status:'not-started',note:''},
+  {id:21,section:'product',parent:20,name:'Include FAQs and troubleshooting guides',owner:'Tech Writer',start:'2026-05-01',due:'2026-06-01',priority:'high',status:'not-started',note:''},
+  {id:22,section:'product',parent:null,name:'Competitive differentiation — define clear value points vs competitors',owner:'PM + Marketing',start:'2026-04-06',due:'2026-04-30',priority:'high',status:'not-started',note:''},
+  {id:23,section:'product',parent:22,name:'Validate claims with product truth and evidence',owner:'PM',start:'2026-04-15',due:'2026-05-01',priority:'high',status:'not-started',note:''},
+  {id:24,section:'product',parent:22,name:'Align messaging in demos, site, and collateral',owner:'Marketing',start:'2026-04-20',due:'2026-05-10',priority:'high',status:'not-started',note:''},
+  {id:25,section:'product',parent:22,name:'Train sales teams on competitive positioning',owner:'Sales Enablement',start:'2026-05-01',due:'2026-05-31',priority:'high',status:'not-started',note:''},
+  {id:26,section:'product',parent:null,name:'Application — verify production domain and routing (e.g. app.domain.com)',owner:'Infra / DevOps',start:'2026-04-06',due:'2026-04-20',priority:'critical',status:'not-started',note:''},
+  {id:27,section:'product',parent:26,name:'Ensure SSL certificates are configured and valid',owner:'DevOps',start:'2026-04-06',due:'2026-04-15',priority:'critical',status:'not-started',note:''},
+  {id:28,section:'product',parent:26,name:'Validate login and authentication flows (SSO, MFA)',owner:'Security + Engineering',start:'2026-04-10',due:'2026-04-30',priority:'critical',status:'not-started',note:''},
+  {id:29,section:'product',parent:26,name:'Validate user onboarding flow (account creation, invitations, permissions)',owner:'Engineering + PM',start:'2026-04-10',due:'2026-05-01',priority:'critical',status:'not-started',note:''},
+  {id:30,section:'product',parent:26,name:'Test all core platform workflows (meetings, agents, documents, etc.)',owner:'QA Lead',start:'2026-04-15',due:'2026-05-15',priority:'critical',status:'not-started',note:''},
+  {id:31,section:'product',parent:26,name:'Validate cross-browser compatibility (Chrome, Edge, Safari)',owner:'QA / Frontend',start:'2026-05-01',due:'2026-05-20',priority:'high',status:'not-started',note:''},
+  {id:32,section:'product',parent:26,name:'Verify responsiveness across screen sizes (desktop and laptop)',owner:'Frontend Lead',start:'2026-05-01',due:'2026-05-20',priority:'high',status:'not-started',note:''},
+  {id:33,section:'product',parent:26,name:'Test performance under expected user load',owner:'Infra / QA',start:'2026-05-01',due:'2026-05-25',priority:'high',status:'not-started',note:''},
+  {id:34,section:'product',parent:26,name:'Ensure logging and monitoring enabled for platform usage',owner:'SRE / DevOps',start:'2026-04-15',due:'2026-05-10',priority:'high',status:'not-started',note:''},
+  {id:35,section:'product',parent:26,name:'Verify platform security protections (session management, etc.)',owner:'Security Engineer',start:'2026-04-15',due:'2026-05-15',priority:'critical',status:'not-started',note:''},
+  {id:101,section:'product',parent:null,name:'Tenant management — define and validate multi-tenant architecture and isolation model',owner:'VP Engineering + PM',start:'2026-04-10',due:'2026-05-01',priority:'critical',status:'not-started',note:''},
+  {id:102,section:'product',parent:101,name:'Verify tenant data isolation — no cross-tenant data leakage',owner:'Security Engineer',start:'2026-04-15',due:'2026-05-10',priority:'critical',status:'not-started',note:''},
+  {id:103,section:'product',parent:101,name:'Validate tenant provisioning and de-provisioning flows end-to-end',owner:'Engineering Lead',start:'2026-04-15',due:'2026-05-10',priority:'critical',status:'not-started',note:''},
+  {id:104,section:'product',parent:101,name:'Confirm tenant-level configuration and customisation (branding, settings)',owner:'PM + Engineering',start:'2026-04-20',due:'2026-05-15',priority:'high',status:'not-started',note:''},
+  {id:105,section:'product',parent:101,name:'Test tenant admin roles — permissions, user management, audit visibility',owner:'QA Lead',start:'2026-04-20',due:'2026-05-20',priority:'high',status:'not-started',note:''},
+  {id:106,section:'product',parent:101,name:'Validate tenant-level usage reporting and billing attribution',owner:'Engineering + Finance',start:'2026-04-25',due:'2026-05-25',priority:'high',status:'not-started',note:''},
+  {id:107,section:'product',parent:101,name:'Document tenant onboarding and offboarding runbook',owner:'Head of Support + PM',start:'2026-05-01',due:'2026-05-31',priority:'medium',status:'not-started',note:''},
+  {id:36,section:'infra',parent:null,name:'Scalability — define expected GA load, concurrency, storage, and growth assumptions',owner:'VP Engineering + Infra Lead',start:'2026-04-06',due:'2026-04-20',priority:'critical',status:'not-started',note:''},
+  {id:37,section:'infra',parent:36,name:'Run load tests against target thresholds',owner:'Infra Lead',start:'2026-04-20',due:'2026-05-10',priority:'critical',status:'not-started',note:''},
+  {id:38,section:'infra',parent:36,name:'Document bottlenecks and scaling plan',owner:'Infra Lead',start:'2026-05-10',due:'2026-05-25',priority:'high',status:'not-started',note:''},
+  {id:39,section:'infra',parent:36,name:'Secure engineering sign-off on capacity',owner:'VP Engineering',start:'2026-05-25',due:'2026-06-05',priority:'critical',status:'not-started',note:''},
+  {id:40,section:'infra',parent:null,name:'High availability — confirm redundancy across critical components',owner:'SRE Lead',start:'2026-04-10',due:'2026-05-01',priority:'critical',status:'not-started',note:''},
+  {id:41,section:'infra',parent:40,name:'Test failover and recovery scenarios',owner:'SRE Lead',start:'2026-05-01',due:'2026-05-20',priority:'critical',status:'not-started',note:''},
+  {id:42,section:'infra',parent:40,name:'Validate uptime design against target SLA',owner:'VP Engineering',start:'2026-05-15',due:'2026-06-01',priority:'critical',status:'not-started',note:''},
+  {id:43,section:'infra',parent:40,name:'Document single points of failure and mitigations',owner:'SRE Lead',start:'2026-04-20',due:'2026-05-10',priority:'high',status:'not-started',note:''},
+  {id:44,section:'infra',parent:null,name:'Performance — set target response times for critical workflows',owner:'VP Engineering + PM',start:'2026-04-10',due:'2026-04-25',priority:'high',status:'not-started',note:''},
+  {id:45,section:'infra',parent:44,name:'Run performance tests under normal and peak conditions',owner:'QA / Infra',start:'2026-04-25',due:'2026-05-15',priority:'high',status:'not-started',note:''},
+  {id:46,section:'infra',parent:44,name:'Confirm metrics meet agreed thresholds before release',owner:'VP Engineering',start:'2026-05-15',due:'2026-06-01',priority:'critical',status:'not-started',note:''},
+  {id:47,section:'infra',parent:null,name:'CI/CD pipeline configured and validated for production deployments',owner:'DevOps Lead',start:'2026-04-06',due:'2026-04-30',priority:'high',status:'not-started',note:''},
+  {id:48,section:'infra',parent:null,name:'Observability stack — logs, metrics, traces, and alerts for critical services',owner:'SRE Lead',start:'2026-04-10',due:'2026-05-10',priority:'critical',status:'not-started',note:''},
+  {id:49,section:'infra',parent:48,name:'Ensure dashboards are usable by on-call teams',owner:'SRE Lead',start:'2026-05-01',due:'2026-05-15',priority:'high',status:'not-started',note:''},
+  {id:50,section:'infra',parent:48,name:'Validate alert thresholds and on-call routing',owner:'SRE Lead',start:'2026-05-10',due:'2026-05-25',priority:'high',status:'not-started',note:''},
+  {id:51,section:'infra',parent:48,name:'Confirm retention policies and access controls for logs',owner:'Security + SRE',start:'2026-05-01',due:'2026-05-20',priority:'medium',status:'not-started',note:''},
+  {id:52,section:'infra',parent:null,name:'Backup and DR — define scope, frequency, retention, and restore owners',owner:'Infra Lead',start:'2026-04-10',due:'2026-04-30',priority:'critical',status:'not-started',note:''},
+  {id:53,section:'infra',parent:52,name:'Test restore for critical data and configs',owner:'Infra Lead',start:'2026-04-30',due:'2026-05-20',priority:'critical',status:'not-started',note:''},
+  {id:54,section:'infra',parent:52,name:'Document disaster recovery plan; confirm runbooks are current',owner:'SRE Lead',start:'2026-05-01',due:'2026-05-25',priority:'critical',status:'not-started',note:''},
+  {id:55,section:'infra',parent:null,name:'Security hardening — harden production environment before GA',owner:'Head of Security',start:'2026-04-15',due:'2026-05-31',priority:'critical',status:'not-started',note:''},
+  {id:56,section:'svcmgmt',parent:null,name:'Incident response process and playbook documented',owner:'SRE Lead + Head of Support',start:'2026-04-10',due:'2026-05-15',priority:'critical',status:'not-started',note:''},
+  {id:57,section:'svcmgmt',parent:null,name:'Monitoring and alerting triggers production support workflow',owner:'SRE Lead',start:'2026-04-15',due:'2026-05-10',priority:'critical',status:'not-started',note:''},
+  {id:58,section:'svcmgmt',parent:null,name:'Service health dashboards live and accessible to stakeholders',owner:'SRE Lead',start:'2026-04-15',due:'2026-05-15',priority:'high',status:'not-started',note:''},
+  {id:59,section:'svcmgmt',parent:null,name:'Maintenance and upgrades process defined and communicated',owner:'VP Engineering',start:'2026-04-20',due:'2026-05-15',priority:'medium',status:'not-started',note:''},
+  {id:60,section:'svcmgmt',parent:null,name:'API versioning strategy agreed — managing multiple API versions in parallel',owner:'Platform Lead + PM',start:'2026-04-10',due:'2026-05-01',priority:'high',status:'not-started',note:''},
+  {id:61,section:'svcmgmt',parent:null,name:'Escalation paths defined and communicated across support tiers',owner:'Head of Support',start:'2026-04-15',due:'2026-05-10',priority:'high',status:'not-started',note:''},
+  {id:62,section:'data',parent:null,name:'Encryption proven and confirmed for data at rest and in transit',owner:'Security Engineer',start:'2026-04-06',due:'2026-04-30',priority:'critical',status:'not-started',note:''},
+  {id:63,section:'data',parent:null,name:'Access controls in place — role-based, least privilege enforced',owner:'Security + Engineering',start:'2026-04-06',due:'2026-04-30',priority:'critical',status:'not-started',note:''},
+  {id:64,section:'data',parent:null,name:'Audit logs enabled and retained per policy',owner:'Security Engineer',start:'2026-04-10',due:'2026-05-01',priority:'critical',status:'not-started',note:''},
+  {id:65,section:'data',parent:null,name:'Data retention and deletion policies documented and enforced',owner:'Legal + Engineering',start:'2026-04-10',due:'2026-05-01',priority:'critical',status:'not-started',note:''},
+  {id:66,section:'data',parent:null,name:'Export and backup options for customers defined and tested',owner:'PM + Engineering',start:'2026-04-15',due:'2026-05-15',priority:'medium',status:'not-started',note:''},
+  {id:67,section:'billing',parent:null,name:'Packages defined — all enabled features per product/package listed',owner:'CPO + Finance',start:'2026-04-06',due:'2026-04-25',priority:'critical',status:'not-started',note:''},
+  {id:68,section:'billing',parent:null,name:'Usage metering captured in-app including overage tracking',owner:'Engineering + Finance',start:'2026-04-10',due:'2026-05-10',priority:'critical',status:'not-started',note:''},
+  {id:69,section:'billing',parent:null,name:'Usage data export to billing system tested end-to-end',owner:'RevOps + Engineering',start:'2026-04-15',due:'2026-05-15',priority:'critical',status:'not-started',note:''},
+  {id:70,section:'billing',parent:null,name:'Ability to issue free credits configured and tested',owner:'Engineering + Finance',start:'2026-04-15',due:'2026-05-01',priority:'medium',status:'not-started',note:''},
+  {id:71,section:'billing',parent:null,name:'Overage flows defined, implemented, and customer alerts tested',owner:'PM + Engineering',start:'2026-04-15',due:'2026-05-15',priority:'high',status:'not-started',note:''},
+  {id:72,section:'billing',parent:null,name:'Trial definition agreed — duration, limitations, conversion flow',owner:'CPO + Finance',start:'2026-04-06',due:'2026-04-20',priority:'high',status:'not-started',note:''},
+  {id:73,section:'billing',parent:null,name:'Invoicing system configured and tested',owner:'Finance + Engineering',start:'2026-04-15',due:'2026-05-20',priority:'critical',status:'not-started',note:''},
+  {id:74,section:'billing',parent:null,name:'Credit notes process documented and tested in system',owner:'Finance',start:'2026-04-20',due:'2026-05-15',priority:'medium',status:'not-started',note:''},
+  {id:75,section:'support',parent:null,name:'Help center and knowledge base published with GA content',owner:'Head of Support',start:'2026-04-15',due:'2026-06-01',priority:'critical',status:'not-started',note:''},
+  {id:76,section:'support',parent:null,name:'Ticketing system configured — queues, routing, SLA rules set',owner:'Head of Support',start:'2026-04-10',due:'2026-04-30',priority:'critical',status:'not-started',note:''},
+  {id:77,section:'support',parent:null,name:'SLA management — tiers defined and enforced in tooling',owner:'Head of Support',start:'2026-04-15',due:'2026-05-10',priority:'high',status:'not-started',note:''},
+  {id:78,section:'legal',parent:null,name:'Terms of Use updated for GA and approved by legal counsel',owner:'General Counsel',start:'2026-04-06',due:'2026-05-01',priority:'critical',status:'not-started',note:''},
+  {id:79,section:'legal',parent:null,name:'Contract templates (MSA, order forms) finalized',owner:'Legal',start:'2026-04-10',due:'2026-05-01',priority:'critical',status:'not-started',note:''},
+  {id:80,section:'legal',parent:null,name:'Data Processing Agreements (DPA) templates ready',owner:'Legal',start:'2026-04-10',due:'2026-05-01',priority:'critical',status:'not-started',note:''},
+  {id:81,section:'legal',parent:null,name:'IP ownership and liability provisions reviewed and signed off',owner:'General Counsel',start:'2026-04-10',due:'2026-04-30',priority:'high',status:'not-started',note:''},
+  {id:82,section:'marketing',parent:null,name:'Branding finalized — logo, brand guide, visual identity approved',owner:'Head of Marketing',start:'2026-04-06',due:'2026-04-30',priority:'critical',status:'not-started',note:''},
+  {id:83,section:'marketing',parent:null,name:'Website updated — GA landing page, pricing, features, and CTA live',owner:'Marketing / Web',start:'2026-04-15',due:'2026-05-20',priority:'critical',status:'not-started',note:''},
+  {id:84,section:'analytics',parent:null,name:'Product analytics implemented — events, funnels, retention tracked',owner:'PM + Engineering',start:'2026-04-10',due:'2026-05-15',priority:'high',status:'not-started',note:''},
+  {id:85,section:'analytics',parent:null,name:'NPS surveys configured and scheduled post-launch',owner:'PM / Customer Success',start:'2026-04-20',due:'2026-05-31',priority:'medium',status:'not-started',note:''},
+  {id:86,section:'analytics',parent:null,name:'Feature request process and tooling in place',owner:'PM',start:'2026-04-10',due:'2026-04-30',priority:'medium',status:'not-started',note:''},
+  {id:87,section:'analytics',parent:null,name:'Upsell and cross-sell capability defined in product and CRM',owner:'CPO + RevOps',start:'2026-04-15',due:'2026-05-15',priority:'high',status:'not-started',note:''},
+  {id:88,section:'analytics',parent:null,name:'Technical and business KPIs defined and dashboarded',owner:'CPO + CTO',start:'2026-04-06',due:'2026-04-25',priority:'critical',status:'not-started',note:''},
+  {id:89,section:'analytics',parent:null,name:'Sales KPIs defined — pipeline, win rate, ACV targets set',owner:'Head of Sales',start:'2026-04-06',due:'2026-04-20',priority:'high',status:'not-started',note:''},
+  {id:90,section:'analytics',parent:null,name:'Customer KPIs defined — activation, NPS, churn, expansion',owner:'Head of CS',start:'2026-04-10',due:'2026-04-25',priority:'high',status:'not-started',note:''},
+  {id:91,section:'analytics',parent:null,name:'Financial KPIs defined — ARR, MRR, CAC, LTV targets',owner:'CFO',start:'2026-04-06',due:'2026-04-20',priority:'high',status:'not-started',note:''},
+  {id:92,section:'analytics',parent:null,name:'Operational KPIs defined — uptime, MTTR, support ticket volume',owner:'VP Engineering + Head of Support',start:'2026-04-10',due:'2026-04-25',priority:'high',status:'not-started',note:''},
+  {id:93,section:'security',parent:null,name:'Third-party penetration test completed — all critical findings remediated',owner:'Head of Security',start:'2026-04-06',due:'2026-05-15',priority:'critical',status:'in-progress',note:''},
+  {id:94,section:'security',parent:null,name:'Internal vulnerability assessment completed',owner:'Security Engineer',start:'2026-04-06',due:'2026-05-01',priority:'critical',status:'not-started',note:''},
+  {id:95,section:'security',parent:null,name:'Incident response plan tested with tabletop exercise',owner:'Head of Security + SRE',start:'2026-05-01',due:'2026-05-31',priority:'high',status:'not-started',note:''},
+  {id:96,section:'security',parent:null,name:'Bug bounty program scoped and launched',owner:'Head of Security',start:'2026-05-01',due:'2026-06-01',priority:'medium',status:'not-started',note:''},
+  {id:97,section:'compliance',parent:null,name:'SOC 2 Type II audit in-flight or completed',owner:'Head of Security + Compliance',start:'2026-04-06',due:'2026-06-01',priority:'critical',status:'not-started',note:''},
+  {id:98,section:'compliance',parent:null,name:'GDPR / data privacy impact assessment signed off',owner:'Legal + Security',start:'2026-04-10',due:'2026-05-01',priority:'critical',status:'not-started',note:''},
+  {id:99,section:'compliance',parent:null,name:'ISO 27001 or equivalent certification status confirmed',owner:'Head of Security',start:'2026-04-10',due:'2026-05-15',priority:'high',status:'not-started',note:''},
+  {id:100,section:'compliance',parent:null,name:'Regional compliance requirements verified (CCPA, PDPA, etc.)',owner:'Legal',start:'2026-04-10',due:'2026-05-01',priority:'high',status:'not-started',note:''},
 ];
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
-let tasks = [];
-let sectionOpen = {};
-let currentUser = null;
-let isAdmin = false;
-let editingId = null;
+// ── STATE ──────────────────────────────────────────────────────────────────────
+let SECTIONS=[], tasks=[], users={}, sectionOpen={};
+let currentUser=null, isAdmin=false;
+let editingTaskId=null, mergingSecId=null, deletingSecId=null, noteTaskId=null;
 
-function loadTasks() {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) { tasks = JSON.parse(saved); }
-    else { tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS)); saveTasks(); }
-  } catch(e) { tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS)); }
+function loadData(){
+  try{
+    const raw=localStorage.getItem(SK);
+    if(raw){
+      const d=JSON.parse(raw);
+      tasks=d.tasks||JSON.parse(JSON.stringify(DEF_TASKS));
+      SECTIONS=d.sections||JSON.parse(JSON.stringify(DEF_SECTIONS));
+      users=d.users||{};
+      tasks.forEach(t=>{if(t.note===undefined)t.note='';});
+    } else {
+      tasks=JSON.parse(JSON.stringify(DEF_TASKS));
+      SECTIONS=JSON.parse(JSON.stringify(DEF_SECTIONS));
+      users={};save();
+    }
+  } catch(e){
+    tasks=JSON.parse(JSON.stringify(DEF_TASKS));
+    SECTIONS=JSON.parse(JSON.stringify(DEF_SECTIONS));
+    users={};
+  }
 }
-function saveTasks() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
-}
-function nextId() { return Math.max(0, ...tasks.map(t => t.id)) + 1; }
+function save(){localStorage.setItem(SK,JSON.stringify({tasks,sections:SECTIONS,users}));}
+function nextId(){return Math.max(0,...tasks.map(t=>t.id))+1;}
+function secById(id){return SECTIONS.find(s=>s.id===id);}
+function x(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-// ── AUTH ──────────────────────────────────────────────────────────────────────
-function doLogin() {
-  const name = document.getElementById('login-name').value.trim();
-  const pass = document.getElementById('login-admin-pass').value.trim();
-  if (!name) { alert('Please enter your name.'); return; }
-  isAdmin = (pass === ADMIN_PASS);
-  currentUser = name;
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  document.getElementById('user-badge').textContent = isAdmin ? '⭐ Admin: ' + name : '👤 ' + name;
-  document.getElementById('add-task-btn').style.display = isAdmin ? '' : 'none';
-  SECTIONS.forEach(s => sectionOpen[s.id] = true);
-  loadTasks();
+// ── AUTH ───────────────────────────────────────────────────────────────────────
+function doLogin(){
+  const name=document.getElementById('login-name').value.trim();
+  const pass=document.getElementById('login-pass').value.trim();
+  if(!name){alert('Please enter your name.');return;}
+  isAdmin=(pass===ADMIN_PASS);
+  currentUser=name;
+  if(!users[name])users[name]={mappedOwner:'',lastSeen:''};
+  users[name].lastSeen=new Date().toLocaleString();
+  save();
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('user-badge').textContent=isAdmin?'⭐ Admin: '+name:'👤 '+name;
+  ['add-task-btn','add-cat-btn','users-btn'].forEach(id=>
+    document.getElementById(id).style.display=isAdmin?'':'none');
+  SECTIONS.forEach(s=>sectionOpen[s.id]=true);
   render();
 }
-function doLogout() {
-  currentUser = null; isAdmin = false;
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('login-name').value = '';
-  document.getElementById('login-admin-pass').value = '';
+function doLogout(){
+  currentUser=null;isAdmin=false;
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-name').value='';
+  document.getElementById('login-pass').value='';
 }
-document.getElementById('login-name').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('login-name').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 
-// ── OWNERSHIP ─────────────────────────────────────────────────────────────────
-function canEdit(task) {
-  if (isAdmin) return true;
-  // Match owner field loosely (case-insensitive, partial)
-  const own = (task.owner || '').toLowerCase();
-  const user = (currentUser || '').toLowerCase();
-  return own.includes(user) || user.includes(own.split('/')[0].trim()) || user.includes(own.split('+')[0].trim());
+// ── PERMISSIONS ────────────────────────────────────────────────────────────────
+function canEdit(task){
+  if(isAdmin)return true;
+  const mapped=(users[currentUser]||{}).mappedOwner||'';
+  if(!mapped)return false;
+  return(task.owner||'').toLowerCase().includes(mapped.toLowerCase());
 }
 
-// ── RENDER ────────────────────────────────────────────────────────────────────
-function sl(s) { return {done:'Done','in-progress':'In progress','not-started':'Not started',blocked:'Blocked'}[s]||s; }
-function fd(d) { if(!d) return '—'; const[,m,day]=d.split('-'); return `${m}/${day}`; }
+// ── USERS PANEL ────────────────────────────────────────────────────────────────
+function openUsers(){
+  const allOwners=[...new Set(tasks.map(t=>t.owner).filter(Boolean))].sort();
+  const rows=Object.entries(users).map(([name,info])=>{
+    const opts=allOwners.map(o=>`<option value="${x(o)}"${info.mappedOwner===o?' selected':''}>${x(o)}</option>`).join('');
+    const isThisAdmin=name===currentUser&&isAdmin;
+    const dotClass=isThisAdmin?'admin':info.mappedOwner?'mapped':'pending';
+    const label=isThisAdmin?'Admin':info.mappedOwner?'Mapped — can edit assigned tasks':'Pending — no edit access yet';
+    return`<tr>
+      <td><span class="sdot ${dotClass}"></span><strong>${x(name)}</strong></td>
+      <td style="color:var(--text2);font-size:11px">${info.lastSeen||'—'}</td>
+      <td>
+        <select class="owner-sel" onchange="mapUser('${x(name).replace(/'/g,"\\'")}',this.value)">
+          <option value="">— No access —</option>${opts}
+        </select>
+      </td>
+      <td style="font-size:11px;color:var(--text2)">${label}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('user-table-wrap').innerHTML=`
+    <table class="user-table">
+      <thead><tr><th>Login name</th><th>Last seen</th><th>Assign to owner</th><th>Access status</th></tr></thead>
+      <tbody>${rows||'<tr><td colspan="4" style="color:var(--text3);padding:14px">No users have logged in yet.</td></tr>'}</tbody>
+    </table>`;
+  document.getElementById('users-modal').classList.remove('hidden');
+}
+function mapUser(loginName,ownerVal){
+  if(!users[loginName])users[loginName]={mappedOwner:'',lastSeen:''};
+  users[loginName].mappedOwner=ownerVal;
+  save();openUsers();toast(`${loginName} → ${ownerVal||'no access'} ✓`);
+}
 
-function updateMetrics() {
-  const total=tasks.length, done=tasks.filter(t=>t.status==='done').length,
-    prog=tasks.filter(t=>t.status==='in-progress').length,
-    blk=tasks.filter(t=>t.status==='blocked').length,
-    ns=tasks.filter(t=>t.status==='not-started').length;
+// ── INLINE EDIT ────────────────────────────────────────────────────────────────
+function inlineEdit(id,field){
+  const t=tasks.find(x=>x.id===id);if(!t||!canEdit(t))return;
+  const cell=document.getElementById(`ic-${field}-${id}`);if(!cell)return;
+  const cur=t[field]||'';
+  cell.innerHTML=`<input class="ii" value="${x(cur)}"
+    onblur="saveInline(${id},'${field}',this.value)"
+    onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape'){this.value=this.defaultValue;this.blur()}"
+    autofocus>`;
+  const inp=cell.querySelector('input');inp.defaultValue=cur;inp.select();
+}
+function saveInline(id,field,val){
+  const t=tasks.find(z=>z.id===id);if(!t)return;
+  if(val.trim())t[field]=val.trim();
+  save();render();toast('Saved ✓');
+}
+
+// ── STATUS / PRIORITY ─────────────────────────────────────────────────────────
+function chStatus(id,val){
+  const t=tasks.find(z=>z.id===id);if(!t||!canEdit(t))return;
+  t.status=val;save();updateMetrics();
+  // recolor dropdown in place
+  const el=document.getElementById('dsel-s-'+id);
+  if(el){STATUS_OPTS.forEach(s=>el.classList.remove(s));el.classList.add(val);}
+  toast('Status updated ✓');
+}
+function chPriority(id,val){
+  const t=tasks.find(z=>z.id===id);if(!t||!canEdit(t))return;
+  t.priority=val;save();
+  const el=document.getElementById('dsel-p-'+id);
+  if(el){PRIO_OPTS.forEach(p=>el.classList.remove(p));el.classList.add(val);}
+  toast('Priority updated ✓');
+}
+function toggleDone(id){
+  const t=tasks.find(z=>z.id===id);if(!t||!canEdit(t))return;
+  t.status=t.status==='completed'?'not-started':'completed';
+  save();render();toast('Updated ✓');
+}
+
+// ── NOTE ───────────────────────────────────────────────────────────────────────
+function openNote(id){
+  const t=tasks.find(z=>z.id===id);if(!t||!canEdit(t))return;
+  noteTaskId=id;
+  document.getElementById('note-task-name').textContent=t.name;
+  document.getElementById('note-ta').value=t.note||'';
+  document.getElementById('note-modal').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('note-ta').focus(),80);
+}
+function saveNote(){
+  const t=tasks.find(z=>z.id===noteTaskId);if(!t)return;
+  t.note=document.getElementById('note-ta').value.trim();
+  save();closeM('note-modal');render();toast('Note saved ✓');
+}
+
+// ── DELETE TASK ────────────────────────────────────────────────────────────────
+function delTask(id){
+  if(!isAdmin)return;
+  if(!confirm('Delete this task and all its subtasks?'))return;
+  tasks=tasks.filter(t=>t.id!==id&&t.parent!==id);
+  save();render();toast('Deleted');
+}
+
+// ── SECTION MANAGEMENT ─────────────────────────────────────────────────────────
+function startSecRename(id){
+  if(!isAdmin)return;
+  const sec=secById(id);if(!sec)return;
+  const el=document.getElementById('sec-te-'+id);if(!el)return;
+  el.outerHTML=`<input class="sec-inp" id="sec-inp-${id}" value="${x(sec.title)}"
+    onblur="saveSecRename('${id}',this.value)"
+    onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape')render()"
+    onclick="event.stopPropagation()" autofocus>`;
+  document.getElementById('sec-inp-'+id)?.select();
+}
+function saveSecRename(id,val){
+  const sec=secById(id);if(sec&&val.trim())sec.title=val.trim();
+  save();render();toast('Category renamed ✓');
+}
+function openAddCat(){
+  document.getElementById('cat-name').value='';
+  document.getElementById('cat-modal').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('cat-name').focus(),80);
+}
+function saveCat(){
+  const name=document.getElementById('cat-name').value.trim();
+  if(!name){alert('Name required.');return;}
+  const id='cat_'+Date.now();
+  SECTIONS.push({id,num:String(SECTIONS.length+1),title:name});
+  sectionOpen[id]=true;
+  save();closeM('cat-modal');render();toast('Category added ✓');
+}
+function openMerge(secId){
+  mergingSecId=secId;
+  const sec=secById(secId);
+  document.getElementById('merge-from-name').textContent=sec.title;
+  document.getElementById('merge-target').innerHTML=
+    SECTIONS.filter(s=>s.id!==secId).map(s=>`<option value="${s.id}">${x(s.title)}</option>`).join('');
+  document.getElementById('merge-modal').classList.remove('hidden');
+}
+function confirmMerge(){
+  const tid=document.getElementById('merge-target').value;
+  tasks.forEach(t=>{if(t.section===mergingSecId)t.section=tid;});
+  SECTIONS=SECTIONS.filter(s=>s.id!==mergingSecId);
+  renum();save();closeM('merge-modal');render();toast('Merged ✓');
+}
+function openDelCat(secId){
+  deletingSecId=secId;
+  const sec=secById(secId);
+  document.getElementById('delcat-name').textContent=sec.title;
+  document.getElementById('delcat-target').innerHTML=
+    '<option value="__delete__">— Delete all tasks permanently —</option>'+
+    SECTIONS.filter(s=>s.id!==secId).map(s=>`<option value="${s.id}">Move to: ${x(s.title)}</option>`).join('');
+  document.getElementById('delcat-modal').classList.remove('hidden');
+}
+function confirmDelCat(){
+  const tid=document.getElementById('delcat-target').value;
+  if(tid==='__delete__')tasks=tasks.filter(t=>t.section!==deletingSecId);
+  else tasks.forEach(t=>{if(t.section===deletingSecId)t.section=tid;});
+  SECTIONS=SECTIONS.filter(s=>s.id!==deletingSecId);
+  renum();save();closeM('delcat-modal');render();toast('Category deleted ✓');
+}
+function renum(){SECTIONS.forEach((s,i)=>s.num=String(i+1));}
+
+// ── TASK MODAL ─────────────────────────────────────────────────────────────────
+function openAddTask(secId,parentId){
+  editingTaskId=null;
+  document.getElementById('task-modal-title').textContent=parentId?'Add subtask':'Add task';
+  document.getElementById('f-name').value='';
+  document.getElementById('f-owner').value=isAdmin?'':currentUser;
+  document.getElementById('f-start').value='';document.getElementById('f-due').value='';
+  document.getElementById('f-priority').value='high';
+  document.getElementById('f-status').value='not-started';
+  document.getElementById('f-note').value='';
+  popSecSel();
+  if(secId)document.getElementById('f-section').value=secId;
+  refreshParents();
+  if(parentId)document.getElementById('f-parent').value=parentId;
+  document.getElementById('task-modal').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('f-name').focus(),80);
+}
+function openEditTask(id){
+  const t=tasks.find(z=>z.id===id);if(!t||!canEdit(t))return;
+  editingTaskId=id;
+  document.getElementById('task-modal-title').textContent='Edit task';
+  document.getElementById('f-name').value=t.name;
+  document.getElementById('f-owner').value=t.owner||'';
+  document.getElementById('f-start').value=t.start||'';document.getElementById('f-due').value=t.due||'';
+  document.getElementById('f-priority').value=t.priority;
+  document.getElementById('f-status').value=t.status;
+  document.getElementById('f-note').value=t.note||'';
+  popSecSel();document.getElementById('f-section').value=t.section;
+  refreshParents();document.getElementById('f-parent').value=t.parent||'';
+  document.getElementById('task-modal').classList.remove('hidden');
+}
+function popSecSel(){
+  document.getElementById('f-section').innerHTML=
+    SECTIONS.map(s=>`<option value="${s.id}">${s.num}. ${x(s.title)}</option>`).join('');
+  document.getElementById('f-section').onchange=refreshParents;
+}
+function refreshParents(){
+  const sid=document.getElementById('f-section').value;
+  const pts=tasks.filter(t=>t.section===sid&&!t.parent&&t.id!==editingTaskId);
+  document.getElementById('f-parent').innerHTML=
+    '<option value="">— top-level task —</option>'+
+    pts.map(p=>`<option value="${p.id}">${p.name.substring(0,58)}${p.name.length>58?'…':''}</option>`).join('');
+}
+function saveTask(){
+  const name=document.getElementById('f-name').value.trim();
+  const owner=document.getElementById('f-owner').value.trim();
+  if(!name||!owner){alert('Name and owner are required.');return;}
+  const pv=document.getElementById('f-parent').value;
+  const data={name,owner,
+    section:document.getElementById('f-section').value,
+    parent:pv?parseInt(pv):null,
+    start:document.getElementById('f-start').value,
+    due:document.getElementById('f-due').value,
+    priority:document.getElementById('f-priority').value,
+    status:document.getElementById('f-status').value,
+    note:document.getElementById('f-note').value.trim(),
+  };
+  if(editingTaskId){Object.assign(tasks.find(z=>z.id===editingTaskId),data);toast('Task updated ✓');}
+  else{tasks.push({id:nextId(),...data});toast('Task added ✓');}
+  save();closeM('task-modal');render();
+}
+
+// ── MODAL HELPERS ──────────────────────────────────────────────────────────────
+function closeM(id){document.getElementById(id).classList.add('hidden');editingTaskId=null;noteTaskId=null;}
+function bgClose(e,id){if(e.target.id===id)closeM(id);}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')['task-modal','note-modal','cat-modal','merge-modal','delcat-modal','users-modal']
+    .forEach(id=>document.getElementById(id).classList.add('hidden'));
+});
+
+// ── RENDER ─────────────────────────────────────────────────────────────────────
+function fd(d){if(!d)return'—';const[,m,day]=d.split('-');return`${m}/${day}`;}
+
+function updateMetrics(){
+  const total=tasks.length;
+  const done=tasks.filter(t=>t.status==='completed').length;
+  const prog=tasks.filter(t=>t.status==='in-progress').length;
+  const del=tasks.filter(t=>t.status==='delayed').length;
+  const blk=tasks.filter(t=>t.status==='blocked').length;
+  const ns=tasks.filter(t=>t.status==='not-started').length;
   document.getElementById('m-total').textContent=total;
   document.getElementById('m-done').textContent=done;
   document.getElementById('m-prog').textContent=prog;
+  document.getElementById('m-del').textContent=del;
   document.getElementById('m-blk').textContent=blk;
   document.getElementById('m-ns').textContent=ns;
   document.getElementById('m-bar').style.width=(total?Math.round(done/total*100):0)+'%';
   const diff=Math.ceil((new Date('2026-06-30')-new Date())/864e5);
-  document.getElementById('days-left').textContent=diff>0?`${diff} days to launch`:'Launch day!';
+  document.getElementById('days-left').textContent=diff>0?`${diff} days to launch`:'🎉 Launch day!';
 }
-
-function updateOwnerSelect() {
-  const sel=document.getElementById('s-owner'), cur=sel.value;
-  const owners=[...new Set(tasks.map(t=>t.owner))].sort();
-  sel.innerHTML='<option value="">All owners</option>'+owners.map(o=>`<option value="${o}"${cur===o?' selected':''}>${o}</option>`).join('');
+function updateOwnerSel(){
+  const sel=document.getElementById('s-owner'),cur=sel.value;
+  const owners=[...new Set(tasks.map(t=>t.owner).filter(Boolean))].sort();
+  sel.innerHTML='<option value="">All owners</option>'+owners.map(o=>`<option value="${x(o)}"${cur===o?' selected':''}>${x(o)}</option>`).join('');
 }
-
-function getFiltered() {
-  const q=document.getElementById('s-search').value.toLowerCase();
+function getFiltered(){
+  const q=document.getElementById('s-q').value.toLowerCase();
   const fs=document.getElementById('s-status').value;
   const fp=document.getElementById('s-priority').value;
   const fo=document.getElementById('s-owner').value;
-  return tasks.filter(t => {
-    if(q && !t.name.toLowerCase().includes(q) && !(t.owner||'').toLowerCase().includes(q)) return false;
-    if(fs && t.status!==fs) return false;
-    if(fp && t.priority!==fp) return false;
-    if(fo && t.owner!==fo) return false;
+  return tasks.filter(t=>{
+    if(q&&!t.name.toLowerCase().includes(q)&&!(t.owner||'').toLowerCase().includes(q)&&!(t.note||'').toLowerCase().includes(q))return false;
+    if(fs&&t.status!==fs)return false;
+    if(fp&&t.priority!==fp)return false;
+    if(fo&&t.owner!==fo)return false;
     return true;
   });
 }
 
-function render() {
-  updateMetrics();
-  updateOwnerSelect();
-  const filtered = getFiltered();
-  const filteredIds = new Set(filtered.map(t=>t.id));
-  const filterActive = document.getElementById('s-search').value || document.getElementById('s-status').value || document.getElementById('s-priority').value || document.getElementById('s-owner').value;
-  let html = '';
+function render(){
+  updateMetrics();updateOwnerSel();
+  const filtered=getFiltered();
+  const fids=new Set(filtered.map(t=>t.id));
+  const fa=document.getElementById('s-q').value||document.getElementById('s-status').value||document.getElementById('s-priority').value||document.getElementById('s-owner').value;
+  let html='';
 
-  SECTIONS.forEach(sec => {
-    const allSec = tasks.filter(t=>t.section===sec.id);
-    const secFiltered = filtered.filter(t=>t.section===sec.id);
-    if (filterActive && !secFiltered.length) return;
+  SECTIONS.forEach(sec=>{
+    const allSec=tasks.filter(t=>t.section===sec.id);
+    if(fa&&!filtered.some(t=>t.section===sec.id))return;
+    const done=allSec.filter(t=>t.status==='completed').length;
+    const isOpen=fa||sectionOpen[sec.id];
 
-    const done = allSec.filter(t=>t.status==='done').length;
-    const isOpen = filterActive || sectionOpen[sec.id];
+    const parents=allSec.filter(t=>!t.parent);
+    let ordered=[];
+    parents.forEach(p=>{ordered.push(p);allSec.filter(c=>c.parent===p.id).forEach(c=>ordered.push(c));});
+    allSec.filter(t=>t.parent&&!parents.find(p=>p.id===t.parent)).forEach(t=>ordered.push(t));
+    const display=fa?ordered.filter(t=>fids.has(t.id)):ordered;
 
-    // Build ordered list: parent then its children, in order
-    const parents = allSec.filter(t=>!t.parent);
-    let ordered = [];
-    parents.forEach(p => {
-      ordered.push(p);
-      allSec.filter(c=>c.parent===p.id).forEach(c=>ordered.push(c));
-    });
-    // Orphan subtasks
-    allSec.filter(t=>t.parent && !parents.find(p=>p.id===t.parent)).forEach(t=>ordered.push(t));
-
-    const display = filterActive ? ordered.filter(t=>filteredIds.has(t.id)) : ordered;
-
-    html += `<div class="section" id="sec-${sec.id}">
-      <div class="sec-hdr" onclick="toggleSection('${sec.id}')">
+    html+=`<div class="section">
+      <div class="sec-hdr">
         <span class="sec-num">${sec.num}</span>
-        <span class="sec-title">${sec.title}</span>
+        <div class="sec-title-area">
+          <span class="sec-title" id="sec-te-${sec.id}"
+            onclick="${isAdmin?`startSecRename('${sec.id}')`:'void(0)'}"
+            title="${isAdmin?'Click to rename':''}">
+            ${x(sec.title)}
+          </span>
+        </div>
         <span class="sec-meta">${done}/${allSec.length} done</span>
-        <span class="sec-chev${isOpen?' open':''}" id="chev-${sec.id}">▶</span>
+        ${isAdmin?`<div class="sec-acts">
+          <button class="sab" onclick="startSecRename('${sec.id}')">✏ Rename</button>
+          <button class="sab amber" onclick="openMerge('${sec.id}')">⇄ Merge</button>
+          <button class="sab red" onclick="openDelCat('${sec.id}')">🗑 Delete</button>
+          <button class="sab" onclick="openAddTask('${sec.id}',null)">+ Task</button>
+        </div>`:''}
+        <span class="sec-chev${isOpen?' open':''}" id="chev-${sec.id}" onclick="toggleSection('${sec.id}')">▶</span>
       </div>
-      <div class="task-list${isOpen?' open':''}" id="tlist-${sec.id}">
+      <div class="tlist${isOpen?' open':''}" id="tlist-${sec.id}">
         <div class="t-head">
           <span></span><span></span>
           <span class="th">Task</span>
@@ -498,166 +856,103 @@ function render() {
           <span class="th">Due</span>
           <span class="th">Status</span>
           <span class="th">Priority</span>
+          <span class="th">Note / update</span>
           <span class="th">Actions</span>
         </div>
-        ${display.length ? display.map(t => {
-          const isSub = !!t.parent;
-          const hasKids = tasks.some(c=>c.parent===t.id);
-          const editable = canEdit(t);
-          return `<div class="t-row${isSub?' is-sub':''}${!editable?' locked':''}">
-            <input type="checkbox" class="chk" ${t.status==='done'?'checked':''} ${!editable?'disabled':''} onchange="toggleDone(${t.id})">
-            <div class="sub-dot-wrap">${isSub?'<div class="sub-dot"></div>':''}</div>
-            <span class="tname${t.status==='done'?' done':''}${!isSub&&hasKids?' parent':''}${!editable?' locked-name':''}" onclick="${editable?`openEdit(${t.id})`:'void(0)'}">
-              ${t.name}
-            </span>
-            <span class="owner-cell" title="${t.owner||''}">${t.owner||'—'}</span>
-            <span class="date-cell">${fd(t.start)}</span>
-            <span class="date-cell">${fd(t.due)}</span>
-            <button class="spill ${t.status}" onclick="cycleStatus(${t.id})" ${!editable?'disabled':''}>${sl(t.status)}</button>
-            <span class="badge ${t.priority}">${t.priority}</span>
-            <div class="row-actions">
-              <button class="ract" onclick="openAdd('${sec.id}',${t.id})" title="Add subtask">+ sub</button>
-              ${editable && isAdmin ? `<button class="ract del" onclick="delTask(${t.id})" title="Delete">✕</button>` : ''}
+        ${display.length?display.map(t=>{
+          const isSub=!!t.parent;
+          const hasKids=tasks.some(c=>c.parent===t.id);
+          const editable=canEdit(t);
+          const notePreview=t.note?(t.note.length>55?t.note.substring(0,55)+'…':t.note):'';
+          return `<div class="t-row">
+            <input type="checkbox" class="chk"
+              ${t.status==='completed'?'checked':''}
+              ${!editable?'disabled':''}
+              onchange="toggleDone(${t.id})">
+            <div class="subdot-w">${isSub?'<div class="subdot"></div>':''}</div>
+
+            <div class="icell" id="ic-name-${t.id}">
+              <span class="ival${t.status==='completed'?' done':''}${!isSub&&hasKids?' bold':''}${!editable?' ro':''}"
+                onclick="${editable?`inlineEdit(${t.id},'name')`:'void(0)'}"
+                title="${x(t.name)}">${x(t.name)}</span>
+              ${editable?`<span class="pencil" onclick="inlineEdit(${t.id},'name')">✏</span>`:''}
+            </div>
+
+            <div class="icell" id="ic-owner-${t.id}">
+              <span class="ival${!editable?' ro':''}"
+                onclick="${editable?`inlineEdit(${t.id},'owner')`:'void(0)'}"
+                title="${x(t.owner||'')}">${x(t.owner||'—')}</span>
+              ${editable?`<span class="pencil" onclick="inlineEdit(${t.id},'owner')">✏</span>`:''}
+            </div>
+
+            <span style="font-size:11px;color:var(--text2);align-self:center">${fd(t.start)}</span>
+            <span style="font-size:11px;color:var(--text2);align-self:center">${fd(t.due)}</span>
+
+            <select id="dsel-s-${t.id}" class="dsel ${t.status}"
+              onchange="chStatus(${t.id},this.value)"
+              ${!editable?'disabled':''}>
+              ${STATUS_OPTS.map(s=>`<option value="${s}"${t.status===s?' selected':''}>${STATUS_LBL[s]}</option>`).join('')}
+            </select>
+
+            <select id="dsel-p-${t.id}" class="dsel ${t.priority}"
+              onchange="chPriority(${t.id},this.value)"
+              ${!editable?'disabled':''}>
+              ${PRIO_OPTS.map(p=>`<option value="${p}"${t.priority===p?' selected':''}>${p.charAt(0).toUpperCase()+p.slice(1)}</option>`).join('')}
+            </select>
+
+            <div class="note-cell" onclick="${editable?`openNote(${t.id})`:''}" style="cursor:${editable?'pointer':'default'};align-self:center">
+              <span class="note-val${!notePreview?' empty':''}${!editable?' ro':''}" title="${x(t.note||'')}">
+                ${notePreview?x(notePreview):'Add note…'}
+              </span>
+              ${editable?`<span class="pencil" style="opacity:${t.note?'.7':'0'};margin-top:0">✏</span>`:''}
+            </div>
+
+            <div class="racts">
+              ${editable?`<button class="ract" onclick="openEditTask(${t.id})">Edit</button>`:''}
+              <button class="ract" onclick="openAddTask('${sec.id}',${t.id})">+ Sub</button>
+              ${isAdmin?`<button class="ract del" onclick="delTask(${t.id})">✕</button>`:''}
             </div>
           </div>`;
-        }).join('') : '<div style="padding:12px 14px;font-size:12px;color:var(--text3)">No tasks match filters</div>'}
+        }).join(''):`<div style="padding:10px 14px;font-size:12px;color:var(--text3)">No tasks match filters</div>`}
       </div>
     </div>`;
   });
 
-  document.getElementById('main-body').innerHTML = html || '<div style="text-align:center;padding:2rem;color:var(--text2);font-size:13px">No tasks match your filters.</div>';
+  document.getElementById('main-body').innerHTML=html||
+    '<div style="text-align:center;padding:2rem;color:var(--text2);font-size:13px">No tasks match your filters.</div>';
 }
 
-// ── INTERACTIONS ──────────────────────────────────────────────────────────────
-function toggleSection(id) {
-  sectionOpen[id] = !sectionOpen[id];
-  const el = document.getElementById('tlist-'+id);
-  const ch = document.getElementById('chev-'+id);
-  if(el) el.classList.toggle('open', sectionOpen[id]);
-  if(ch) ch.classList.toggle('open', sectionOpen[id]);
+function toggleSection(id){
+  sectionOpen[id]=!sectionOpen[id];
+  document.getElementById('tlist-'+id)?.classList.toggle('open',sectionOpen[id]);
+  document.getElementById('chev-'+id)?.classList.toggle('open',sectionOpen[id]);
 }
-function collapseAll() { SECTIONS.forEach(s=>sectionOpen[s.id]=false); render(); }
-function expandAll() { SECTIONS.forEach(s=>sectionOpen[s.id]=true); render(); }
+function collapseAll(){SECTIONS.forEach(s=>sectionOpen[s.id]=false);render();}
+function expandAll(){SECTIONS.forEach(s=>sectionOpen[s.id]=true);render();}
 
-function toggleDone(id) {
-  const t = tasks.find(x=>x.id===id);
-  if(!t || !canEdit(t)) return;
-  t.status = t.status==='done' ? 'not-started' : 'done';
-  saveTasks(); render(); toast('Updated ✓');
-}
-function cycleStatus(id) {
-  const t = tasks.find(x=>x.id===id);
-  if(!t || !canEdit(t)) return;
-  const c = ['not-started','in-progress','blocked','done'];
-  t.status = c[(c.indexOf(t.status)+1)%c.length];
-  saveTasks(); render(); toast('Status updated ✓');
-}
-function delTask(id) {
-  if(!isAdmin) return;
-  if(!confirm('Delete this task and all its subtasks?')) return;
-  tasks = tasks.filter(t=>t.id!==id && t.parent!==id);
-  saveTasks(); render(); toast('Deleted');
-}
-
-// ── MODAL ─────────────────────────────────────────────────────────────────────
-function openAdd(sectionId, parentId) {
-  editingId = null;
-  document.getElementById('modal-title').textContent = parentId ? 'Add subtask' : 'Add task';
-  document.getElementById('f-name').value = '';
-  document.getElementById('f-owner').value = isAdmin ? '' : currentUser;
-  document.getElementById('f-start').value = '';
-  document.getElementById('f-due').value = '';
-  document.getElementById('f-priority').value = 'high';
-  document.getElementById('f-status').value = 'not-started';
-  populateSectionSelect();
-  if (sectionId) document.getElementById('f-section').value = sectionId;
-  refreshParentSelect();
-  if (parentId) document.getElementById('f-parent').value = parentId;
-  document.getElementById('modal-overlay').classList.remove('hidden');
-}
-function openEdit(id) {
-  const t = tasks.find(x=>x.id===id);
-  if(!t) return;
-  editingId = id;
-  document.getElementById('modal-title').textContent = 'Edit task';
-  document.getElementById('f-name').value = t.name;
-  document.getElementById('f-owner').value = t.owner||'';
-  document.getElementById('f-start').value = t.start||'';
-  document.getElementById('f-due').value = t.due||'';
-  document.getElementById('f-priority').value = t.priority;
-  document.getElementById('f-status').value = t.status;
-  populateSectionSelect();
-  document.getElementById('f-section').value = t.section;
-  refreshParentSelect();
-  document.getElementById('f-parent').value = t.parent||'';
-  document.getElementById('modal-overlay').classList.remove('hidden');
-}
-function populateSectionSelect() {
-  document.getElementById('f-section').innerHTML = SECTIONS.map(s=>`<option value="${s.id}">${s.num}. ${s.title}</option>`).join('');
-  document.getElementById('f-section').onchange = refreshParentSelect;
-}
-function refreshParentSelect() {
-  const secId = document.getElementById('f-section').value;
-  const parents = tasks.filter(t=>t.section===secId && !t.parent && t.id !== editingId);
-  document.getElementById('f-parent').innerHTML =
-    '<option value="">— top-level task —</option>' +
-    parents.map(p=>`<option value="${p.id}">${p.name.substring(0,60)}${p.name.length>60?'…':''}</option>`).join('');
-}
-function saveModal() {
-  const name = document.getElementById('f-name').value.trim();
-  const owner = document.getElementById('f-owner').value.trim();
-  if(!name||!owner) { alert('Name and owner are required.'); return; }
-  const pv = document.getElementById('f-parent').value;
-  const data = {
-    name, owner,
-    section: document.getElementById('f-section').value,
-    parent: pv ? parseInt(pv) : null,
-    start: document.getElementById('f-start').value,
-    due: document.getElementById('f-due').value,
-    priority: document.getElementById('f-priority').value,
-    status: document.getElementById('f-status').value,
-  };
-  if (editingId) {
-    Object.assign(tasks.find(x=>x.id===editingId), data);
-    toast('Task updated ✓');
-  } else {
-    tasks.push({id:nextId(), ...data});
-    toast('Task added ✓');
-  }
-  saveTasks(); closeModal(); render();
-}
-function closeModal() { document.getElementById('modal-overlay').classList.add('hidden'); editingId=null; }
-function closeModalClick(e) { if(e.target.id==='modal-overlay') closeModal(); }
-
-// ── EXPORT ────────────────────────────────────────────────────────────────────
-function exportCSV() {
-  const headers = ['ID','Section','Parent ID','Task','Owner','Start','Due','Priority','Status'];
-  const rows = tasks.map(t=>[
+// ── EXPORT ─────────────────────────────────────────────────────────────────────
+function exportCSV(){
+  const headers=['ID','Section','Parent','Task','Owner','Start','Due','Priority','Status','Note'];
+  const rows=tasks.map(t=>[
     t.id,
     SECTIONS.find(s=>s.id===t.section)?.title||t.section,
     t.parent||'',
     `"${(t.name||'').replace(/"/g,'""')}"`,
     `"${(t.owner||'').replace(/"/g,'""')}"`,
-    t.start||'', t.due||'',
-    t.priority, t.status
+    t.start||'',t.due||'',t.priority,t.status,
+    `"${(t.note||'').replace(/"/g,'""')}"`
   ]);
-  const csv = [headers, ...rows].map(r=>r.join(',')).join('\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-  a.download = 'ga_checklist.csv';
-  a.click();
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([[headers,...rows].map(r=>r.join(',')).join('\n')],{type:'text/csv'}));
+  a.download='ga_checklist.csv';a.click();
 }
 
-// ── TOAST ─────────────────────────────────────────────────────────────────────
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'), 2000);
+// ── TOAST ──────────────────────────────────────────────────────────────────────
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2200);
 }
-
-// ── KEYBOARD ──────────────────────────────────────────────────────────────────
-document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
 </script>
 </body>
 </html>
