@@ -182,6 +182,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
   .t-head .th:nth-child(9),.t-row>*:nth-child(9){display:none}
 }
 </style>
+
+  <!-- Firebase SDK (compat version — works in plain HTML with no build tools) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAtKK486L54STfCIzkVOXiBiGySzrRD4oE",
+      authDomain: "ga-checklist-83175.firebaseapp.com",
+      projectId: "ga-checklist-83175",
+      storageBucket: "ga-checklist-83175.firebasestorage.app",
+      messagingSenderId: "572424808540",
+      appId: "1:572424808540:web:9ab253d45fd30f51915e99"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
 </head>
 <body>
 
@@ -200,6 +216,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 
 <!-- APP -->
 <div id="app">
+  <div id="loading-bar" style="display:none;position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#185FA5,#3B6D11);z-index:999;animation:loadpulse 1s infinite alternate">
+  </div>
+  <style>@keyframes loadpulse{0%{opacity:.4}100%{opacity:1}}</style>
   <div class="topbar">
     <h1>🚀 GA Launch Checklist</h1>
     <span class="topbar-meta" id="days-left"></span>
@@ -365,7 +384,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 
 <script>
 const ADMIN_PASS='ga-admin-2026';
-const SK='ga_cl_v7';
+
+// ── FIREBASE ──────────────────────────────────────────────────────────────────
+// Config loaded via CDN below — no npm needed
+const FB_PROJECT = 'ga-checklist-83175';
+const SK='ga_cl_v7'; // kept for migration only
 const STATUS_OPTS=['not-started','in-progress','delayed','blocked','completed'];
 const STATUS_LBL={'not-started':'Not started','in-progress':'In progress','delayed':'Delayed','blocked':'Blocked','completed':'Completed'};
 const PRIO_OPTS=['critical','high','medium','low'];
@@ -499,43 +522,66 @@ let SECTIONS=[], tasks=[], users={}, sectionOpen={};
 let currentUser=null, isAdmin=false;
 let editingTaskId=null, mergingSecId=null, deletingSecId=null, noteTaskId=null;
 
-function loadData(){
-  // wipe ALL previous storage keys so we always start clean
-  try{
-    ['ga_checklist_v3','ga_checklist_v4','ga_cl_v1','ga_cl_v2',
-     'ga_cl_v3','ga_cl_v4','ga_cl_v5','ga_cl_v6','ga_cl_v7_old'].forEach(k=>localStorage.removeItem(k));
-  }catch(e){}
-
-  // ALWAYS seed from defaults first — never trust empty storage
+// ── FIREBASE PERSISTENCE ─────────────────────────────────────────────────────
+async function loadData(){
+  // always seed defaults first
   tasks    = JSON.parse(JSON.stringify(DEF_TASKS));
   SECTIONS = JSON.parse(JSON.stringify(DEF_SECTIONS));
   users    = {};
 
-  // then try to load saved overrides (status changes, notes, new tasks etc.)
+  if(!db){ render(); return; } // fallback if Firebase not ready
+
   try{
-    const raw = localStorage.getItem(SK);
-    if(raw){
-      const d = JSON.parse(raw);
-      // ONLY use saved data if it actually has tasks in it
-      if(d && Array.isArray(d.tasks) && d.tasks.length >= 50){
+    showLoading(true);
+    const snap = await db.collection('checklist').doc('state').get();
+    if(snap.exists){
+      const d = snap.data();
+      if(d.tasks && d.tasks.length >= 50){
         tasks    = d.tasks;
         SECTIONS = (d.sections && d.sections.length > 0) ? d.sections : SECTIONS;
         users    = d.users || {};
         tasks.forEach(t=>{ if(t.note===undefined) t.note=''; });
+      } else {
+        // first time — seed defaults into Firebase
+        await saveToFirebase();
       }
+    } else {
+      // document doesn't exist yet — create it with defaults
+      await saveToFirebase();
     }
-  }catch(e){ /* corrupted storage — keep defaults */ }
-
-  // save clean state so next load is fast
-  save();
+  } catch(e){
+    console.error('Firebase load error:', e);
+    toast('⚠️ Could not load from cloud — showing defaults');
+  }
+  showLoading(false);
+  render();
 }
-function save(){localStorage.setItem(SK,JSON.stringify({tasks,sections:SECTIONS,users}));}
+
+let saveTimer=null;
+function save(){
+  // debounce — wait 800ms after last change before writing to Firebase
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>saveToFirebase(),800);
+}
+async function saveToFirebase(){
+  if(!db) return;
+  try{
+    await db.collection('checklist').doc('state').set({tasks,sections:SECTIONS,users,updated:new Date().toISOString()});
+  } catch(e){
+    console.error('Firebase save error:',e);
+    toast('⚠️ Save failed — check connection');
+  }
+}
+function showLoading(show){
+  const el=document.getElementById('loading-bar');
+  if(el) el.style.display=show?'block':'none';
+}
 function nextId(){return Math.max(0,...tasks.map(t=>t.id))+1;}
 function secById(id){return SECTIONS.find(s=>s.id===id);}
 function x(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 // ── AUTH ───────────────────────────────────────────────────────────────────────
-function doLogin(){
+async function doLogin(){
   const name=document.getElementById('login-name').value.trim();
   const pass=document.getElementById('login-pass').value.trim();
   if(!name){alert('Please enter your name.');return;}
@@ -549,9 +595,22 @@ function doLogin(){
   document.getElementById('user-badge').textContent=isAdmin?'⭐ Admin: '+name:'👤 '+name;
   ['add-task-btn','add-cat-btn','users-btn'].forEach(id=>
     document.getElementById(id).style.display=isAdmin?'':'none');
-  loadData();
-  SECTIONS.forEach(s=>sectionOpen[s.id]=true);
-  render();
+  await loadData();
+  // set up real-time listener so all users see live updates
+  if(db){
+    db.collection('checklist').doc('state').onSnapshot(snap=>{
+      if(!snap.exists) return;
+      const d=snap.data();
+      if(!d||!d.tasks||d.tasks.length<50) return;
+      // only update if data changed (avoid overwriting mid-edit)
+      if(JSON.stringify(d.tasks)===JSON.stringify(tasks)) return;
+      tasks=d.tasks;
+      if(d.sections&&d.sections.length>0) SECTIONS=d.sections;
+      if(d.users) users=d.users;
+      tasks.forEach(t=>{if(t.note===undefined)t.note='';});
+      render();
+    });
+  }
 }
 function doLogout(){
   currentUser=null;isAdmin=false;
