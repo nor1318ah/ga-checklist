@@ -487,23 +487,28 @@ let currentUser=null, isAdmin=false;
 let editingTaskId=null, mergingSecId=null, deletingSecId=null, noteTaskId=null;
 
 function loadData(){
+  // clear any leftover data from older versions of this app
+  ['ga_checklist_v3','ga_checklist_v4','ga_cl_v3','ga_cl_v4'].forEach(k=>localStorage.removeItem(k));
   try{
     const raw=localStorage.getItem(SK);
     if(raw){
       const d=JSON.parse(raw);
-      tasks=d.tasks||JSON.parse(JSON.stringify(DEF_TASKS));
-      SECTIONS=d.sections||JSON.parse(JSON.stringify(DEF_SECTIONS));
+      // if saved tasks array is empty or missing, re-seed from defaults
+      tasks=(d.tasks&&d.tasks.length>0)?d.tasks:JSON.parse(JSON.stringify(DEF_TASKS));
+      SECTIONS=(d.sections&&d.sections.length>0)?d.sections:JSON.parse(JSON.stringify(DEF_SECTIONS));
       users=d.users||{};
       tasks.forEach(t=>{if(t.note===undefined)t.note='';});
     } else {
       tasks=JSON.parse(JSON.stringify(DEF_TASKS));
       SECTIONS=JSON.parse(JSON.stringify(DEF_SECTIONS));
-      users={};save();
+      users={};
+      save();
     }
   } catch(e){
     tasks=JSON.parse(JSON.stringify(DEF_TASKS));
     SECTIONS=JSON.parse(JSON.stringify(DEF_SECTIONS));
     users={};
+    save();
   }
 }
 function save(){localStorage.setItem(SK,JSON.stringify({tasks,sections:SECTIONS,users}));}
