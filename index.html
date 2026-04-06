@@ -596,6 +596,8 @@ async function doLogin(){
   ['add-task-btn','add-cat-btn','users-btn'].forEach(id=>
     document.getElementById(id).style.display=isAdmin?'':'none');
   await loadData();
+  // ensure all sections are open by default after data loads
+  SECTIONS.forEach(s=>{ if(sectionOpen[s.id]===undefined) sectionOpen[s.id]=true; });
   // set up real-time listener so all users see live updates
   if(db){
     db.collection('checklist').doc('state').onSnapshot(snap=>{
@@ -608,6 +610,7 @@ async function doLogin(){
       if(d.sections&&d.sections.length>0) SECTIONS=d.sections;
       if(d.users) users=d.users;
       tasks.forEach(t=>{if(t.note===undefined)t.note='';});
+      SECTIONS.forEach(s=>{ if(sectionOpen[s.id]===undefined) sectionOpen[s.id]=true; });
       render();
     });
   }
@@ -903,7 +906,7 @@ function render(){
     const allSec=tasks.filter(t=>t.section===sec.id);
     if(fa&&!filtered.some(t=>t.section===sec.id))return;
     const done=allSec.filter(t=>t.status==='completed').length;
-    const isOpen=fa||sectionOpen[sec.id];
+    const isOpen=fa||(sectionOpen[sec.id]!==false);
 
     const parents=allSec.filter(t=>!t.parent);
     let ordered=[];
@@ -1046,7 +1049,7 @@ function toggleSection(id){
   document.getElementById('chev-'+id)?.classList.toggle('open',sectionOpen[id]);
 }
 function collapseAll(){SECTIONS.forEach(s=>sectionOpen[s.id]=false);render();}
-function expandAll(){SECTIONS.forEach(s=>sectionOpen[s.id]=true);render();}
+function expandAll(){SECTIONS.forEach(s=>sectionOpen[s.id]=true);render();console.log('Expanded',SECTIONS.length,'sections');}
 
 // ── EXPORT ─────────────────────────────────────────────────────────────────────
 function exportCSV(){
