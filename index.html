@@ -895,6 +895,76 @@ function getFiltered(){
   });
 }
 
+
+// ── COMPUTED PARENT FIELDS ────────────────────────────────────────────────────
+const PRIO_RANK={critical:4,high:3,medium:2,low:1};
+const STATUS_RANK={blocked:5,delayed:4,'in-progress':3,'not-started':2,completed:1};
+
+function getChildren(pid){return tasks.filter(t=>t.parent===pid);}
+
+function computedDue(t){
+  const kids=getChildren(t.id);
+  if(!kids.length)return t.due||'';
+  const dates=kids.map(k=>k.due).filter(Boolean).sort();
+  return dates.length?dates[dates.length-1]:(t.due||'');
+}
+function computedStatus(t){
+  const kids=getChildren(t.id);
+  if(!kids.length)return t.status;
+  let best=kids[0].status;
+  kids.forEach(k=>{if((STATUS_RANK[k.status]||0)>(STATUS_RANK[best]||0))best=k.status;});
+  return best;
+}
+function computedPriority(t){
+  const kids=getChildren(t.id);
+  if(!kids.length)return t.priority;
+  let best=kids[0].priority;
+  kids.forEach(k=>{if((PRIO_RANK[k.priority]||0)>(PRIO_RANK[best]||0))best=k.priority;});
+  return best;
+}
+function computedOwner(t){
+  if(t.owner)return t.owner;
+  const kids=getChildren(t.id);
+  if(!kids.length)return '';
+  const owners=[...new Set(kids.map(k=>k.owner).filter(Boolean))];
+  if(!owners.length)return '';
+  return owners.length===1?owners[0]:'Multiple';
+}
+
+// ── DRAG-TO-REORDER ───────────────────────────────────────────────────────────
+let dragId=null;
+function onDragStart(e,id){dragId=id;e.dataTransfer.effectAllowed='move';document.getElementById('tr-'+id)?.classList.add('dragging');}
+function onDragEnd(e,id){document.getElementById('tr-'+id)?.classList.remove('dragging');document.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));}
+function onDragOver(e,id){e.preventDefault();if(id===dragId)return;document.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));document.getElementById('tr-'+id)?.classList.add('drag-over');}
+function onDrop(e,id){
+  e.preventDefault();
+  if(!dragId||dragId===id)return;
+  const dragged=tasks.find(t=>t.id===dragId);
+  const target=tasks.find(t=>t.id===id);
+  if(!dragged||!target||dragged.parent!==target.parent)return;
+  const fi=tasks.indexOf(dragged),ti=tasks.indexOf(target);
+  tasks.splice(fi,1);tasks.splice(ti,0,dragged);
+  dragId=null;save();render();toast('Order updated ✓');
+}
+function moveUp(id){
+  const t=tasks.find(z=>z.id===id);if(!t||!t.parent)return;
+  const sibs=tasks.filter(z=>z.parent===t.parent);
+  const i=sibs.indexOf(t);if(i<=0)return;
+  const prev=sibs[i-1];
+  const ti=tasks.indexOf(t),pi=tasks.indexOf(prev);
+  tasks.splice(ti,1);tasks.splice(pi,0,t);
+  save();render();toast('Moved up ✓');
+}
+function moveDown(id){
+  const t=tasks.find(z=>z.id===id);if(!t||!t.parent)return;
+  const sibs=tasks.filter(z=>z.parent===t.parent);
+  const i=sibs.indexOf(t);if(i>=sibs.length-1)return;
+  const next=sibs[i+1];
+  const ti=tasks.indexOf(t),ni=tasks.indexOf(next);
+  tasks.splice(ti,1);tasks.splice(ni+1,0,t);
+  save();render();toast('Moved down ✓');
+}
+
 function render(){
   updateMetrics();updateOwnerSel();
   const filtered=getFiltered();
@@ -902,11 +972,22 @@ function render(){
   const fa=document.getElementById('s-q').value||document.getElementById('s-status').value||document.getElementById('s-priority').value||document.getElementById('s-owner').value;
   let html='';
 
+  console.log('RENDER called — tasks:',tasks.length,'sections:',SECTIONS.length,'sectionOpen:',JSON.stringify(sectionOpen));
+
+  if(!SECTIONS||SECTIONS.length===0){
+    document.getElementById('main-body').innerHTML='<div style="text-align:center;padding:2rem;color:red">No sections loaded</div>';
+    return;
+  }
+  if(!tasks||tasks.length===0){
+    document.getElementById('main-body').innerHTML='<div style="text-align:center;padding:2rem;color:red">No tasks loaded</div>';
+    return;
+  }
+
   SECTIONS.forEach(sec=>{
     const allSec=tasks.filter(t=>t.section===sec.id);
     if(fa&&!filtered.some(t=>t.section===sec.id))return;
     const done=allSec.filter(t=>t.status==='completed').length;
-    const isOpen=fa||(sectionOpen[sec.id]!==false);
+    const isOpen=true; // force open always
 
     const parents=allSec.filter(t=>!t.parent);
     let ordered=[];
