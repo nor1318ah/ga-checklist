@@ -352,7 +352,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 
 <script>
 const ADMIN_PASS='ga-admin-2026';
-const SK='ga_cl_v5';
+const SK='ga_cl_v6';
 const STATUS_OPTS=['not-started','in-progress','delayed','blocked','completed'];
 const STATUS_LBL={'not-started':'Not started','in-progress':'In progress','delayed':'Delayed','blocked':'Blocked','completed':'Completed'};
 const PRIO_OPTS=['critical','high','medium','low'];
@@ -487,29 +487,26 @@ let currentUser=null, isAdmin=false;
 let editingTaskId=null, mergingSecId=null, deletingSecId=null, noteTaskId=null;
 
 function loadData(){
-  // clear any leftover data from older versions of this app
-  ['ga_checklist_v3','ga_checklist_v4','ga_cl_v3','ga_cl_v4'].forEach(k=>localStorage.removeItem(k));
+  // always start from defaults, then merge in any saved user/status overrides
+  tasks=JSON.parse(JSON.stringify(DEF_TASKS));
+  SECTIONS=JSON.parse(JSON.stringify(DEF_SECTIONS));
+  users={};
   try{
+    // wipe old version keys
+    ['ga_checklist_v3','ga_checklist_v4','ga_cl_v3','ga_cl_v4','ga_cl_v5'].forEach(k=>localStorage.removeItem(k));
     const raw=localStorage.getItem(SK);
     if(raw){
       const d=JSON.parse(raw);
-      // if saved tasks array is empty or missing, re-seed from defaults
-      tasks=(d.tasks&&d.tasks.length>0)?d.tasks:JSON.parse(JSON.stringify(DEF_TASKS));
-      SECTIONS=(d.sections&&d.sections.length>0)?d.sections:JSON.parse(JSON.stringify(DEF_SECTIONS));
-      users=d.users||{};
-      tasks.forEach(t=>{if(t.note===undefined)t.note='';});
-    } else {
-      tasks=JSON.parse(JSON.stringify(DEF_TASKS));
-      SECTIONS=JSON.parse(JSON.stringify(DEF_SECTIONS));
-      users={};
-      save();
+      // only use saved tasks if we actually have some
+      if(d.tasks&&d.tasks.length>0){
+        tasks=d.tasks;
+        tasks.forEach(t=>{if(t.note===undefined)t.note='';});
+      }
+      if(d.sections&&d.sections.length>0) SECTIONS=d.sections;
+      if(d.users) users=d.users;
     }
-  } catch(e){
-    tasks=JSON.parse(JSON.stringify(DEF_TASKS));
-    SECTIONS=JSON.parse(JSON.stringify(DEF_SECTIONS));
-    users={};
-    save();
-  }
+  } catch(e){ /* ignore, use defaults */ }
+  save();
 }
 function save(){localStorage.setItem(SK,JSON.stringify({tasks,sections:SECTIONS,users}));}
 function nextId(){return Math.max(0,...tasks.map(t=>t.id))+1;}
