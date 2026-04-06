@@ -365,7 +365,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 
 <script>
 const ADMIN_PASS='ga-admin-2026';
-const SK='ga_cl_v6';
+const SK='ga_cl_v7';
 const STATUS_OPTS=['not-started','in-progress','delayed','blocked','completed'];
 const STATUS_LBL={'not-started':'Not started','in-progress':'In progress','delayed':'Delayed','blocked':'Blocked','completed':'Completed'};
 const PRIO_OPTS=['critical','high','medium','low'];
@@ -500,25 +500,33 @@ let currentUser=null, isAdmin=false;
 let editingTaskId=null, mergingSecId=null, deletingSecId=null, noteTaskId=null;
 
 function loadData(){
-  // always start from defaults, then merge in any saved user/status overrides
-  tasks=JSON.parse(JSON.stringify(DEF_TASKS));
-  SECTIONS=JSON.parse(JSON.stringify(DEF_SECTIONS));
-  users={};
+  // wipe ALL previous storage keys so we always start clean
   try{
-    // wipe old version keys
-    ['ga_checklist_v3','ga_checklist_v4','ga_cl_v3','ga_cl_v4','ga_cl_v5'].forEach(k=>localStorage.removeItem(k));
-    const raw=localStorage.getItem(SK);
+    ['ga_checklist_v3','ga_checklist_v4','ga_cl_v1','ga_cl_v2',
+     'ga_cl_v3','ga_cl_v4','ga_cl_v5','ga_cl_v6','ga_cl_v7_old'].forEach(k=>localStorage.removeItem(k));
+  }catch(e){}
+
+  // ALWAYS seed from defaults first — never trust empty storage
+  tasks    = JSON.parse(JSON.stringify(DEF_TASKS));
+  SECTIONS = JSON.parse(JSON.stringify(DEF_SECTIONS));
+  users    = {};
+
+  // then try to load saved overrides (status changes, notes, new tasks etc.)
+  try{
+    const raw = localStorage.getItem(SK);
     if(raw){
-      const d=JSON.parse(raw);
-      // only use saved tasks if we actually have some
-      if(d.tasks&&d.tasks.length>0){
-        tasks=d.tasks;
-        tasks.forEach(t=>{if(t.note===undefined)t.note='';});
+      const d = JSON.parse(raw);
+      // ONLY use saved data if it actually has tasks in it
+      if(d && Array.isArray(d.tasks) && d.tasks.length >= 50){
+        tasks    = d.tasks;
+        SECTIONS = (d.sections && d.sections.length > 0) ? d.sections : SECTIONS;
+        users    = d.users || {};
+        tasks.forEach(t=>{ if(t.note===undefined) t.note=''; });
       }
-      if(d.sections&&d.sections.length>0) SECTIONS=d.sections;
-      if(d.users) users=d.users;
     }
-  } catch(e){ /* ignore, use defaults */ }
+  }catch(e){ /* corrupted storage — keep defaults */ }
+
+  // save clean state so next load is fast
   save();
 }
 function save(){localStorage.setItem(SK,JSON.stringify({tasks,sections:SECTIONS,users}));}
