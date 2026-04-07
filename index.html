@@ -686,41 +686,29 @@ function buildParentRow(t, secId) {
   const kids = getChildren(t.id);
   const kidsDone = kids.filter(k=>k.status==='completed').length;
   const kidsPct = kids.length ? Math.round(kidsDone/kids.length*100) : 0;
-  const pStatus = computedStatus(t);
-  const pPrio = computedPriority(t);
   const flagCls = t.flagged ? ' flagged-row' : '';
 
-  let html = '<div class="parent-row'+flagCls+'" id="tr-'+t.id+'">';
-  html += '<input type="checkbox" class="chk" '+(pStatus==='completed'?'checked':'')+' disabled>';
-  html += '<div></div><div></div>';
-  html += '<div style="min-width:0">';
-  // title line
-  html += '<div style="display:flex;align-items:center;gap:6px;min-width:0;margin-bottom:4px">';
+  let html = '<div class="parent-row'+flagCls+'" id="tr-'+t.id+'" style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:0.5px solid var(--border);background:var(--bg2)">';
+
   if(isAdmin){
-    html += '<span id="sec-te-name-'+t.id+'" style="font-size:13px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer" onclick="inlineEdit('+t.id+',\'name\')" title="'+esc(t.name)+'">'+esc(t.name)+'</span>';
-    html += '<span class="pencil" onclick="inlineEdit('+t.id+',\'name\')" style="opacity:.4">✏</span>';
+    html += '<span id="ic-name-'+t.id+'" style="font-size:13px;font-weight:700;flex:0 0 auto;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;color:var(--text)" onclick="inlineEdit('+t.id+',\'name\')" title="'+esc(t.name)+'">'+esc(t.name)+'</span>';
   } else {
-    html += '<span style="font-size:13px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(t.name)+'">'+esc(t.name)+'</span>';
+    html += '<span style="font-size:13px;font-weight:700;flex:0 0 auto;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)" title="'+esc(t.name)+'">'+esc(t.name)+'</span>';
   }
-  html += '<span class="dsel '+pStatus+'" style="font-size:10px;font-weight:700;border-radius:8px;padding:2px 8px;flex-shrink:0">'+STATUS_LBL[pStatus]+'</span>';
-  html += '<span class="dsel '+pPrio+'" style="font-size:10px;font-weight:700;border-radius:8px;padding:2px 8px;flex-shrink:0">'+pPrio.charAt(0).toUpperCase()+pPrio.slice(1)+'</span>';
-  html += '<button class="flag-btn'+(t.flagged?' on':'')+'" onclick="toggleFlag('+t.id+')" title="'+(t.flagged?'Remove flag':'Flag for review')+'">🚩</button>';
-  html += '<div class="racts" style="flex-shrink:0">';
-  html += '<button class="ract" onclick="openAddTask(\''+secId+'\','+t.id+')">+Sub</button>';
-  if(isAdmin) html += '<button class="ract del" onclick="delTask('+t.id+')">✕</button>';
+
+  html += '<div style="flex:1;height:6px;background:var(--border);border-radius:6px;overflow:hidden;min-width:60px">';
+  html += '<div style="height:100%;width:'+kidsPct+'%;background:'+(kidsPct===100?'var(--green)':'var(--blue)')+';border-radius:6px;transition:width .4s"></div>';
   html += '</div>';
+  html += '<span style="font-size:11px;color:var(--text2);white-space:nowrap;flex-shrink:0">'+kidsDone+'/'+kids.length+' subtasks · '+kidsPct+'%</span>';
+  html += '<button class="flag-btn'+(t.flagged?' on':'')+'" onclick="toggleFlag('+t.id+')" style="flex-shrink:0">🚩</button>';
+  if(isAdmin){
+    html += '<button class="ract" onclick="openAddTask(\''+secId+'\','+t.id+')">+Sub</button>';
+    html += '<button class="ract del" onclick="delTask('+t.id+')">✕</button>';
+  }
   html += '</div>';
-  // progress bar line
-  html += '<div style="display:flex;align-items:center;gap:8px">';
-  html += '<div style="flex:1;max-width:240px;height:5px;background:var(--border);border-radius:5px;overflow:hidden">';
-  html += '<div style="height:100%;width:'+kidsPct+'%;background:'+(kidsPct===100?'var(--green)':'var(--blue)')+';border-radius:5px;transition:width .4s"></div>';
-  html += '</div>';
-  html += '<span style="font-size:10px;color:var(--text2);white-space:nowrap">'+kidsDone+'/'+kids.length+' tasks &nbsp;·&nbsp; '+kidsPct+'%</span>';
-  html += '</div>';
-  html += '</div>';
-  html += '</div>'; // end parent-row
   return html;
 }
+
 
 function buildSubtaskRow(t, secId, seqNum) {
   const editable = canEdit(t);
@@ -815,8 +803,10 @@ function render(){
     const done=allSec.filter(t=>t.status==='completed').length;
     const pct=allSec.length?Math.round(done/allSec.length*100):0;
     const isOpen=sectionOpen[sec.id]!==false;
+    const mainTasks=allSec.filter(t=>!t.parent);
+    const mainDone=mainTasks.filter(t=>computedStatus(t)==='completed').length;
 
-    const parents=allSec.filter(t=>!t.parent);
+    const parents=mainTasks;
     let ordered=[];
     parents.forEach(function(p){
       ordered.push(p);
@@ -831,8 +821,9 @@ function render(){
     html+='<div class="sec-title-area">';
     html+='<span class="sec-title" id="sec-te-'+sec.id+'" onclick="'+(isAdmin?'startSecRename(\''+sec.id+'\')':'void(0)')+'" title="'+(isAdmin?'Click to rename':'')+'">'+esc(sec.title)+'</span>';
     html+='<div class="sec-pbar-wrap"><div class="sec-pbar'+(pct===100?' full':'')+'" style="width:'+pct+'%"></div></div>';
+    html+='<span style="font-size:10px;color:var(--text2)"> '+pct+'%</span>';
     html+='</div>';
-    html+='<span class="sec-meta">'+done+'/'+allSec.length+' &nbsp;'+pct+'%</span>';
+    html+='<span class="sec-meta">'+mainDone+'/'+mainTasks.length+' tasks</span>';
     if(isAdmin){
       html+='<div class="sec-acts">';
       html+='<button class="sab" onclick="startSecRename(\''+sec.id+'\')">✏ Rename</button>';
