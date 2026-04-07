@@ -957,16 +957,23 @@ function expandAll(){SECTIONS.forEach(s=>sectionOpen[s.id]=true);render();}
 
 // ── EXPORT ────────────────────────────────────────────────────────────────────
 function exportCSV(){
-  const headers=['ID','Section','Parent','Task','Owner','Start','Due','Priority','Status','Note','Link','Flagged'];
-  const rows=tasks.map(t=>[t.id,SECTIONS.find(s=>s.id===t.section)?.title||t.section,t.parent||'',
-    `"${(t.name||'').replace(/"/g,'""')}"`,'
-    `"${(t.owner||'').replace(/"/g,'""')}"`,'
-    t.start||'',t.due||'',t.priority,t.status,
-    `"${(t.note||'').replace(/"/g,'""')}"`,'
-    t.link||'',t.flagged?'yes':'no']);
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([[headers,...rows].map(r=>r.join(',')).join('\n')],{type:'text/csv'}));
-  a.download='ga_checklist.csv';a.click();
+  const q = s => '"'+String(s||'').replace(/"/g,'""')+'"';
+  const headers = ['ID','Section','Parent','Task','Owner','Start','Due','Priority','Status','Note','Link','Flagged'];
+  const rows = tasks.map(t=>[
+    t.id,
+    SECTIONS.find(s=>s.id===t.section)?.title||t.section,
+    t.parent||'',
+    q(t.name), q(t.owner),
+    t.start||'', t.due||'',
+    t.priority, t.status,
+    q(t.note), t.link||'',
+    t.flagged?'yes':'no'
+  ]);
+  const csv = [headers,...rows].map(r=>r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download = 'ga_checklist.csv';
+  a.click();
 }
 
 // ── TOAST ─────────────────────────────────────────────────────────────────────
