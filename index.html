@@ -490,10 +490,12 @@ async function loadData(){
   users = {};
   try{
     showLoading(true);
-    const snap = await db.collection('checklist').doc('state').get();
+    const snap = await db.collection('checklist').doc('state_v2').get();
     if(snap.exists){
       const d = snap.data();
-      if(d && Array.isArray(d.tasks) && d.tasks.length >= 10){
+      // Force reset if saved data has fewer tasks than defaults (catches stale/empty state)
+      const savedOk = d && Array.isArray(d.tasks) && d.tasks.length >= DEF_TASKS.length - 5;
+      if(savedOk){
         tasks = d.tasks;
         if(d.sections && d.sections.length > 0) SECTIONS = d.sections;
         if(d.users) users = d.users;
@@ -503,6 +505,8 @@ async function loadData(){
           if(t.flagged===undefined)t.flagged=false;
         });
       } else {
+        // Saved data is stale or empty — push defaults to Firebase
+        console.log('Resetting Firebase with defaults. Saved:',d?.tasks?.length,'Default:',DEF_TASKS.length);
         await saveToFirebase();
       }
     } else {
@@ -513,7 +517,7 @@ async function loadData(){
 }
 function save(){clearTimeout(saveTimer);saveTimer=setTimeout(saveToFirebase,800);}
 async function saveToFirebase(){
-  try{await db.collection('checklist').doc('state').set({tasks,sections:SECTIONS,users,updated:new Date().toISOString()});}
+  try{await db.collection('checklist').doc('state_v2').set({tasks,sections:SECTIONS,users,updated:new Date().toISOString()});}
   catch(e){console.error('Save error:',e);toast('⚠ Save failed');}
 }
 function showLoading(v){document.getElementById('loading-bar').style.display=v?'block':'none';}
@@ -538,7 +542,7 @@ async function doLogin(){
   save(); // save updated lastSeen/email
   SECTIONS.forEach(s=>sectionOpen[s.id]=true);
   // set up real-time listener
-  db.collection('checklist').doc('state').onSnapshot(snap=>{
+  db.collection('checklist').doc('state_v2').onSnapshot(snap=>{
     if(!snap.exists)return;
     const d=snap.data();
     if(!d||!Array.isArray(d.tasks)||d.tasks.length<10)return;
