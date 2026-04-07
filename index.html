@@ -4,6 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GA Launch Checklist</title>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyAtKK486L54STfCIzkVOXiBiGySzrRD4oE",
+  authDomain:"ga-checklist-83175.firebaseapp.com",
+  projectId:"ga-checklist-83175",
+  storageBucket:"ga-checklist-83175.firebasestorage.app",
+  messagingSenderId:"572424808540",
+  appId:"1:572424808540:web:9ab253d45fd30f51915e99"
+});
+const db = firebase.firestore();
+</script>
+<!-- EmailJS for notifications -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -15,6 +31,7 @@
   --amber:#854F0B;--amber-lt:#FAEEDA;--amber-txt:#633806;
   --red:#A32D2D;--red-lt:#FCEBEB;--red-txt:#791F1F;
   --purple:#533AB7;--purple-lt:#EEEDFE;--purple-txt:#26215C;
+  --orange:#b85c00;--orange-lt:#fff3e0;--orange-txt:#7c3d00;
   --gray-lt:#F1EFE8;--gray-txt:#5F5E5A;
   --r:8px;--rl:12px;
 }
@@ -29,23 +46,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .li:focus{outline:none;border-color:var(--blue)}
 .lbtn{width:100%;padding:11px;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-size:14px;font-weight:600;cursor:pointer}
 .lbtn:hover{background:var(--blue-txt)}
-.hint{font-size:11px;color:var(--text3);margin-top:10px}
-
-/* drag handle */
-.drag-handle{cursor:grab;color:var(--text3);font-size:12px;padding:0 2px;flex-shrink:0;opacity:0;user-select:none}
-.t-row:hover .drag-handle{opacity:1}
-.t-row.dragging{opacity:.4;background:var(--blue-lt)!important}
-.t-row.drag-over{border-top:2px solid var(--blue)!important}
-/* subtask sequence number */
-.sub-seq{font-size:9px;font-weight:700;color:var(--blue-txt);background:var(--blue-lt);border-radius:4px;padding:1px 4px;flex-shrink:0;min-width:18px;text-align:center}
-/* inherited badge */
-.inherited{opacity:.55;font-style:italic}
-/* parent computed fields */
-.computed{font-size:10px;color:var(--text2);font-style:italic}
-
 
 /* APP */
 #app{display:none;min-height:100vh}
+#loading-bar{display:none;position:fixed;top:0;left:0;right:0;height:3px;background:var(--blue);z-index:9999;animation:ldpulse 1s infinite alternate}
+@keyframes ldpulse{0%{opacity:.5}100%{opacity:1}}
 .topbar{background:var(--bg);border-bottom:0.5px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:50;flex-wrap:wrap}
 .topbar h1{font-size:15px;font-weight:700;flex:1}
 .topbar-meta{font-size:12px;color:var(--text2)}
@@ -55,31 +60,45 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .tbtn.pri{background:var(--blue);color:#fff;border-color:var(--blue)}
 .tbtn.pri:hover{background:var(--blue-txt)}
 .tbtn.grn{background:var(--green);color:#fff;border-color:var(--green)}
-.tbtn.grn:hover{background:var(--green-txt)}
 .tbtn.pur{background:var(--purple);color:#fff;border-color:var(--purple)}
 
+/* OVERALL PROGRESS */
+.overall-progress{background:var(--bg);border-bottom:0.5px solid var(--border);padding:10px 20px}
+.op-row{display:flex;align-items:center;gap:12px}
+.op-label{font-size:11px;font-weight:700;color:var(--text2);white-space:nowrap}
+.op-bar-wrap{flex:1;height:10px;background:var(--bg3);border-radius:10px;overflow:hidden;border:0.5px solid var(--border)}
+.op-bar{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--blue),var(--green));transition:width .5s}
+.op-pct{font-size:12px;font-weight:700;color:var(--green-txt);white-space:nowrap;min-width:36px}
+.op-stats{display:flex;gap:16px;margin-top:6px}
+.op-stat{font-size:11px;color:var(--text2)}
+.op-stat span{font-weight:700;color:var(--text)}
+
 /* METRICS */
-.metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;padding:12px 20px;background:var(--bg);border-bottom:0.5px solid var(--border)}
-.metric{background:var(--bg2);border-radius:var(--r);padding:9px 10px}
+.metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;padding:10px 20px;background:var(--bg);border-bottom:0.5px solid var(--border)}
+.metric{background:var(--bg2);border-radius:var(--r);padding:8px 10px}
 .mlabel{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;font-weight:600}
 .mval{font-size:18px;font-weight:700}
-.pbar-w{height:3px;background:var(--border);border-radius:3px;margin-top:4px}
-.pbar{height:100%;border-radius:3px;background:var(--blue);transition:width .4s}
 
 /* TOOLBAR */
 .toolbar{display:flex;gap:5px;padding:8px 20px;background:var(--bg);border-bottom:0.5px solid var(--border);flex-wrap:wrap;align-items:center}
 .toolbar input,.toolbar select{font-size:12px;padding:4px 8px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--text);height:28px}
 .toolbar input{flex:1;min-width:130px}
+.filter-flag{font-size:12px;padding:0 10px;height:28px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg);cursor:pointer;color:var(--text2)}
+.filter-flag.active{background:var(--orange-lt);color:var(--orange);border-color:var(--orange)}
 
 /* SECTIONS */
 .body{padding:12px 20px 80px}
 .section{margin-bottom:10px;background:var(--bg);border:0.5px solid var(--border);border-radius:var(--rl)}
 .sec-hdr{display:flex;align-items:center;gap:7px;padding:9px 14px;user-select:none}
 .sec-num{font-size:10px;font-weight:700;color:var(--blue-txt);background:var(--blue-lt);padding:2px 7px;border-radius:8px;white-space:nowrap;flex-shrink:0}
-.sec-title-area{flex:1;min-width:0;display:flex;align-items:center;gap:5px}
-.sec-title{font-weight:700;font-size:13px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sec-title-area{flex:1;min-width:0}
+.sec-title{font-weight:700;font-size:13px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
 .sec-title:hover{color:var(--blue)}
 .sec-inp{font-size:13px;font-weight:700;border:1.5px solid var(--blue);border-radius:5px;padding:3px 8px;outline:none;background:var(--bg);color:var(--text);width:260px}
+/* section progress bar */
+.sec-pbar-wrap{height:4px;background:var(--bg3);border-radius:4px;margin-top:3px;overflow:hidden}
+.sec-pbar{height:100%;border-radius:4px;background:var(--blue);transition:width .4s}
+.sec-pbar.done{background:var(--green)}
 .sec-meta{font-size:11px;color:var(--text2);white-space:nowrap;flex-shrink:0}
 .sec-acts{display:flex;gap:3px;flex-shrink:0}
 .sab{font-size:10px;padding:2px 7px;border:0.5px solid var(--border2);border-radius:5px;background:transparent;cursor:pointer;color:var(--text2);white-space:nowrap}
@@ -89,20 +108,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .sec-chev{font-size:10px;color:var(--text3);transition:transform .2s;cursor:pointer;padding:3px;flex-shrink:0}
 .sec-chev.open{transform:rotate(90deg)}
 
-/* TABLE — chk | dot | name | owner | start | due | status | priority | note | actions */
+/* TABLE */
 .tlist{display:none;border-top:0.5px solid var(--border)}
 .tlist.open{display:block}
-.t-head{display:grid;grid-template-columns:18px 13px 24px minmax(0,1fr) 130px 58px 58px 112px 88px minmax(0,150px) 100px;gap:5px;padding:4px 14px;background:var(--bg2);border-bottom:0.5px solid var(--border)}
-.t-row{display:grid;grid-template-columns:18px 13px 24px minmax(0,1fr) 130px 58px 58px 112px 88px minmax(0,150px) 100px;gap:5px;align-items:start;padding:7px 14px;border-bottom:0.5px solid var(--border);transition:background .1s}
+/* chk | dot | # | name | owner | start | due | status | priority | note | link | flag | actions */
+.t-head{display:grid;grid-template-columns:18px 13px 22px minmax(0,1fr) 100px 58px 62px 108px 82px minmax(0,120px) 28px 28px 90px;gap:4px;padding:4px 14px;background:var(--bg2);border-bottom:0.5px solid var(--border)}
+.t-row{display:grid;grid-template-columns:18px 13px 22px minmax(0,1fr) 100px 58px 62px 108px 82px minmax(0,120px) 28px 28px 90px;gap:4px;align-items:start;padding:6px 14px;border-bottom:0.5px solid var(--border);transition:background .1s}
 .t-row:last-child{border-bottom:none}
 .t-row:hover{background:var(--bg2)}
-.th{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.3px;font-weight:700;align-self:center}
+.t-row.due-soon{background:#fff8ed!important;border-left:3px solid var(--amber)!important}
+.t-row.overdue{background:#fff0f0!important;border-left:3px solid var(--red)!important}
+.t-row.flagged-row{background:#f5f0ff!important;border-left:3px solid var(--purple)!important}
+.th{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.3px;font-weight:700;align-self:center}
 
 .chk{width:13px;height:13px;border-radius:3px;border:1.5px solid var(--border2);cursor:pointer;appearance:none;flex-shrink:0;margin-top:3px}
 .chk:checked{background:var(--green);border-color:var(--green);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2 5l2.5 2.5L8 3' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-size:100%}
 .chk:disabled{opacity:.3;cursor:not-allowed}
-.subdot-w{display:flex;align-items:flex-start;justify-content:center;width:12px;padding-top:5px;flex-shrink:0}
+.subdot-w{display:flex;align-items:flex-start;justify-content:center;width:12px;padding-top:4px;flex-shrink:0}
 .subdot{width:4px;height:4px;border-radius:50%;background:var(--border2)}
+.sub-seq{font-size:9px;font-weight:700;color:var(--blue-txt);background:var(--blue-lt);border-radius:4px;padding:1px 4px;text-align:center;display:flex;align-items:center;justify-content:center}
 
 /* INLINE CELLS */
 .icell{display:flex;align-items:flex-start;gap:3px;min-width:0}
@@ -116,7 +140,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .pencil:hover{color:var(--blue)}
 .ii{font-size:12px;padding:2px 6px;border:1.5px solid var(--blue);border-radius:5px;outline:none;background:var(--bg);color:var(--text);width:100%}
 
-/* STATUS & PRIORITY */
+/* STATUS & PRIORITY DROPDOWNS */
 .dsel{font-size:10px;padding:3px 4px;border-radius:8px;font-weight:700;border:none;cursor:pointer;appearance:none;-webkit-appearance:none;outline:none;width:100%;text-align:center}
 .dsel:disabled{opacity:.4;cursor:not-allowed}
 .dsel.not-started{background:var(--gray-lt);color:var(--gray-txt)}
@@ -133,13 +157,35 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .note-cell{display:flex;align-items:flex-start;gap:3px;min-width:0;cursor:pointer}
 .note-val{font-size:11px;line-height:1.4;color:var(--text2);flex:1;word-break:break-word;white-space:normal;min-height:16px}
 .note-val.empty{color:var(--text3);font-style:italic}
-.note-val.ro{cursor:default}
+
+/* LINK CELL */
+.link-cell{display:flex;align-items:center;justify-content:center}
+.link-icon{font-size:14px;cursor:pointer;opacity:.4;transition:opacity .15s;text-decoration:none}
+.link-icon:hover,.link-icon.has-link{opacity:1}
+.link-icon.has-link{color:var(--blue)}
+
+/* FLAG */
+.flag-btn{font-size:13px;cursor:pointer;opacity:.3;transition:opacity .15s;background:none;border:none;padding:0;line-height:1}
+.flag-btn:hover{opacity:.7}
+.flag-btn.flagged{opacity:1;color:var(--orange)}
 
 /* ROW ACTIONS */
-.racts{display:flex;gap:3px;align-items:flex-start;padding-top:2px;flex-wrap:wrap}
-.ract{font-size:10px;padding:2px 6px;border:0.5px solid var(--border);border-radius:5px;background:transparent;cursor:pointer;color:var(--text2);white-space:nowrap}
+.racts{display:flex;gap:2px;align-items:flex-start;padding-top:1px;flex-wrap:wrap}
+.ract{font-size:10px;padding:2px 5px;border:0.5px solid var(--border);border-radius:5px;background:transparent;cursor:pointer;color:var(--text2);white-space:nowrap}
 .ract:hover{background:var(--bg2)}
 .ract.del:hover{background:var(--red-lt);color:var(--red-txt)}
+
+/* DUE DATE BADGES */
+.due-badge{font-size:10px;font-weight:700;padding:1px 5px;border-radius:6px;white-space:nowrap}
+.due-badge.overdue{background:var(--red-lt);color:var(--red-txt)}
+.due-badge.due-soon{background:var(--orange-lt);color:var(--orange-txt)}
+.due-badge.normal{background:transparent;color:var(--text2)}
+
+/* DRAG */
+.drag-handle{cursor:grab;color:var(--text3);font-size:11px;opacity:0;flex-shrink:0}
+.t-row:hover .drag-handle{opacity:1}
+.t-row.dragging{opacity:.4}
+.t-row.drag-over{border-top:2px solid var(--blue)}
 
 /* MODALS */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:200}
@@ -160,65 +206,41 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .user-table td{padding:8px 10px;border-bottom:0.5px solid var(--border);vertical-align:middle}
 .user-table tr:last-child td{border-bottom:none}
 .user-table tr:hover td{background:var(--bg2)}
-.owner-sel{font-size:12px;padding:5px 8px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--text);width:100%;max-width:220px}
+.owner-sel{font-size:12px;padding:5px 8px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--text);width:100%;max-width:200px}
+.email-inp{font-size:12px;padding:5px 8px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--text);width:100%;max-width:200px}
 .sdot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;vertical-align:middle}
-.sdot.admin{background:var(--blue)}
-.sdot.mapped{background:var(--green)}
-.sdot.pending{background:var(--amber)}
+.sdot.admin{background:var(--blue)}.sdot.mapped{background:var(--green)}.sdot.pending{background:var(--amber)}
 
 /* TOAST */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a18;color:#fff;font-size:12px;padding:8px 18px;border-radius:20px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1}
 
-@media(max-width:1050px){
-  .t-head,.t-row{grid-template-columns:18px 13px minmax(0,1fr) 110px 58px 112px 88px minmax(0,130px) 80px}
-  .t-head .th:nth-child(6),.t-row>*:nth-child(6){display:none}
-}
-@media(max-width:720px){
-  .metrics{grid-template-columns:repeat(3,1fr)}
-  .t-head,.t-row{grid-template-columns:18px 13px minmax(0,1fr) 100px 112px 88px 75px}
-  .t-head .th:nth-child(5),.t-row>*:nth-child(5),
-  .t-head .th:nth-child(6),.t-row>*:nth-child(6),
-  .t-head .th:nth-child(9),.t-row>*:nth-child(9){display:none}
-}
-</style>
+/* EMAIL SETTINGS */
+.email-settings{background:var(--blue-lt);border-radius:var(--r);padding:12px;margin-bottom:14px;font-size:12px}
+.email-settings strong{color:var(--blue-txt)}
 
-  <!-- Firebase SDK (compat version — works in plain HTML with no build tools) -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAtKK486L54STfCIzkVOXiBiGySzrRD4oE",
-      authDomain: "ga-checklist-83175.firebaseapp.com",
-      projectId: "ga-checklist-83175",
-      storageBucket: "ga-checklist-83175.firebasestorage.app",
-      messagingSenderId: "572424808540",
-      appId: "1:572424808540:web:9ab253d45fd30f51915e99"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-  </script>
+@media(max-width:1100px){.t-head,.t-row{grid-template-columns:18px 13px 22px minmax(0,1fr) 90px 58px 108px 82px minmax(0,100px) 28px 28px 80px}.t-head .th:nth-child(7),.t-row>*:nth-child(7){display:none}}
+@media(max-width:750px){.metrics{grid-template-columns:repeat(3,1fr)}.t-head,.t-row{grid-template-columns:18px 13px minmax(0,1fr) 80px 108px 82px 28px 70px}.t-head .th:nth-child(6),.t-row>*:nth-child(6),.t-head .th:nth-child(7),.t-row>*:nth-child(7),.t-head .th:nth-child(10),.t-row>*:nth-child(10){display:none}}
+</style>
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-card">
     <div style="font-size:32px;margin-bottom:10px">🚀</div>
     <h1>GA Launch Checklist</h1>
-    <p>Enter your name to access and update your assigned tasks</p>
+    <p>Enter your name to access your tasks</p>
     <input class="li" id="login-name" type="text" placeholder="Your full name" autocomplete="off">
     <input class="li" id="login-pass" type="password" placeholder="Admin password (leave blank if owner)">
+    <div class="frow" style="margin-bottom:10px">
+      <input class="li" id="login-email" type="email" placeholder="Your email (for due-date alerts)" style="margin-bottom:0">
+    </div>
     <button class="lbtn" onclick="doLogin()">Continue →</button>
-    
   </div>
 </div>
 
-<!-- APP -->
 <div id="app">
-  <div id="loading-bar" style="display:none;position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#185FA5,#3B6D11);z-index:999;animation:loadpulse 1s infinite alternate">
-  </div>
-  <style>@keyframes loadpulse{0%{opacity:.4}100%{opacity:1}}</style>
+  <div id="loading-bar"></div>
   <div class="topbar">
     <h1>🚀 GA Launch Checklist</h1>
     <span class="topbar-meta" id="days-left"></span>
@@ -229,13 +251,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
     <button class="tbtn" onclick="doLogout()">Sign out</button>
   </div>
 
-  <div class="metrics">
-    <div class="metric"><div class="mlabel">Total</div><div class="mval" style="color:var(--blue-txt)" id="m-total">0</div></div>
-    <div class="metric"><div class="mlabel">Completed</div><div class="mval" style="color:var(--green-txt)" id="m-done">0</div><div class="pbar-w"><div class="pbar" id="m-bar"></div></div></div>
-    <div class="metric"><div class="mlabel">In progress</div><div class="mval" style="color:var(--blue-txt)" id="m-prog">0</div></div>
-    <div class="metric"><div class="mlabel">Delayed</div><div class="mval" style="color:var(--amber-txt)" id="m-del">0</div></div>
-    <div class="metric"><div class="mlabel">Blocked</div><div class="mval" style="color:var(--red-txt)" id="m-blk">0</div></div>
-    <div class="metric"><div class="mlabel">Not started</div><div class="mval" style="color:var(--gray-txt)" id="m-ns">0</div></div>
+  <!-- OVERALL PROGRESS BAR -->
+  <div class="overall-progress">
+    <div class="op-row">
+      <span class="op-label">Overall progress</span>
+      <div class="op-bar-wrap"><div class="op-bar" id="op-bar" style="width:0%"></div></div>
+      <span class="op-pct" id="op-pct">0%</span>
+    </div>
+    <div class="op-stats">
+      <span class="op-stat"><span id="s-done">0</span> completed</span>
+      <span class="op-stat"><span id="s-prog">0</span> in progress</span>
+      <span class="op-stat"><span id="s-del">0</span> delayed</span>
+      <span class="op-stat"><span id="s-blk">0</span> blocked</span>
+      <span class="op-stat"><span id="s-ns">0</span> not started</span>
+      <span class="op-stat"><span id="s-flag">0</span> flagged</span>
+    </div>
   </div>
 
   <div class="toolbar">
@@ -256,6 +286,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
       <option value="low">Low</option>
     </select>
     <select id="s-owner" onchange="render()"><option value="">All owners</option></select>
+    <select id="s-due" onchange="render()">
+      <option value="">All due dates</option>
+      <option value="overdue">Overdue</option>
+      <option value="due7">Due in 7 days</option>
+      <option value="due14">Due in 14 days</option>
+    </select>
+    <button class="filter-flag" id="flag-filter-btn" onclick="toggleFlagFilter()" title="Show flagged only">🚩 Flagged</button>
     <button class="tbtn" onclick="collapseAll()">Collapse all</button>
     <button class="tbtn" onclick="expandAll()">Expand all</button>
     <button class="tbtn" onclick="exportCSV()">Export CSV</button>
@@ -268,41 +305,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 <div class="overlay hidden" id="task-modal" onclick="bgClose(event,'task-modal')">
   <div class="modal" onclick="event.stopPropagation()">
     <h2 id="task-modal-title">Add task</h2>
-    <div class="frow"><label>Task name *</label><input class="finput" id="f-name" type="text" placeholder="Describe the task…"></div>
+    <div class="frow"><label>Task name *</label><input class="finput" id="f-name" type="text"></div>
     <div class="fgrid">
       <div><label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px;font-weight:600">Section *</label><select class="finput" id="f-section" onchange="refreshParents()"></select></div>
       <div><label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px;font-weight:600">Parent task</label><select class="finput" id="f-parent"></select></div>
     </div>
-    <div class="frow"><label>Owner *</label><input class="finput" id="f-owner" type="text" placeholder="e.g. Head of Engineering"></div>
+    <div class="frow"><label>Owner</label><input class="finput" id="f-owner" type="text" placeholder="e.g. Shroog"></div>
     <div class="fgrid">
       <div><label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px;font-weight:600">Start date</label><input class="finput" id="f-start" type="date"></div>
       <div><label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px;font-weight:600">Due date</label><input class="finput" id="f-due" type="date"></div>
     </div>
     <div class="fgrid">
-      <div>
-        <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px;font-weight:600">Status</label>
+      <div><label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px;font-weight:600">Status</label>
         <select class="finput" id="f-status">
-          <option value="not-started">Not started</option>
-          <option value="in-progress">In progress</option>
-          <option value="delayed">Delayed</option>
-          <option value="blocked">Blocked</option>
-          <option value="completed">Completed</option>
+          <option value="not-started">Not started</option><option value="in-progress">In progress</option>
+          <option value="delayed">Delayed</option><option value="blocked">Blocked</option><option value="completed">Completed</option>
         </select>
       </div>
-      <div>
-        <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px;font-weight:600">Priority</label>
+      <div><label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px;font-weight:600">Priority</label>
         <select class="finput" id="f-priority">
-          <option value="critical">Critical</option>
-          <option value="high" selected>High</option>
-          <option value="medium">Medium</option>
-          <option value="low">Low</option>
+          <option value="critical">Critical</option><option value="high" selected>High</option>
+          <option value="medium">Medium</option><option value="low">Low</option>
         </select>
       </div>
     </div>
-    <div class="frow">
-      <label>Note / update</label>
-      <textarea class="finput" id="f-note" rows="2" placeholder="Optional note, delay justification, or update…" style="resize:vertical;font-family:inherit;font-size:13px;line-height:1.5"></textarea>
-    </div>
+    <div class="frow"><label>Evidence link (URL)</label><input class="finput" id="f-link" type="url" placeholder="https://…"></div>
+    <div class="frow"><label>Note / update</label><textarea class="finput" id="f-note" rows="2" style="resize:vertical;font-family:inherit;font-size:13px"></textarea></div>
     <div class="mactions">
       <button class="tbtn" onclick="closeM('task-modal')">Cancel</button>
       <button class="tbtn pri" onclick="saveTask()">Save task</button>
@@ -315,9 +343,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
   <div class="modal" style="width:min(460px,93vw)" onclick="event.stopPropagation()">
     <h2>📝 Note / update</h2>
     <p id="note-task-name" style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5"></p>
-    <div class="frow">
-      <label>Note, update, or delay justification</label>
-      <textarea class="finput" id="note-ta" rows="5" placeholder="Type your note here…" style="resize:vertical;font-family:inherit;font-size:13px;line-height:1.5"></textarea>
+    <div class="frow"><label>Note, update, or delay justification</label>
+      <textarea class="finput" id="note-ta" rows="5" style="resize:vertical;font-family:inherit;font-size:13px"></textarea>
     </div>
     <div class="mactions">
       <button class="tbtn" onclick="closeM('note-modal')">Cancel</button>
@@ -326,15 +353,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
   </div>
 </div>
 
+<!-- LINK MODAL -->
+<div class="overlay hidden" id="link-modal" onclick="bgClose(event,'link-modal')">
+  <div class="modal" style="width:min(460px,93vw)" onclick="event.stopPropagation()">
+    <h2>🔗 Evidence link</h2>
+    <p id="link-task-name" style="font-size:12px;color:var(--text2);margin-bottom:12px"></p>
+    <div class="frow"><label>URL to evidence, document, or artifact</label>
+      <input class="finput" id="link-inp" type="url" placeholder="https://…">
+    </div>
+    <div id="link-preview" style="display:none;margin-bottom:10px">
+      <a id="link-href" href="#" target="_blank" style="font-size:12px;color:var(--blue)">Open current link ↗</a>
+    </div>
+    <div class="mactions">
+      <button class="tbtn" onclick="closeM('link-modal')">Cancel</button>
+      <button class="tbtn pri" onclick="saveLink()">Save link</button>
+    </div>
+  </div>
+</div>
+
 <!-- CATEGORY MODAL -->
 <div class="overlay hidden" id="cat-modal" onclick="bgClose(event,'cat-modal')">
   <div class="modal" style="width:min(400px,93vw)" onclick="event.stopPropagation()">
     <h2>Add category</h2>
-    <div class="frow"><label>Category name *</label><input class="finput" id="cat-name" type="text" placeholder="e.g. Partner Readiness"></div>
-    <div class="mactions">
-      <button class="tbtn" onclick="closeM('cat-modal')">Cancel</button>
-      <button class="tbtn pri" onclick="saveCat()">Add</button>
-    </div>
+    <div class="frow"><label>Category name *</label><input class="finput" id="cat-name" type="text"></div>
+    <div class="mactions"><button class="tbtn" onclick="closeM('cat-modal')">Cancel</button><button class="tbtn pri" onclick="saveCat()">Add</button></div>
   </div>
 </div>
 
@@ -342,12 +384,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 <div class="overlay hidden" id="merge-modal" onclick="bgClose(event,'merge-modal')">
   <div class="modal" style="width:min(440px,93vw)" onclick="event.stopPropagation()">
     <h2>Merge category</h2>
-    <div class="warn-box">⚠️ All tasks in <strong id="merge-from-name"></strong> will be moved into the selected category. Cannot be undone.</div>
+    <div class="warn-box">⚠️ All tasks in <strong id="merge-from-name"></strong> will move into the selected category.</div>
     <div class="frow"><label>Move all tasks into:</label><select class="finput" id="merge-target"></select></div>
-    <div class="mactions">
-      <button class="tbtn" onclick="closeM('merge-modal')">Cancel</button>
-      <button class="tbtn" onclick="confirmMerge()" style="background:var(--amber);color:#fff;border-color:var(--amber)">Merge</button>
-    </div>
+    <div class="mactions"><button class="tbtn" onclick="closeM('merge-modal')">Cancel</button>
+      <button class="tbtn" onclick="confirmMerge()" style="background:var(--amber);color:#fff;border-color:var(--amber)">Merge</button></div>
   </div>
 </div>
 
@@ -355,276 +395,174 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 <div class="overlay hidden" id="delcat-modal" onclick="bgClose(event,'delcat-modal')">
   <div class="modal" style="width:min(440px,93vw)" onclick="event.stopPropagation()">
     <h2>Delete category</h2>
-    <div class="warn-box">⚠️ Deleting <strong id="delcat-name"></strong>. What should happen to its tasks?</div>
+    <div class="warn-box">⚠️ Deleting <strong id="delcat-name"></strong>. What happens to its tasks?</div>
     <div class="frow"><label>Tasks in this category:</label>
-      <select class="finput" id="delcat-target">
-        <option value="__delete__">— Delete all tasks permanently —</option>
-      </select>
-    </div>
-    <div class="mactions">
-      <button class="tbtn" onclick="closeM('delcat-modal')">Cancel</button>
-      <button class="tbtn" onclick="confirmDelCat()" style="background:var(--red);color:#fff;border-color:var(--red)">Delete category</button>
-    </div>
+      <select class="finput" id="delcat-target"><option value="__delete__">— Delete all tasks permanently —</option></select></div>
+    <div class="mactions"><button class="tbtn" onclick="closeM('delcat-modal')">Cancel</button>
+      <button class="tbtn" onclick="confirmDelCat()" style="background:var(--red);color:#fff;border-color:var(--red)">Delete category</button></div>
   </div>
 </div>
 
 <!-- USERS MODAL -->
 <div class="overlay hidden" id="users-modal" onclick="bgClose(event,'users-modal')">
-  <div class="modal" style="width:min(720px,95vw)" onclick="event.stopPropagation()">
+  <div class="modal" style="width:min(780px,95vw)" onclick="event.stopPropagation()">
     <h2>👥 User registry</h2>
-    <p style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6">
-      Everyone who has logged in appears below. Assign each person to the <strong>owner name</strong> that appears on their tasks — this grants them edit access to those tasks. Owners can update status, priority, notes, and add subtasks.
+    <div class="email-settings">
+      <strong>Email notifications:</strong> Users who provide their email and are mapped to an owner will receive alerts when their tasks are due within 7 days. 
+      Notifications are sent when they log in. You can also trigger them manually below.
+    </div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.6">
+      Assign each person to the <strong>owner name</strong> on their tasks to grant edit access.
     </p>
     <div id="user-table-wrap"></div>
-    <div class="mactions"><button class="tbtn" onclick="closeM('users-modal')">Close</button></div>
+    <div class="mactions">
+      <button class="tbtn grn" onclick="sendAllDueNotifications()">📧 Send due-date alerts now</button>
+      <button class="tbtn" onclick="closeM('users-modal')">Close</button>
+    </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const ADMIN_PASS='ga-admin-2026';
+const DEF_TASKS=[{"id": 1, "section": "product_readiness", "parent": null, "name": "GA features", "owner": "Shroog", "start": "", "due": "2026-04-15", "priority": "critical", "status": "in-progress", "note": "", "link": "", "flagged": false}, {"id": 108, "section": "product_readiness", "parent": 1, "name": "Define GA features and align with eng. team", "owner": "Shroog", "start": "2026-01-01", "due": "2026-01-31", "priority": "high", "status": "completed", "note": "Features tagged as GA features was based on customer request from roadmap prioritization sessions", "link": "", "flagged": false}, {"id": 2, "section": "product_readiness", "parent": 1, "name": "Validate and test critical user/customer journeys in production environment including billing and support", "owner": "Shroog", "start": "2026-06-01", "due": "2026-06-23", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 14, "section": "product_readiness", "parent": 1, "name": "Confirm compliance  of design with HUMAIN guidelines", "owner": "Abdulrhman", "start": "2026-06-01", "due": "2026-04-14", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 111, "section": "product_readiness", "parent": 1, "name": "Ensure all bugs are resolved before securing approval", "owner": "Abdulaziz", "start": "2026-06-16", "due": "2026-06-23", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 4, "section": "product_readiness", "parent": 1, "name": "Secure GA launch approval from Brain GM after obtaining sign-off from prod. and eng head", "owner": "Abdulaziz", "start": "2026-06-23", "due": "2026-06-25", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 5, "section": "product_readiness", "parent": null, "name": "Limitations", "owner": "Shroog", "start": "2026-04-06", "due": "2026-04-20", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 109, "section": "product_readiness", "parent": 5, "name": "List all Limitations for Application", "owner": "Abdulaziz", "start": "2026-04-08", "due": "2026-04-12", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 6, "section": "product_readiness", "parent": 5, "name": "Classify each limitation as blocker vs accepted", "owner": "Abdulaziz", "start": "2026-04-12", "due": "2026-04-14", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 110, "section": "product_readiness", "parent": 5, "name": "Get plan to resolve blocker limitations", "owner": "Abdulaziz", "start": "2026-04-21", "due": "2026-04-28", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 16, "section": "product_readiness", "parent": null, "name": "Analytics", "owner": "Dr. Sadeen", "start": "2026-04-15", "due": "2026-05-01", "priority": "medium", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 19, "section": "product_readiness", "parent": 16, "name": "Track onboarding analytics", "owner": "Dr. Sadeen", "start": "2026-05-20", "due": "2026-06-10", "priority": "low", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 20, "section": "product_readiness", "parent": null, "name": "Documentation", "owner": "Shroog", "start": "2026-04-15", "due": "2026-06-01", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 21, "section": "product_readiness", "parent": 20, "name": "Include FAQs and troubleshooting guides", "owner": "Badriah", "start": "2026-05-01", "due": "2026-06-01", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 26, "section": "product_readiness", "parent": null, "name": "Application", "owner": "Dr. Sadeen", "start": "2026-04-06", "due": "2026-04-20", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 27, "section": "product_readiness", "parent": 26, "name": "Ensure SSL certificates are configured and valid", "owner": "Dr. Sadeen", "start": "2026-04-06", "due": "2026-04-15", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 28, "section": "product_readiness", "parent": 26, "name": "Validate login and authentication flows (SSO, MFA)", "owner": "Dr. Sadeen", "start": "2026-04-10", "due": "2026-04-30", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 29, "section": "product_readiness", "parent": 26, "name": "Validate user onboarding flow (account creation, invitations, permissions)", "owner": "Dr. Sadeen", "start": "2026-04-10", "due": "2026-05-01", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 30, "section": "product_readiness", "parent": 26, "name": "Test all core platform workflows (meetings, agents, documents, etc.)", "owner": "Dr. Sadeen", "start": "2026-04-15", "due": "2026-05-15", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 31, "section": "product_readiness", "parent": 26, "name": "Validate cross-browser compatibility (Chrome, Edge, Safari)", "owner": "Dr. Sadeen", "start": "2026-05-01", "due": "2026-05-20", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 32, "section": "product_readiness", "parent": 26, "name": "Verify responsiveness across screen sizes (desktop and laptop)", "owner": "Dr. Sadeen", "start": "2026-05-01", "due": "2026-05-20", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 33, "section": "product_readiness", "parent": 26, "name": "Test performance under expected user load", "owner": "Dr. Sadeen", "start": "2026-05-01", "due": "2026-05-25", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 34, "section": "product_readiness", "parent": 26, "name": "Ensure logging and monitoring enabled for platform usage", "owner": "Dr. Sadeen", "start": "2026-04-15", "due": "2026-05-10", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 35, "section": "product_readiness", "parent": 26, "name": "Verify platform security protections (session management, etc.)", "owner": "Dr. Sadeen", "start": "2026-04-15", "due": "2026-05-15", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 101, "section": "product_readiness", "parent": null, "name": "Tenant management — define and validate multi-tenant architecture and isolation model", "owner": "Dr. Sadeen", "start": "2026-04-10", "due": "2026-05-01", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 102, "section": "product_readiness", "parent": 101, "name": "Verify tenant data isolation — no cross-tenant data leakage", "owner": "Dr. Sadeen", "start": "2026-04-15", "due": "2026-05-10", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 103, "section": "product_readiness", "parent": 101, "name": "Validate tenant provisioning and de-provisioning flows end-to-end", "owner": "Dr. Sadeen", "start": "2026-04-15", "due": "2026-05-10", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 104, "section": "product_readiness", "parent": 101, "name": "Confirm tenant-level configuration and customisation (branding, settings)", "owner": "Dr. Sadeen", "start": "2026-04-20", "due": "2026-05-15", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 105, "section": "product_readiness", "parent": 101, "name": "Test tenant admin roles — permissions, user management, audit visibility", "owner": "Dr. Sadeen", "start": "2026-04-20", "due": "2026-05-20", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 106, "section": "product_readiness", "parent": 101, "name": "Validate tenant-level usage reporting and billing attribution", "owner": "Dr. Sadeen", "start": "2026-04-25", "due": "2026-05-25", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 107, "section": "product_readiness", "parent": 101, "name": "Document tenant onboarding and offboarding runbook", "owner": "Dr. Sadeen", "start": "2026-05-01", "due": "2026-05-31", "priority": "medium", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 36, "section": "infrastructure", "parent": null, "name": "Scalability — define expected GA load, concurrency, storage, and growth assumptions", "owner": "Dr. Sadeen", "start": "2026-04-06", "due": "2026-04-20", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 37, "section": "infrastructure", "parent": 36, "name": "Run load tests against target thresholds", "owner": "Infra Lead", "start": "2026-04-20", "due": "2026-05-10", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 38, "section": "infrastructure", "parent": 36, "name": "Document bottlenecks and scaling plan", "owner": "Infra Lead", "start": "2026-05-10", "due": "2026-05-25", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 39, "section": "infrastructure", "parent": 36, "name": "Secure engineering sign-off on capacity", "owner": "VP Engineering", "start": "2026-05-25", "due": "2026-06-05", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 40, "section": "infrastructure", "parent": null, "name": "High availability — confirm redundancy across critical components", "owner": "Dr. Sadeen", "start": "2026-04-10", "due": "2026-05-01", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 41, "section": "infrastructure", "parent": 40, "name": "Test failover and recovery scenarios", "owner": "SRE Lead", "start": "2026-05-01", "due": "2026-05-20", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 42, "section": "infrastructure", "parent": 40, "name": "Validate uptime design against target SLA", "owner": "VP Engineering", "start": "2026-05-15", "due": "2026-06-01", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 43, "section": "infrastructure", "parent": 40, "name": "Document single points of failure and mitigations", "owner": "SRE Lead", "start": "2026-04-20", "due": "2026-05-10", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 44, "section": "infrastructure", "parent": null, "name": "Performance — set target response times for critical workflows", "owner": "Dr. Sadeen", "start": "2026-04-10", "due": "2026-04-25", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 45, "section": "infrastructure", "parent": 44, "name": "Run performance tests under normal and peak conditions", "owner": "QA / Infra", "start": "2026-04-25", "due": "2026-05-15", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 46, "section": "infrastructure", "parent": 44, "name": "Confirm metrics meet agreed thresholds before release", "owner": "VP Engineering", "start": "2026-05-15", "due": "2026-06-01", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 47, "section": "infrastructure", "parent": null, "name": "CI/CD pipeline configured and validated for production deployments", "owner": "DevOps Lead", "start": "2026-04-06", "due": "2026-04-30", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 48, "section": "infrastructure", "parent": null, "name": "Observability stack — logs, metrics, traces, and alerts for critical services", "owner": "Dr. Sadeen", "start": "2026-04-10", "due": "2026-05-10", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 49, "section": "infrastructure", "parent": 48, "name": "Ensure dashboards are usable by on-call teams", "owner": "SRE Lead", "start": "2026-05-01", "due": "2026-05-15", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 50, "section": "infrastructure", "parent": 48, "name": "Validate alert thresholds and on-call routing", "owner": "SRE Lead", "start": "2026-05-10", "due": "2026-05-25", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 51, "section": "infrastructure", "parent": 48, "name": "Confirm retention policies and access controls for logs", "owner": "Security + SRE", "start": "2026-05-01", "due": "2026-05-20", "priority": "medium", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 52, "section": "infrastructure", "parent": null, "name": "Backup and DR — define scope, frequency, retention, and restore owners", "owner": "Dr. Sadeen", "start": "2026-04-10", "due": "2026-04-30", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 53, "section": "infrastructure", "parent": 52, "name": "Test restore for critical data and configs", "owner": "Infra Lead", "start": "2026-04-30", "due": "2026-05-20", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 54, "section": "infrastructure", "parent": 52, "name": "Document disaster recovery plan; confirm runbooks are current", "owner": "SRE Lead", "start": "2026-05-01", "due": "2026-05-25", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 55, "section": "infrastructure", "parent": null, "name": "Security hardening — harden production environment before GA", "owner": "Head of Security", "start": "2026-04-15", "due": "2026-05-31", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 56, "section": "service_management_and_operations", "parent": null, "name": "Incident response process and playbook documented", "owner": "SRE Lead + Head of Support", "start": "2026-04-10", "due": "2026-05-15", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 57, "section": "service_management_and_operations", "parent": null, "name": "Monitoring and alerting triggers production support workflow", "owner": "SRE Lead", "start": "2026-04-15", "due": "2026-05-10", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 58, "section": "service_management_and_operations", "parent": null, "name": "Service health dashboards live and accessible to stakeholders", "owner": "SRE Lead", "start": "2026-04-15", "due": "2026-05-15", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 59, "section": "service_management_and_operations", "parent": null, "name": "Maintenance and upgrades process defined and communicated", "owner": "VP Engineering", "start": "2026-04-20", "due": "2026-05-15", "priority": "medium", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 60, "section": "service_management_and_operations", "parent": null, "name": "API versioning strategy agreed — managing multiple API versions in parallel", "owner": "Platform Lead + PM", "start": "2026-04-10", "due": "2026-05-01", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 61, "section": "service_management_and_operations", "parent": null, "name": "Escalation paths defined and communicated across support tiers", "owner": "Head of Support", "start": "2026-04-15", "due": "2026-05-10", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 62, "section": "data", "parent": null, "name": "Encryption proven and confirmed for data at rest and in transit", "owner": "Security Engineer", "start": "2026-04-06", "due": "2026-04-30", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 63, "section": "data", "parent": null, "name": "Access controls in place — role-based, least privilege enforced", "owner": "Security + Engineering", "start": "2026-04-06", "due": "2026-04-30", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 64, "section": "data", "parent": null, "name": "Audit logs enabled and retained per policy", "owner": "Security Engineer", "start": "2026-04-10", "due": "2026-05-01", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 65, "section": "data", "parent": null, "name": "Data retention and deletion policies documented and enforced", "owner": "Legal + Engineering", "start": "2026-04-10", "due": "2026-05-01", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 66, "section": "data", "parent": null, "name": "Export and backup options for customers defined and tested", "owner": "PM + Engineering", "start": "2026-04-15", "due": "2026-05-15", "priority": "medium", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 67, "section": "billing", "parent": null, "name": "Packages defined — all enabled features per product/package listed", "owner": "CPO + Finance", "start": "2026-04-06", "due": "2026-04-25", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 68, "section": "billing", "parent": null, "name": "Usage metering captured in-app including overage tracking", "owner": "Engineering + Finance", "start": "2026-04-10", "due": "2026-05-10", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 69, "section": "billing", "parent": null, "name": "Usage data export to billing system tested end-to-end", "owner": "RevOps + Engineering", "start": "2026-04-15", "due": "2026-05-15", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 70, "section": "billing", "parent": null, "name": "Ability to issue free credits configured and tested", "owner": "Engineering + Finance", "start": "2026-04-15", "due": "2026-05-01", "priority": "medium", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 71, "section": "billing", "parent": null, "name": "Overage flows defined, implemented, and customer alerts tested", "owner": "PM + Engineering", "start": "2026-04-15", "due": "2026-05-15", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 72, "section": "billing", "parent": null, "name": "Trial definition agreed — duration, limitations, conversion flow", "owner": "CPO + Finance", "start": "2026-04-06", "due": "2026-04-20", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 73, "section": "billing", "parent": null, "name": "Invoicing system configured and tested", "owner": "Finance + Engineering", "start": "2026-04-15", "due": "2026-05-20", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 74, "section": "billing", "parent": null, "name": "Credit notes process documented and tested in system", "owner": "Finance", "start": "2026-04-20", "due": "2026-05-15", "priority": "medium", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 75, "section": "support", "parent": null, "name": "Help center and knowledge base published with GA content", "owner": "Head of Support", "start": "2026-04-15", "due": "2026-06-01", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 76, "section": "support", "parent": null, "name": "Ticketing system configured — queues, routing, SLA rules set", "owner": "Head of Support", "start": "2026-04-10", "due": "2026-04-30", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 77, "section": "support", "parent": null, "name": "SLA management — tiers defined and enforced in tooling", "owner": "Head of Support", "start": "2026-04-15", "due": "2026-05-10", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 78, "section": "product_readiness", "parent": 26, "name": "Publish Terms and Conditions to be part of application", "owner": "Dr. Sadeen", "start": "2026-04-06", "due": "2026-05-01", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 80, "section": "product_readiness", "parent": 20, "name": "Data Processing Agreements (DPA) templates ready", "owner": "Legal", "start": "2026-04-10", "due": "2026-05-01", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 81, "section": "legal", "parent": null, "name": "IP ownership and liability provisions reviewed and signed off", "owner": "General Counsel", "start": "2026-04-10", "due": "2026-04-30", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 82, "section": "marketing", "parent": null, "name": "Branding finalized — logo, brand guide, visual identity approved", "owner": "Head of Marketing", "start": "2026-04-06", "due": "2026-04-30", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 83, "section": "marketing", "parent": null, "name": "Website updated — GA landing page, pricing, features, and CTA live", "owner": "Marketing / Web", "start": "2026-04-15", "due": "2026-05-20", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 86, "section": "analytics_and_feedback", "parent": null, "name": "Feature request process and tooling in place", "owner": "PM", "start": "2026-04-10", "due": "2026-04-30", "priority": "medium", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 87, "section": "analytics_and_feedback", "parent": null, "name": "Upsell and cross-sell capability defined in product and CRM", "owner": "CPO + RevOps", "start": "2026-04-15", "due": "2026-05-15", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 88, "section": "analytics_and_feedback", "parent": null, "name": "Technical and business KPIs defined and dashboarded", "owner": "CPO + CTO", "start": "2026-04-06", "due": "2026-04-25", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 89, "section": "analytics_and_feedback", "parent": null, "name": "Sales KPIs defined — pipeline, win rate, ACV targets set", "owner": "Head of Sales", "start": "2026-04-06", "due": "2026-04-20", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 90, "section": "analytics_and_feedback", "parent": null, "name": "Customer KPIs defined — activation, NPS, churn, expansion", "owner": "Head of CS", "start": "2026-04-10", "due": "2026-04-25", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 91, "section": "analytics_and_feedback", "parent": null, "name": "Financial KPIs defined — ARR, MRR, CAC, LTV targets", "owner": "CFO", "start": "2026-04-06", "due": "2026-04-20", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 92, "section": "analytics_and_feedback", "parent": null, "name": "Operational KPIs defined — uptime, MTTR, support ticket volume", "owner": "VP Engineering + Head of Support", "start": "2026-04-10", "due": "2026-04-25", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 93, "section": "security_testing", "parent": null, "name": "Third-party penetration test completed — all critical findings remediated", "owner": "Head of Security", "start": "2026-04-06", "due": "2026-05-15", "priority": "critical", "status": "in-progress", "note": "", "link": "", "flagged": false}, {"id": 94, "section": "security_testing", "parent": null, "name": "Internal vulnerability assessment completed", "owner": "Security Engineer", "start": "2026-04-06", "due": "2026-05-01", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 95, "section": "security_testing", "parent": null, "name": "Incident response plan tested with tabletop exercise", "owner": "Head of Security + SRE", "start": "2026-05-01", "due": "2026-05-31", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 96, "section": "security_testing", "parent": null, "name": "Bug bounty program scoped and launched", "owner": "Head of Security", "start": "2026-05-01", "due": "2026-06-01", "priority": "medium", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 97, "section": "compliance_certificates", "parent": null, "name": "SOC 2 Type II audit in-flight or completed", "owner": "Head of Security + Compliance", "start": "2026-04-06", "due": "2026-06-01", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 98, "section": "compliance_certificates", "parent": null, "name": "GDPR / data privacy impact assessment signed off", "owner": "Legal + Security", "start": "2026-04-10", "due": "2026-05-01", "priority": "critical", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 99, "section": "compliance_certificates", "parent": null, "name": "ISO 27001 or equivalent certification status confirmed", "owner": "Head of Security", "start": "2026-04-10", "due": "2026-05-15", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 100, "section": "compliance_certificates", "parent": null, "name": "Regional compliance requirements verified (CCPA, PDPA, etc.)", "owner": "Legal", "start": "2026-04-10", "due": "2026-05-01", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 112, "section": "product_readiness", "parent": 20, "name": "Guided tutorials — identify first-time user flows", "owner": "Abdulrahman", "start": "", "due": "", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 113, "section": "product_readiness", "parent": 20, "name": "User Manual", "owner": "Abdulrahman", "start": "", "due": "", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 114, "section": "product_readiness", "parent": 16, "name": "Conduct Stress testing on system", "owner": "Dr. Sadeen", "start": "", "due": "", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 115, "section": "product_readiness", "parent": 20, "name": "Technical Proposal and Sales colatorals ready", "owner": "Reem", "start": "", "due": "", "priority": "high", "status": "completed", "note": "", "link": "", "flagged": false}, {"id": 116, "section": "product_readiness", "parent": 20, "name": "Privacy policy", "owner": "Najd", "start": "", "due": "", "priority": "high", "status": "in-progress", "note": "", "link": "", "flagged": false}, {"id": 117, "section": "product_readiness", "parent": 20, "name": "User Acceptance Policy", "owner": "Hassa", "start": "", "due": "", "priority": "high", "status": "in-progress", "note": "", "link": "", "flagged": false}, {"id": 118, "section": "product_readiness", "parent": 20, "name": "Contracts Template", "owner": "Nourah", "start": "", "due": "", "priority": "high", "status": "in-progress", "note": "", "link": "", "flagged": false}, {"id": 119, "section": "product_readiness", "parent": 20, "name": "SLA", "owner": "Arwa", "start": "", "due": "", "priority": "high", "status": "in-progress", "note": "", "link": "", "flagged": false}, {"id": 120, "section": "product_readiness", "parent": 26, "name": "verify production domain and routing (e.g. app.domain.com)", "owner": "Dr. Sadeen", "start": "", "due": "", "priority": "high", "status": "not-started", "note": "", "link": "", "flagged": false}];
+const DEF_SECTIONS=[{"id": "product_readiness", "num": "1", "title": "Product Readiness"}, {"id": "infrastructure", "num": "2", "title": "Infrastructure"}, {"id": "service_management_and_operations", "num": "3", "title": "Service Management & Operations"}, {"id": "data", "num": "4", "title": "Data"}, {"id": "billing", "num": "5", "title": "Billing"}, {"id": "support", "num": "6", "title": "Support"}, {"id": "legal", "num": "7", "title": "Legal"}, {"id": "marketing", "num": "8", "title": "Marketing"}, {"id": "analytics_and_feedback", "num": "9", "title": "Analytics & Feedback"}, {"id": "security_testing", "num": "10", "title": "Security Testing"}, {"id": "compliance_certificates", "num": "11", "title": "Compliance Certificates"}];
+
+
+// ── CONSTANTS ─────────────────────────────────────────────────────────────────
+const ADMIN_PASS = 'ga-admin-2026';
+const SK = 'ga_cl_v8';
+const STATUS_OPTS = ['not-started','in-progress','delayed','blocked','completed'];
+const STATUS_LBL = {'not-started':'Not started','in-progress':'In progress','delayed':'Delayed','blocked':'Blocked','completed':'Completed'};
+const PRIO_OPTS = ['critical','high','medium','low'];
+const PRIO_RANK = {critical:4,high:3,medium:2,low:1};
+const STATUS_RANK = {blocked:5,delayed:4,'in-progress':3,'not-started':2,completed:1};
+const DUE_WARN_DAYS = 7;
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let tasks = [], SECTIONS = [], users = {}, sectionOpen = {};
+let currentUser = null, currentEmail = null, isAdmin = false;
+let editingTaskId = null, mergingSecId = null, deletingSecId = null;
+let noteTaskId = null, linkTaskId = null;
+let showFlaggedOnly = false;
+let dragId = null;
+let saveTimer = null;
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function x(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function fd(d){if(!d)return'—';const[,m,day]=d.split('-');return`${m}/${day}`;}
+function secById(id){return SECTIONS.find(s=>s.id===id);}
+function nextId(){return Math.max(0,...tasks.map(t=>t.id))+1;}
+function getChildren(pid){return tasks.filter(t=>t.parent===pid);}
+
+// due date helpers
+function daysUntil(due){
+  if(!due)return null;
+  const today=new Date();today.setHours(0,0,0,0);
+  const d=new Date(due);return Math.ceil((d-today)/864e5);
+}
+function dueClass(due,status){
+  if(!due||status==='completed')return'normal';
+  const d=daysUntil(due);
+  if(d<0)return'overdue';
+  if(d<=DUE_WARN_DAYS)return'due-soon';
+  return'normal';
+}
+function dueBadge(due,status){
+  if(!due||status==='completed')return fd(due);
+  const d=daysUntil(due);
+  if(d<0)return`<span class="due-badge overdue">${fd(due)} ⚠</span>`;
+  if(d===0)return`<span class="due-badge due-soon">Today!</span>`;
+  if(d<=DUE_WARN_DAYS)return`<span class="due-badge due-soon">${fd(due)} (${d}d)</span>`;
+  return`<span class="due-badge normal">${fd(due)}</span>`;
+}
+
+// ── COMPUTED PARENT FIELDS ────────────────────────────────────────────────────
+function computedDue(t){const kids=getChildren(t.id);if(!kids.length)return t.due||'';const d=kids.map(k=>k.due).filter(Boolean).sort();return d.length?d[d.length-1]:(t.due||'');}
+function computedStatus(t){const kids=getChildren(t.id);if(!kids.length)return t.status;let b=kids[0].status;kids.forEach(k=>{if((STATUS_RANK[k.status]||0)>(STATUS_RANK[b]||0))b=k.status;});return b;}
+function computedPriority(t){const kids=getChildren(t.id);if(!kids.length)return t.priority;let b=kids[0].priority;kids.forEach(k=>{if((PRIO_RANK[k.priority]||0)>(PRIO_RANK[b]||0))b=k.priority;});return b;}
+function computedOwner(t){if(t.owner)return t.owner;const kids=getChildren(t.id);if(!kids.length)return'';const o=[...new Set(kids.map(k=>k.owner).filter(Boolean))];return o.length===0?'':(o.length===1?o[0]:'Multiple');}
 
 // ── FIREBASE ──────────────────────────────────────────────────────────────────
-// Config loaded via CDN below — no npm needed
-const FB_PROJECT = 'ga-checklist-83175';
-const SK='ga_cl_v7'; // kept for migration only
-const STATUS_OPTS=['not-started','in-progress','delayed','blocked','completed'];
-const STATUS_LBL={'not-started':'Not started','in-progress':'In progress','delayed':'Delayed','blocked':'Blocked','completed':'Completed'};
-const PRIO_OPTS=['critical','high','medium','low'];
-
-const DEF_SECTIONS=[
-  {id:'product',num:'1',title:'Product Readiness'},
-  {id:'infra',num:'2',title:'Infrastructure'},
-  {id:'svcmgmt',num:'3',title:'Service Management & Operations'},
-  {id:'data',num:'4',title:'Data'},
-  {id:'billing',num:'5',title:'Billing'},
-  {id:'support',num:'6',title:'Support'},
-  {id:'legal',num:'7',title:'Legal'},
-  {id:'marketing',num:'8',title:'Marketing'},
-  {id:'analytics',num:'9',title:'Analytics & Feedback'},
-  {id:'security',num:'10',title:'Security Testing'},
-  {id:'compliance',num:'11',title:'Compliance Certificates'},
-];
-
-const DEF_TASKS=[
-  {id:1,section:'product',parent:null,name:'GA features — confirm scope based on roadmap and release status',owner:'CPO / Head of Product',start:'2026-04-06',due:'2026-04-15',priority:'critical',status:'in-progress',note:''},
-  {id:2,section:'product',parent:1,name:'Validate critical user journeys end-to-end in production environment',owner:'QA Lead / PM',start:'2026-04-06',due:'2026-04-15',priority:'critical',status:'not-started',note:''},
-  {id:3,section:'product',parent:1,name:'Document any excluded scope and obtain approval',owner:'PM',start:'2026-04-08',due:'2026-04-18',priority:'high',status:'not-started',note:''},
-  {id:4,section:'product',parent:1,name:'Obtain sign-off from Product, Engineering, and GTM',owner:'CPO',start:'2026-04-15',due:'2026-04-25',priority:'critical',status:'not-started',note:''},
-  {id:5,section:'product',parent:null,name:'Limitations — list all known product, scale, region, language, integration, and support limitations',owner:'PM + Eng Lead',start:'2026-04-06',due:'2026-04-20',priority:'high',status:'not-started',note:''},
-  {id:6,section:'product',parent:5,name:'Classify each limitation as blocker vs accepted',owner:'PM',start:'2026-04-10',due:'2026-04-20',priority:'high',status:'not-started',note:''},
-  {id:7,section:'product',parent:5,name:'Get cyber and legal alignment on disclosures',owner:'Legal + Security',start:'2026-04-15',due:'2026-04-30',priority:'high',status:'not-started',note:''},
-  {id:8,section:'product',parent:null,name:'Feature flags — configure per sub-product (Advisor, Assistant)',owner:'Engineering Lead',start:'2026-04-10',due:'2026-05-01',priority:'high',status:'not-started',note:''},
-  {id:9,section:'product',parent:null,name:'Defect threshold — agree severity thresholds for GA',owner:'VP Engineering + PM',start:'2026-04-06',due:'2026-04-15',priority:'critical',status:'not-started',note:''},
-  {id:10,section:'product',parent:9,name:'Review all open defects by severity and business impact',owner:'QA Lead',start:'2026-04-15',due:'2026-05-15',priority:'critical',status:'not-started',note:''},
-  {id:11,section:'product',parent:9,name:'Close or formally waive anything above threshold',owner:'VP Engineering',start:'2026-05-15',due:'2026-06-01',priority:'critical',status:'not-started',note:''},
-  {id:12,section:'product',parent:9,name:'Confirm no blocker or critical defects remain in GA scope',owner:'QA Lead',start:'2026-06-01',due:'2026-06-15',priority:'critical',status:'not-started',note:''},
-  {id:13,section:'product',parent:null,name:'UX compliance — review core flows against design standards and accessibility',owner:'UX Lead',start:'2026-04-10',due:'2026-05-01',priority:'high',status:'not-started',note:''},
-  {id:14,section:'product',parent:13,name:'Align user stories with UX standards',owner:'PM + UX',start:'2026-04-10',due:'2026-04-25',priority:'medium',status:'not-started',note:''},
-  {id:15,section:'product',parent:13,name:'Fix high-impact accessibility issues',owner:'Frontend Lead',start:'2026-04-20',due:'2026-05-15',priority:'high',status:'not-started',note:''},
-  {id:16,section:'product',parent:null,name:'Guided tutorials — identify first-time user flows',owner:'PM + UX',start:'2026-04-15',due:'2026-05-01',priority:'medium',status:'not-started',note:''},
-  {id:17,section:'product',parent:16,name:'Create onboarding tours, empty states, and contextual help',owner:'Product + Engineering',start:'2026-04-20',due:'2026-05-20',priority:'medium',status:'not-started',note:''},
-  {id:18,section:'product',parent:16,name:'Test completion and usefulness with pilot users',owner:'PM',start:'2026-05-10',due:'2026-05-31',priority:'medium',status:'not-started',note:''},
-  {id:19,section:'product',parent:16,name:'Track onboarding analytics',owner:'PM + Analytics',start:'2026-05-20',due:'2026-06-10',priority:'low',status:'not-started',note:''},
-  {id:20,section:'product',parent:null,name:'Documentation — publish admin, user, support, and technical docs',owner:'Head of Support / Tech Writer',start:'2026-04-15',due:'2026-06-01',priority:'critical',status:'not-started',note:''},
-  {id:21,section:'product',parent:20,name:'Include FAQs and troubleshooting guides',owner:'Tech Writer',start:'2026-05-01',due:'2026-06-01',priority:'high',status:'not-started',note:''},
-  {id:22,section:'product',parent:null,name:'Competitive differentiation — define clear value points vs competitors',owner:'PM + Marketing',start:'2026-04-06',due:'2026-04-30',priority:'high',status:'not-started',note:''},
-  {id:23,section:'product',parent:22,name:'Validate claims with product truth and evidence',owner:'PM',start:'2026-04-15',due:'2026-05-01',priority:'high',status:'not-started',note:''},
-  {id:24,section:'product',parent:22,name:'Align messaging in demos, site, and collateral',owner:'Marketing',start:'2026-04-20',due:'2026-05-10',priority:'high',status:'not-started',note:''},
-  {id:25,section:'product',parent:22,name:'Train sales teams on competitive positioning',owner:'Sales Enablement',start:'2026-05-01',due:'2026-05-31',priority:'high',status:'not-started',note:''},
-  {id:26,section:'product',parent:null,name:'Application — verify production domain and routing (e.g. app.domain.com)',owner:'Infra / DevOps',start:'2026-04-06',due:'2026-04-20',priority:'critical',status:'not-started',note:''},
-  {id:27,section:'product',parent:26,name:'Ensure SSL certificates are configured and valid',owner:'DevOps',start:'2026-04-06',due:'2026-04-15',priority:'critical',status:'not-started',note:''},
-  {id:28,section:'product',parent:26,name:'Validate login and authentication flows (SSO, MFA)',owner:'Security + Engineering',start:'2026-04-10',due:'2026-04-30',priority:'critical',status:'not-started',note:''},
-  {id:29,section:'product',parent:26,name:'Validate user onboarding flow (account creation, invitations, permissions)',owner:'Engineering + PM',start:'2026-04-10',due:'2026-05-01',priority:'critical',status:'not-started',note:''},
-  {id:30,section:'product',parent:26,name:'Test all core platform workflows (meetings, agents, documents, etc.)',owner:'QA Lead',start:'2026-04-15',due:'2026-05-15',priority:'critical',status:'not-started',note:''},
-  {id:31,section:'product',parent:26,name:'Validate cross-browser compatibility (Chrome, Edge, Safari)',owner:'QA / Frontend',start:'2026-05-01',due:'2026-05-20',priority:'high',status:'not-started',note:''},
-  {id:32,section:'product',parent:26,name:'Verify responsiveness across screen sizes (desktop and laptop)',owner:'Frontend Lead',start:'2026-05-01',due:'2026-05-20',priority:'high',status:'not-started',note:''},
-  {id:33,section:'product',parent:26,name:'Test performance under expected user load',owner:'Infra / QA',start:'2026-05-01',due:'2026-05-25',priority:'high',status:'not-started',note:''},
-  {id:34,section:'product',parent:26,name:'Ensure logging and monitoring enabled for platform usage',owner:'SRE / DevOps',start:'2026-04-15',due:'2026-05-10',priority:'high',status:'not-started',note:''},
-  {id:35,section:'product',parent:26,name:'Verify platform security protections (session management, etc.)',owner:'Security Engineer',start:'2026-04-15',due:'2026-05-15',priority:'critical',status:'not-started',note:''},
-  {id:101,section:'product',parent:null,name:'Tenant management — define and validate multi-tenant architecture and isolation model',owner:'VP Engineering + PM',start:'2026-04-10',due:'2026-05-01',priority:'critical',status:'not-started',note:''},
-  {id:102,section:'product',parent:101,name:'Verify tenant data isolation — no cross-tenant data leakage',owner:'Security Engineer',start:'2026-04-15',due:'2026-05-10',priority:'critical',status:'not-started',note:''},
-  {id:103,section:'product',parent:101,name:'Validate tenant provisioning and de-provisioning flows end-to-end',owner:'Engineering Lead',start:'2026-04-15',due:'2026-05-10',priority:'critical',status:'not-started',note:''},
-  {id:104,section:'product',parent:101,name:'Confirm tenant-level configuration and customisation (branding, settings)',owner:'PM + Engineering',start:'2026-04-20',due:'2026-05-15',priority:'high',status:'not-started',note:''},
-  {id:105,section:'product',parent:101,name:'Test tenant admin roles — permissions, user management, audit visibility',owner:'QA Lead',start:'2026-04-20',due:'2026-05-20',priority:'high',status:'not-started',note:''},
-  {id:106,section:'product',parent:101,name:'Validate tenant-level usage reporting and billing attribution',owner:'Engineering + Finance',start:'2026-04-25',due:'2026-05-25',priority:'high',status:'not-started',note:''},
-  {id:107,section:'product',parent:101,name:'Document tenant onboarding and offboarding runbook',owner:'Head of Support + PM',start:'2026-05-01',due:'2026-05-31',priority:'medium',status:'not-started',note:''},
-  {id:36,section:'infra',parent:null,name:'Scalability — define expected GA load, concurrency, storage, and growth assumptions',owner:'VP Engineering + Infra Lead',start:'2026-04-06',due:'2026-04-20',priority:'critical',status:'not-started',note:''},
-  {id:37,section:'infra',parent:36,name:'Run load tests against target thresholds',owner:'Infra Lead',start:'2026-04-20',due:'2026-05-10',priority:'critical',status:'not-started',note:''},
-  {id:38,section:'infra',parent:36,name:'Document bottlenecks and scaling plan',owner:'Infra Lead',start:'2026-05-10',due:'2026-05-25',priority:'high',status:'not-started',note:''},
-  {id:39,section:'infra',parent:36,name:'Secure engineering sign-off on capacity',owner:'VP Engineering',start:'2026-05-25',due:'2026-06-05',priority:'critical',status:'not-started',note:''},
-  {id:40,section:'infra',parent:null,name:'High availability — confirm redundancy across critical components',owner:'SRE Lead',start:'2026-04-10',due:'2026-05-01',priority:'critical',status:'not-started',note:''},
-  {id:41,section:'infra',parent:40,name:'Test failover and recovery scenarios',owner:'SRE Lead',start:'2026-05-01',due:'2026-05-20',priority:'critical',status:'not-started',note:''},
-  {id:42,section:'infra',parent:40,name:'Validate uptime design against target SLA',owner:'VP Engineering',start:'2026-05-15',due:'2026-06-01',priority:'critical',status:'not-started',note:''},
-  {id:43,section:'infra',parent:40,name:'Document single points of failure and mitigations',owner:'SRE Lead',start:'2026-04-20',due:'2026-05-10',priority:'high',status:'not-started',note:''},
-  {id:44,section:'infra',parent:null,name:'Performance — set target response times for critical workflows',owner:'VP Engineering + PM',start:'2026-04-10',due:'2026-04-25',priority:'high',status:'not-started',note:''},
-  {id:45,section:'infra',parent:44,name:'Run performance tests under normal and peak conditions',owner:'QA / Infra',start:'2026-04-25',due:'2026-05-15',priority:'high',status:'not-started',note:''},
-  {id:46,section:'infra',parent:44,name:'Confirm metrics meet agreed thresholds before release',owner:'VP Engineering',start:'2026-05-15',due:'2026-06-01',priority:'critical',status:'not-started',note:''},
-  {id:47,section:'infra',parent:null,name:'CI/CD pipeline configured and validated for production deployments',owner:'DevOps Lead',start:'2026-04-06',due:'2026-04-30',priority:'high',status:'not-started',note:''},
-  {id:48,section:'infra',parent:null,name:'Observability stack — logs, metrics, traces, and alerts for critical services',owner:'SRE Lead',start:'2026-04-10',due:'2026-05-10',priority:'critical',status:'not-started',note:''},
-  {id:49,section:'infra',parent:48,name:'Ensure dashboards are usable by on-call teams',owner:'SRE Lead',start:'2026-05-01',due:'2026-05-15',priority:'high',status:'not-started',note:''},
-  {id:50,section:'infra',parent:48,name:'Validate alert thresholds and on-call routing',owner:'SRE Lead',start:'2026-05-10',due:'2026-05-25',priority:'high',status:'not-started',note:''},
-  {id:51,section:'infra',parent:48,name:'Confirm retention policies and access controls for logs',owner:'Security + SRE',start:'2026-05-01',due:'2026-05-20',priority:'medium',status:'not-started',note:''},
-  {id:52,section:'infra',parent:null,name:'Backup and DR — define scope, frequency, retention, and restore owners',owner:'Infra Lead',start:'2026-04-10',due:'2026-04-30',priority:'critical',status:'not-started',note:''},
-  {id:53,section:'infra',parent:52,name:'Test restore for critical data and configs',owner:'Infra Lead',start:'2026-04-30',due:'2026-05-20',priority:'critical',status:'not-started',note:''},
-  {id:54,section:'infra',parent:52,name:'Document disaster recovery plan; confirm runbooks are current',owner:'SRE Lead',start:'2026-05-01',due:'2026-05-25',priority:'critical',status:'not-started',note:''},
-  {id:55,section:'infra',parent:null,name:'Security hardening — harden production environment before GA',owner:'Head of Security',start:'2026-04-15',due:'2026-05-31',priority:'critical',status:'not-started',note:''},
-  {id:56,section:'svcmgmt',parent:null,name:'Incident response process and playbook documented',owner:'SRE Lead + Head of Support',start:'2026-04-10',due:'2026-05-15',priority:'critical',status:'not-started',note:''},
-  {id:57,section:'svcmgmt',parent:null,name:'Monitoring and alerting triggers production support workflow',owner:'SRE Lead',start:'2026-04-15',due:'2026-05-10',priority:'critical',status:'not-started',note:''},
-  {id:58,section:'svcmgmt',parent:null,name:'Service health dashboards live and accessible to stakeholders',owner:'SRE Lead',start:'2026-04-15',due:'2026-05-15',priority:'high',status:'not-started',note:''},
-  {id:59,section:'svcmgmt',parent:null,name:'Maintenance and upgrades process defined and communicated',owner:'VP Engineering',start:'2026-04-20',due:'2026-05-15',priority:'medium',status:'not-started',note:''},
-  {id:60,section:'svcmgmt',parent:null,name:'API versioning strategy agreed — managing multiple API versions in parallel',owner:'Platform Lead + PM',start:'2026-04-10',due:'2026-05-01',priority:'high',status:'not-started',note:''},
-  {id:61,section:'svcmgmt',parent:null,name:'Escalation paths defined and communicated across support tiers',owner:'Head of Support',start:'2026-04-15',due:'2026-05-10',priority:'high',status:'not-started',note:''},
-  {id:62,section:'data',parent:null,name:'Encryption proven and confirmed for data at rest and in transit',owner:'Security Engineer',start:'2026-04-06',due:'2026-04-30',priority:'critical',status:'not-started',note:''},
-  {id:63,section:'data',parent:null,name:'Access controls in place — role-based, least privilege enforced',owner:'Security + Engineering',start:'2026-04-06',due:'2026-04-30',priority:'critical',status:'not-started',note:''},
-  {id:64,section:'data',parent:null,name:'Audit logs enabled and retained per policy',owner:'Security Engineer',start:'2026-04-10',due:'2026-05-01',priority:'critical',status:'not-started',note:''},
-  {id:65,section:'data',parent:null,name:'Data retention and deletion policies documented and enforced',owner:'Legal + Engineering',start:'2026-04-10',due:'2026-05-01',priority:'critical',status:'not-started',note:''},
-  {id:66,section:'data',parent:null,name:'Export and backup options for customers defined and tested',owner:'PM + Engineering',start:'2026-04-15',due:'2026-05-15',priority:'medium',status:'not-started',note:''},
-  {id:67,section:'billing',parent:null,name:'Packages defined — all enabled features per product/package listed',owner:'CPO + Finance',start:'2026-04-06',due:'2026-04-25',priority:'critical',status:'not-started',note:''},
-  {id:68,section:'billing',parent:null,name:'Usage metering captured in-app including overage tracking',owner:'Engineering + Finance',start:'2026-04-10',due:'2026-05-10',priority:'critical',status:'not-started',note:''},
-  {id:69,section:'billing',parent:null,name:'Usage data export to billing system tested end-to-end',owner:'RevOps + Engineering',start:'2026-04-15',due:'2026-05-15',priority:'critical',status:'not-started',note:''},
-  {id:70,section:'billing',parent:null,name:'Ability to issue free credits configured and tested',owner:'Engineering + Finance',start:'2026-04-15',due:'2026-05-01',priority:'medium',status:'not-started',note:''},
-  {id:71,section:'billing',parent:null,name:'Overage flows defined, implemented, and customer alerts tested',owner:'PM + Engineering',start:'2026-04-15',due:'2026-05-15',priority:'high',status:'not-started',note:''},
-  {id:72,section:'billing',parent:null,name:'Trial definition agreed — duration, limitations, conversion flow',owner:'CPO + Finance',start:'2026-04-06',due:'2026-04-20',priority:'high',status:'not-started',note:''},
-  {id:73,section:'billing',parent:null,name:'Invoicing system configured and tested',owner:'Finance + Engineering',start:'2026-04-15',due:'2026-05-20',priority:'critical',status:'not-started',note:''},
-  {id:74,section:'billing',parent:null,name:'Credit notes process documented and tested in system',owner:'Finance',start:'2026-04-20',due:'2026-05-15',priority:'medium',status:'not-started',note:''},
-  {id:75,section:'support',parent:null,name:'Help center and knowledge base published with GA content',owner:'Head of Support',start:'2026-04-15',due:'2026-06-01',priority:'critical',status:'not-started',note:''},
-  {id:76,section:'support',parent:null,name:'Ticketing system configured — queues, routing, SLA rules set',owner:'Head of Support',start:'2026-04-10',due:'2026-04-30',priority:'critical',status:'not-started',note:''},
-  {id:77,section:'support',parent:null,name:'SLA management — tiers defined and enforced in tooling',owner:'Head of Support',start:'2026-04-15',due:'2026-05-10',priority:'high',status:'not-started',note:''},
-  {id:78,section:'legal',parent:null,name:'Terms of Use updated for GA and approved by legal counsel',owner:'General Counsel',start:'2026-04-06',due:'2026-05-01',priority:'critical',status:'not-started',note:''},
-  {id:79,section:'legal',parent:null,name:'Contract templates (MSA, order forms) finalized',owner:'Legal',start:'2026-04-10',due:'2026-05-01',priority:'critical',status:'not-started',note:''},
-  {id:80,section:'legal',parent:null,name:'Data Processing Agreements (DPA) templates ready',owner:'Legal',start:'2026-04-10',due:'2026-05-01',priority:'critical',status:'not-started',note:''},
-  {id:81,section:'legal',parent:null,name:'IP ownership and liability provisions reviewed and signed off',owner:'General Counsel',start:'2026-04-10',due:'2026-04-30',priority:'high',status:'not-started',note:''},
-  {id:82,section:'marketing',parent:null,name:'Branding finalized — logo, brand guide, visual identity approved',owner:'Head of Marketing',start:'2026-04-06',due:'2026-04-30',priority:'critical',status:'not-started',note:''},
-  {id:83,section:'marketing',parent:null,name:'Website updated — GA landing page, pricing, features, and CTA live',owner:'Marketing / Web',start:'2026-04-15',due:'2026-05-20',priority:'critical',status:'not-started',note:''},
-  {id:84,section:'analytics',parent:null,name:'Product analytics implemented — events, funnels, retention tracked',owner:'PM + Engineering',start:'2026-04-10',due:'2026-05-15',priority:'high',status:'not-started',note:''},
-  {id:85,section:'analytics',parent:null,name:'NPS surveys configured and scheduled post-launch',owner:'PM / Customer Success',start:'2026-04-20',due:'2026-05-31',priority:'medium',status:'not-started',note:''},
-  {id:86,section:'analytics',parent:null,name:'Feature request process and tooling in place',owner:'PM',start:'2026-04-10',due:'2026-04-30',priority:'medium',status:'not-started',note:''},
-  {id:87,section:'analytics',parent:null,name:'Upsell and cross-sell capability defined in product and CRM',owner:'CPO + RevOps',start:'2026-04-15',due:'2026-05-15',priority:'high',status:'not-started',note:''},
-  {id:88,section:'analytics',parent:null,name:'Technical and business KPIs defined and dashboarded',owner:'CPO + CTO',start:'2026-04-06',due:'2026-04-25',priority:'critical',status:'not-started',note:''},
-  {id:89,section:'analytics',parent:null,name:'Sales KPIs defined — pipeline, win rate, ACV targets set',owner:'Head of Sales',start:'2026-04-06',due:'2026-04-20',priority:'high',status:'not-started',note:''},
-  {id:90,section:'analytics',parent:null,name:'Customer KPIs defined — activation, NPS, churn, expansion',owner:'Head of CS',start:'2026-04-10',due:'2026-04-25',priority:'high',status:'not-started',note:''},
-  {id:91,section:'analytics',parent:null,name:'Financial KPIs defined — ARR, MRR, CAC, LTV targets',owner:'CFO',start:'2026-04-06',due:'2026-04-20',priority:'high',status:'not-started',note:''},
-  {id:92,section:'analytics',parent:null,name:'Operational KPIs defined — uptime, MTTR, support ticket volume',owner:'VP Engineering + Head of Support',start:'2026-04-10',due:'2026-04-25',priority:'high',status:'not-started',note:''},
-  {id:93,section:'security',parent:null,name:'Third-party penetration test completed — all critical findings remediated',owner:'Head of Security',start:'2026-04-06',due:'2026-05-15',priority:'critical',status:'in-progress',note:''},
-  {id:94,section:'security',parent:null,name:'Internal vulnerability assessment completed',owner:'Security Engineer',start:'2026-04-06',due:'2026-05-01',priority:'critical',status:'not-started',note:''},
-  {id:95,section:'security',parent:null,name:'Incident response plan tested with tabletop exercise',owner:'Head of Security + SRE',start:'2026-05-01',due:'2026-05-31',priority:'high',status:'not-started',note:''},
-  {id:96,section:'security',parent:null,name:'Bug bounty program scoped and launched',owner:'Head of Security',start:'2026-05-01',due:'2026-06-01',priority:'medium',status:'not-started',note:''},
-  {id:97,section:'compliance',parent:null,name:'SOC 2 Type II audit in-flight or completed',owner:'Head of Security + Compliance',start:'2026-04-06',due:'2026-06-01',priority:'critical',status:'not-started',note:''},
-  {id:98,section:'compliance',parent:null,name:'GDPR / data privacy impact assessment signed off',owner:'Legal + Security',start:'2026-04-10',due:'2026-05-01',priority:'critical',status:'not-started',note:''},
-  {id:99,section:'compliance',parent:null,name:'ISO 27001 or equivalent certification status confirmed',owner:'Head of Security',start:'2026-04-10',due:'2026-05-15',priority:'high',status:'not-started',note:''},
-  {id:100,section:'compliance',parent:null,name:'Regional compliance requirements verified (CCPA, PDPA, etc.)',owner:'Legal',start:'2026-04-10',due:'2026-05-01',priority:'high',status:'not-started',note:''},
-];
-
-// ── STATE ──────────────────────────────────────────────────────────────────────
-let SECTIONS=[], tasks=[], users={}, sectionOpen={};
-let currentUser=null, isAdmin=false;
-let editingTaskId=null, mergingSecId=null, deletingSecId=null, noteTaskId=null;
-
-// ── FIREBASE PERSISTENCE ─────────────────────────────────────────────────────
 async function loadData(){
-  // always seed defaults first
-  tasks    = JSON.parse(JSON.stringify(DEF_TASKS));
+  tasks = JSON.parse(JSON.stringify(DEF_TASKS));
   SECTIONS = JSON.parse(JSON.stringify(DEF_SECTIONS));
-  users    = {};
-
-  if(!db){ render(); return; } // fallback if Firebase not ready
-
+  users = {};
   try{
     showLoading(true);
     const snap = await db.collection('checklist').doc('state').get();
     if(snap.exists){
       const d = snap.data();
-      if(d.tasks && d.tasks.length >= 50){
-        tasks    = d.tasks;
-        SECTIONS = (d.sections && d.sections.length > 0) ? d.sections : SECTIONS;
-        users    = d.users || {};
-        tasks.forEach(t=>{ if(t.note===undefined) t.note=''; });
+      if(d && Array.isArray(d.tasks) && d.tasks.length >= 10){
+        tasks = d.tasks;
+        if(d.sections && d.sections.length > 0) SECTIONS = d.sections;
+        if(d.users) users = d.users;
+        tasks.forEach(t=>{
+          if(t.note===undefined)t.note='';
+          if(t.link===undefined)t.link='';
+          if(t.flagged===undefined)t.flagged=false;
+        });
       } else {
-        // first time — seed defaults into Firebase
         await saveToFirebase();
       }
     } else {
-      // document doesn't exist yet — create it with defaults
       await saveToFirebase();
     }
-  } catch(e){
-    console.error('Firebase load error:', e);
-    toast('⚠️ Could not load from cloud — showing defaults');
-  }
+  }catch(e){console.error('Load error:',e);toast('⚠ Could not load from cloud');}
   showLoading(false);
-  render();
 }
-
-let saveTimer=null;
-function save(){
-  // debounce — wait 800ms after last change before writing to Firebase
-  clearTimeout(saveTimer);
-  saveTimer=setTimeout(()=>saveToFirebase(),800);
-}
+function save(){clearTimeout(saveTimer);saveTimer=setTimeout(saveToFirebase,800);}
 async function saveToFirebase(){
-  if(!db) return;
-  try{
-    await db.collection('checklist').doc('state').set({tasks,sections:SECTIONS,users,updated:new Date().toISOString()});
-  } catch(e){
-    console.error('Firebase save error:',e);
-    toast('⚠️ Save failed — check connection');
-  }
+  try{await db.collection('checklist').doc('state').set({tasks,sections:SECTIONS,users,updated:new Date().toISOString()});}
+  catch(e){console.error('Save error:',e);toast('⚠ Save failed');}
 }
-function showLoading(show){
-  const el=document.getElementById('loading-bar');
-  if(el) el.style.display=show?'block':'none';
-}
-function nextId(){return Math.max(0,...tasks.map(t=>t.id))+1;}
-function secById(id){return SECTIONS.find(s=>s.id===id);}
-function x(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function showLoading(v){document.getElementById('loading-bar').style.display=v?'block':'none';}
 
-// ── AUTH ───────────────────────────────────────────────────────────────────────
+// ── AUTH ──────────────────────────────────────────────────────────────────────
 async function doLogin(){
-  const name=document.getElementById('login-name').value.trim();
-  const pass=document.getElementById('login-pass').value.trim();
+  const name = document.getElementById('login-name').value.trim();
+  const pass = document.getElementById('login-pass').value.trim();
+  const email = document.getElementById('login-email').value.trim();
   if(!name){alert('Please enter your name.');return;}
-  isAdmin=(pass===ADMIN_PASS);
-  currentUser=name;
-  if(!users[name])users[name]={mappedOwner:'',lastSeen:''};
-  users[name].lastSeen=new Date().toLocaleString();
-  save();
-  document.getElementById('login-screen').style.display='none';
-  document.getElementById('app').style.display='block';
-  document.getElementById('user-badge').textContent=isAdmin?'⭐ Admin: '+name:'👤 '+name;
-  ['add-task-btn','add-cat-btn','users-btn'].forEach(id=>
-    document.getElementById(id).style.display=isAdmin?'':'none');
+  isAdmin = (pass === ADMIN_PASS);
+  currentUser = name;
+  currentEmail = email;
+  if(!users[name]) users[name] = {mappedOwner:'',lastSeen:'',email:''};
+  users[name].lastSeen = new Date().toLocaleString();
+  if(email) users[name].email = email;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('user-badge').textContent = isAdmin ? '⭐ Admin: '+name : '👤 '+name;
+  ['add-task-btn','add-cat-btn','users-btn'].forEach(id=>document.getElementById(id).style.display=isAdmin?'':'none');
   await loadData();
-  // ensure all sections are open by default after data loads
-  SECTIONS.forEach(s=>{ if(sectionOpen[s.id]===undefined) sectionOpen[s.id]=true; });
-  // set up real-time listener so all users see live updates
-  if(db){
-    db.collection('checklist').doc('state').onSnapshot(snap=>{
-      if(!snap.exists) return;
-      const d=snap.data();
-      if(!d||!d.tasks||d.tasks.length<50) return;
-      // only update if data changed (avoid overwriting mid-edit)
-      if(JSON.stringify(d.tasks)===JSON.stringify(tasks)) return;
-      tasks=d.tasks;
-      if(d.sections&&d.sections.length>0) SECTIONS=d.sections;
-      if(d.users) users=d.users;
-      tasks.forEach(t=>{if(t.note===undefined)t.note='';});
-      SECTIONS.forEach(s=>{ if(sectionOpen[s.id]===undefined) sectionOpen[s.id]=true; });
-      render();
-    });
-  }
+  save(); // save updated lastSeen/email
+  SECTIONS.forEach(s=>sectionOpen[s.id]=true);
+  // set up real-time listener
+  db.collection('checklist').doc('state').onSnapshot(snap=>{
+    if(!snap.exists)return;
+    const d=snap.data();
+    if(!d||!Array.isArray(d.tasks)||d.tasks.length<10)return;
+    if(JSON.stringify(d.tasks)===JSON.stringify(tasks))return;
+    tasks=d.tasks;
+    if(d.sections&&d.sections.length>0)SECTIONS=d.sections;
+    if(d.users)users=d.users;
+    tasks.forEach(t=>{if(t.note===undefined)t.note='';if(t.link===undefined)t.link='';if(t.flagged===undefined)t.flagged=false;});
+    SECTIONS.forEach(s=>{if(sectionOpen[s.id]===undefined)sectionOpen[s.id]=true;});
+    render();
+  });
+  // check for due soon tasks and notify
+  checkDueNotifications();
+  render();
 }
 function doLogout(){
   currentUser=null;isAdmin=false;
   document.getElementById('login-screen').style.display='flex';
   document.getElementById('app').style.display='none';
-  document.getElementById('login-name').value='';
-  document.getElementById('login-pass').value='';
+  ['login-name','login-pass','login-email'].forEach(id=>document.getElementById(id).value='');
 }
 document.getElementById('login-name').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 
-// ── PERMISSIONS ────────────────────────────────────────────────────────────────
+// ── PERMISSIONS ───────────────────────────────────────────────────────────────
 function canEdit(task){
   if(isAdmin)return true;
   const mapped=(users[currentUser]||{}).mappedOwner||'';
@@ -632,47 +570,63 @@ function canEdit(task){
   return(task.owner||'').toLowerCase().includes(mapped.toLowerCase());
 }
 
-// ── USERS PANEL ────────────────────────────────────────────────────────────────
-function openUsers(){
-  const allOwners=[...new Set(tasks.map(t=>t.owner).filter(Boolean))].sort();
-  const rows=Object.entries(users).map(([name,info])=>{
-    const opts=allOwners.map(o=>`<option value="${x(o)}"${info.mappedOwner===o?' selected':''}>${x(o)}</option>`).join('');
-    const isThisAdmin=name===currentUser&&isAdmin;
-    const dotClass=isThisAdmin?'admin':info.mappedOwner?'mapped':'pending';
-    const label=isThisAdmin?'Admin':info.mappedOwner?'Mapped — can edit assigned tasks':'Pending — no edit access yet';
-    return`<tr>
-      <td><span class="sdot ${dotClass}"></span><strong>${x(name)}</strong></td>
-      <td style="color:var(--text2);font-size:11px">${info.lastSeen||'—'}</td>
-      <td>
-        <select class="owner-sel" onchange="mapUser('${x(name).replace(/'/g,"\\'")}',this.value)">
-          <option value="">— No access —</option>${opts}
-        </select>
-      </td>
-      <td style="font-size:11px;color:var(--text2)">${label}</td>
-    </tr>`;
-  }).join('');
-  document.getElementById('user-table-wrap').innerHTML=`
-    <table class="user-table">
-      <thead><tr><th>Login name</th><th>Last seen</th><th>Assign to owner</th><th>Access status</th></tr></thead>
-      <tbody>${rows||'<tr><td colspan="4" style="color:var(--text3);padding:14px">No users have logged in yet.</td></tr>'}</tbody>
-    </table>`;
-  document.getElementById('users-modal').classList.remove('hidden');
+// ── EMAIL NOTIFICATIONS ───────────────────────────────────────────────────────
+function checkDueNotifications(){
+  const mapped=(users[currentUser]||{}).mappedOwner||'';
+  const email=currentEmail||(users[currentUser]||{}).email||'';
+  if(!email||!mapped)return;
+  const myTasks=tasks.filter(t=>
+    (t.owner||'').toLowerCase().includes(mapped.toLowerCase()) &&
+    t.status!=='completed' && t.due
+  );
+  const dueSoon=myTasks.filter(t=>{const d=daysUntil(t.due);return d!==null&&d>=0&&d<=DUE_WARN_DAYS;});
+  const overdue=myTasks.filter(t=>{const d=daysUntil(t.due);return d!==null&&d<0;});
+  if(dueSoon.length===0&&overdue.length===0)return;
+  sendNotificationEmail(email,currentUser,dueSoon,overdue);
 }
-function mapUser(loginName,ownerVal){
-  if(!users[loginName])users[loginName]={mappedOwner:'',lastSeen:''};
-  users[loginName].mappedOwner=ownerVal;
-  save();openUsers();toast(`${loginName} → ${ownerVal||'no access'} ✓`);
+function sendAllDueNotifications(){
+  let sent=0;
+  Object.entries(users).forEach(([name,info])=>{
+    if(!info.email||!info.mappedOwner)return;
+    const myTasks=tasks.filter(t=>(t.owner||'').toLowerCase().includes(info.mappedOwner.toLowerCase())&&t.status!=='completed'&&t.due);
+    const dueSoon=myTasks.filter(t=>{const d=daysUntil(t.due);return d!==null&&d>=0&&d<=DUE_WARN_DAYS;});
+    const overdue=myTasks.filter(t=>{const d=daysUntil(t.due);return d!==null&&d<0;});
+    if(dueSoon.length>0||overdue.length>0){sendNotificationEmail(info.email,name,dueSoon,overdue);sent++;}
+  });
+  toast(sent>0?`📧 Sent alerts to ${sent} owners`:`No due-soon tasks found`);
+  closeM('users-modal');
+}
+function sendNotificationEmail(email,name,dueSoon,overdue){
+  // Uses EmailJS public service — configure at emailjs.com
+  // Until configured, we log to console and show an in-app toast
+  const summary=[];
+  if(overdue.length)summary.push(`${overdue.length} OVERDUE task(s)`);
+  if(dueSoon.length)summary.push(`${dueSoon.length} due within 7 days`);
+  const taskList=[...overdue,...dueSoon].map(t=>`• ${t.name} — due ${t.due} [${t.status}]`).join('\n');
+  console.log(`Email to ${email}:\nHi ${name},\n${summary.join(', ')}:\n${taskList}`);
+  // To enable real emails: sign up at emailjs.com, create a template, and replace below:
+  // emailjs.send('YOUR_SERVICE_ID','YOUR_TEMPLATE_ID',{to_email:email,to_name:name,summary:summary.join(', '),task_list:taskList},'YOUR_PUBLIC_KEY');
+  toast(`📧 Due alert logged for ${name} (${summary.join(', ')})`);
 }
 
-// ── INLINE EDIT ────────────────────────────────────────────────────────────────
+// ── FLAG ──────────────────────────────────────────────────────────────────────
+function toggleFlag(id){
+  const t=tasks.find(z=>z.id===id);if(!t)return;
+  t.flagged=!t.flagged;
+  save();render();toast(t.flagged?'🚩 Flagged for review':'Flag removed');
+}
+function toggleFlagFilter(){
+  showFlaggedOnly=!showFlaggedOnly;
+  document.getElementById('flag-filter-btn').classList.toggle('active',showFlaggedOnly);
+  render();
+}
+
+// ── INLINE EDITS ──────────────────────────────────────────────────────────────
 function inlineEdit(id,field){
-  const t=tasks.find(x=>x.id===id);if(!t||!canEdit(t))return;
+  const t=tasks.find(z=>z.id===id);if(!t||!canEdit(t))return;
   const cell=document.getElementById(`ic-${field}-${id}`);if(!cell)return;
   const cur=t[field]||'';
-  cell.innerHTML=`<input class="ii" value="${x(cur)}"
-    onblur="saveInline(${id},'${field}',this.value)"
-    onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape'){this.value=this.defaultValue;this.blur()}"
-    autofocus>`;
+  cell.innerHTML=`<input class="ii" value="${x(cur)}" onblur="saveInline(${id},'${field}',this.value)" onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape'){this.value=this.defaultValue;this.blur()}" autofocus>`;
   const inp=cell.querySelector('input');inp.defaultValue=cur;inp.select();
 }
 function saveInline(id,field,val){
@@ -680,30 +634,11 @@ function saveInline(id,field,val){
   if(val.trim())t[field]=val.trim();
   save();render();toast('Saved ✓');
 }
+function chStatus(id,val){const t=tasks.find(z=>z.id===id);if(!t||!canEdit(t))return;t.status=val;save();render();toast('Status updated ✓');}
+function chPriority(id,val){const t=tasks.find(z=>z.id===id);if(!t||!canEdit(t))return;t.priority=val;save();render();toast('Priority updated ✓');}
+function toggleDone(id){const t=tasks.find(z=>z.id===id);if(!t||!canEdit(t))return;t.status=t.status==='completed'?'not-started':'completed';save();render();toast('Updated ✓');}
 
-// ── STATUS / PRIORITY ─────────────────────────────────────────────────────────
-function chStatus(id,val){
-  const t=tasks.find(z=>z.id===id);if(!t||!canEdit(t))return;
-  t.status=val;save();updateMetrics();
-  // recolor dropdown in place
-  const el=document.getElementById('dsel-s-'+id);
-  if(el){STATUS_OPTS.forEach(s=>el.classList.remove(s));el.classList.add(val);}
-  toast('Status updated ✓');
-}
-function chPriority(id,val){
-  const t=tasks.find(z=>z.id===id);if(!t||!canEdit(t))return;
-  t.priority=val;save();
-  const el=document.getElementById('dsel-p-'+id);
-  if(el){PRIO_OPTS.forEach(p=>el.classList.remove(p));el.classList.add(val);}
-  toast('Priority updated ✓');
-}
-function toggleDone(id){
-  const t=tasks.find(z=>z.id===id);if(!t||!canEdit(t))return;
-  t.status=t.status==='completed'?'not-started':'completed';
-  save();render();toast('Updated ✓');
-}
-
-// ── NOTE ───────────────────────────────────────────────────────────────────────
+// ── NOTE ──────────────────────────────────────────────────────────────────────
 function openNote(id){
   const t=tasks.find(z=>z.id===id);if(!t||!canEdit(t))return;
   noteTaskId=id;
@@ -712,94 +647,50 @@ function openNote(id){
   document.getElementById('note-modal').classList.remove('hidden');
   setTimeout(()=>document.getElementById('note-ta').focus(),80);
 }
-function saveNote(){
-  const t=tasks.find(z=>z.id===noteTaskId);if(!t)return;
-  t.note=document.getElementById('note-ta').value.trim();
-  save();closeM('note-modal');render();toast('Note saved ✓');
-}
+function saveNote(){const t=tasks.find(z=>z.id===noteTaskId);if(!t)return;t.note=document.getElementById('note-ta').value.trim();save();closeM('note-modal');render();toast('Note saved ✓');}
 
-// ── DELETE TASK ────────────────────────────────────────────────────────────────
-function delTask(id){
-  if(!isAdmin)return;
-  if(!confirm('Delete this task and all its subtasks?'))return;
-  tasks=tasks.filter(t=>t.id!==id&&t.parent!==id);
-  save();render();toast('Deleted');
+// ── LINK ──────────────────────────────────────────────────────────────────────
+function openLink(id){
+  const t=tasks.find(z=>z.id===id);if(!t||!canEdit(t))return;
+  linkTaskId=id;
+  document.getElementById('link-task-name').textContent=t.name;
+  document.getElementById('link-inp').value=t.link||'';
+  const prev=document.getElementById('link-preview');
+  const href=document.getElementById('link-href');
+  if(t.link){prev.style.display='block';href.href=t.link;href.textContent=t.link.substring(0,50)+(t.link.length>50?'…':'');}
+  else prev.style.display='none';
+  document.getElementById('link-modal').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('link-inp').focus(),80);
 }
+function saveLink(){const t=tasks.find(z=>z.id===linkTaskId);if(!t)return;t.link=document.getElementById('link-inp').value.trim();save();closeM('link-modal');render();toast('Link saved ✓');}
 
-// ── SECTION MANAGEMENT ─────────────────────────────────────────────────────────
+// ── DELETE ────────────────────────────────────────────────────────────────────
+function delTask(id){if(!isAdmin)return;if(!confirm('Delete this task and all its subtasks?'))return;tasks=tasks.filter(t=>t.id!==id&&t.parent!==id);save();render();toast('Deleted');}
+
+// ── SECTION ───────────────────────────────────────────────────────────────────
 function startSecRename(id){
-  if(!isAdmin)return;
-  const sec=secById(id);if(!sec)return;
+  if(!isAdmin)return;const sec=secById(id);if(!sec)return;
   const el=document.getElementById('sec-te-'+id);if(!el)return;
-  el.outerHTML=`<input class="sec-inp" id="sec-inp-${id}" value="${x(sec.title)}"
-    onblur="saveSecRename('${id}',this.value)"
-    onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape')render()"
-    onclick="event.stopPropagation()" autofocus>`;
+  el.outerHTML=`<input class="sec-inp" id="sec-inp-${id}" value="${x(sec.title)}" onblur="saveSecRename('${id}',this.value)" onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape')render()" onclick="event.stopPropagation()" autofocus>`;
   document.getElementById('sec-inp-'+id)?.select();
 }
-function saveSecRename(id,val){
-  const sec=secById(id);if(sec&&val.trim())sec.title=val.trim();
-  save();render();toast('Category renamed ✓');
-}
-function openAddCat(){
-  document.getElementById('cat-name').value='';
-  document.getElementById('cat-modal').classList.remove('hidden');
-  setTimeout(()=>document.getElementById('cat-name').focus(),80);
-}
-function saveCat(){
-  const name=document.getElementById('cat-name').value.trim();
-  if(!name){alert('Name required.');return;}
-  const id='cat_'+Date.now();
-  SECTIONS.push({id,num:String(SECTIONS.length+1),title:name});
-  sectionOpen[id]=true;
-  save();closeM('cat-modal');render();toast('Category added ✓');
-}
-function openMerge(secId){
-  mergingSecId=secId;
-  const sec=secById(secId);
-  document.getElementById('merge-from-name').textContent=sec.title;
-  document.getElementById('merge-target').innerHTML=
-    SECTIONS.filter(s=>s.id!==secId).map(s=>`<option value="${s.id}">${x(s.title)}</option>`).join('');
-  document.getElementById('merge-modal').classList.remove('hidden');
-}
-function confirmMerge(){
-  const tid=document.getElementById('merge-target').value;
-  tasks.forEach(t=>{if(t.section===mergingSecId)t.section=tid;});
-  SECTIONS=SECTIONS.filter(s=>s.id!==mergingSecId);
-  renum();save();closeM('merge-modal');render();toast('Merged ✓');
-}
-function openDelCat(secId){
-  deletingSecId=secId;
-  const sec=secById(secId);
-  document.getElementById('delcat-name').textContent=sec.title;
-  document.getElementById('delcat-target').innerHTML=
-    '<option value="__delete__">— Delete all tasks permanently —</option>'+
-    SECTIONS.filter(s=>s.id!==secId).map(s=>`<option value="${s.id}">Move to: ${x(s.title)}</option>`).join('');
-  document.getElementById('delcat-modal').classList.remove('hidden');
-}
-function confirmDelCat(){
-  const tid=document.getElementById('delcat-target').value;
-  if(tid==='__delete__')tasks=tasks.filter(t=>t.section!==deletingSecId);
-  else tasks.forEach(t=>{if(t.section===deletingSecId)t.section=tid;});
-  SECTIONS=SECTIONS.filter(s=>s.id!==deletingSecId);
-  renum();save();closeM('delcat-modal');render();toast('Category deleted ✓');
-}
+function saveSecRename(id,val){const sec=secById(id);if(sec&&val.trim())sec.title=val.trim();save();render();toast('Renamed ✓');}
+function openAddCat(){document.getElementById('cat-name').value='';document.getElementById('cat-modal').classList.remove('hidden');setTimeout(()=>document.getElementById('cat-name').focus(),80);}
+function saveCat(){const name=document.getElementById('cat-name').value.trim();if(!name){alert('Name required.');return;}const id='cat_'+Date.now();SECTIONS.push({id,num:String(SECTIONS.length+1),title:name});sectionOpen[id]=true;save();closeM('cat-modal');render();toast('Category added ✓');}
+function openMerge(secId){mergingSecId=secId;const sec=secById(secId);document.getElementById('merge-from-name').textContent=sec.title;document.getElementById('merge-target').innerHTML=SECTIONS.filter(s=>s.id!==secId).map(s=>`<option value="${s.id}">${x(s.title)}</option>`).join('');document.getElementById('merge-modal').classList.remove('hidden');}
+function confirmMerge(){const tid=document.getElementById('merge-target').value;tasks.forEach(t=>{if(t.section===mergingSecId)t.section=tid;});SECTIONS=SECTIONS.filter(s=>s.id!==mergingSecId);renum();save();closeM('merge-modal');render();toast('Merged ✓');}
+function openDelCat(secId){deletingSecId=secId;const sec=secById(secId);document.getElementById('delcat-name').textContent=sec.title;document.getElementById('delcat-target').innerHTML='<option value="__delete__">— Delete all tasks permanently —</option>'+SECTIONS.filter(s=>s.id!==secId).map(s=>`<option value="${s.id}">Move to: ${x(s.title)}</option>`).join('');document.getElementById('delcat-modal').classList.remove('hidden');}
+function confirmDelCat(){const tid=document.getElementById('delcat-target').value;if(tid==='__delete__')tasks=tasks.filter(t=>t.section!==deletingSecId);else tasks.forEach(t=>{if(t.section===deletingSecId)t.section=tid;});SECTIONS=SECTIONS.filter(s=>s.id!==deletingSecId);renum();save();closeM('delcat-modal');render();toast('Category deleted ✓');}
 function renum(){SECTIONS.forEach((s,i)=>s.num=String(i+1));}
 
-// ── TASK MODAL ─────────────────────────────────────────────────────────────────
+// ── TASK MODAL ────────────────────────────────────────────────────────────────
 function openAddTask(secId,parentId){
   editingTaskId=null;
   document.getElementById('task-modal-title').textContent=parentId?'Add subtask':'Add task';
-  document.getElementById('f-name').value='';
-  document.getElementById('f-owner').value=isAdmin?'':currentUser;
-  document.getElementById('f-start').value='';document.getElementById('f-due').value='';
-  document.getElementById('f-priority').value='high';
-  document.getElementById('f-status').value='not-started';
-  document.getElementById('f-note').value='';
-  popSecSel();
-  if(secId)document.getElementById('f-section').value=secId;
-  refreshParents();
-  if(parentId)document.getElementById('f-parent').value=parentId;
+  ['f-name','f-owner','f-start','f-due','f-link','f-note'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-priority').value='high';document.getElementById('f-status').value='not-started';
+  popSecSel();if(secId)document.getElementById('f-section').value=secId;
+  refreshParents();if(parentId)document.getElementById('f-parent').value=parentId;
   document.getElementById('task-modal').classList.remove('hidden');
   setTimeout(()=>document.getElementById('f-name').focus(),80);
 }
@@ -807,58 +698,92 @@ function openEditTask(id){
   const t=tasks.find(z=>z.id===id);if(!t||!canEdit(t))return;
   editingTaskId=id;
   document.getElementById('task-modal-title').textContent='Edit task';
-  document.getElementById('f-name').value=t.name;
-  document.getElementById('f-owner').value=t.owner||'';
+  document.getElementById('f-name').value=t.name;document.getElementById('f-owner').value=t.owner||'';
   document.getElementById('f-start').value=t.start||'';document.getElementById('f-due').value=t.due||'';
-  document.getElementById('f-priority').value=t.priority;
-  document.getElementById('f-status').value=t.status;
-  document.getElementById('f-note').value=t.note||'';
+  document.getElementById('f-priority').value=t.priority;document.getElementById('f-status').value=t.status;
+  document.getElementById('f-link').value=t.link||'';document.getElementById('f-note').value=t.note||'';
   popSecSel();document.getElementById('f-section').value=t.section;
   refreshParents();document.getElementById('f-parent').value=t.parent||'';
   document.getElementById('task-modal').classList.remove('hidden');
 }
-function popSecSel(){
-  document.getElementById('f-section').innerHTML=
-    SECTIONS.map(s=>`<option value="${s.id}">${s.num}. ${x(s.title)}</option>`).join('');
-  document.getElementById('f-section').onchange=refreshParents;
-}
-function refreshParents(){
-  const sid=document.getElementById('f-section').value;
-  const pts=tasks.filter(t=>t.section===sid&&!t.parent&&t.id!==editingTaskId);
-  document.getElementById('f-parent').innerHTML=
-    '<option value="">— top-level task —</option>'+
-    pts.map(p=>`<option value="${p.id}">${p.name.substring(0,58)}${p.name.length>58?'…':''}</option>`).join('');
-}
+function popSecSel(){document.getElementById('f-section').innerHTML=SECTIONS.map(s=>`<option value="${s.id}">${s.num}. ${x(s.title)}</option>`).join('');document.getElementById('f-section').onchange=refreshParents;}
+function refreshParents(){const sid=document.getElementById('f-section').value;const pts=tasks.filter(t=>t.section===sid&&!t.parent&&t.id!==editingTaskId);document.getElementById('f-parent').innerHTML='<option value="">— top-level task —</option>'+pts.map(p=>`<option value="${p.id}">${p.name.substring(0,58)}${p.name.length>58?'…':''}</option>`).join('');}
 function saveTask(){
   const name=document.getElementById('f-name').value.trim();
-  const owner=document.getElementById('f-owner').value.trim();
-  if(!name||!owner){alert('Name and owner are required.');return;}
+  if(!name){alert('Name required.');return;}
   const pv=document.getElementById('f-parent').value;
-  const data={name,owner,
-    section:document.getElementById('f-section').value,
-    parent:pv?parseInt(pv):null,
-    start:document.getElementById('f-start').value,
-    due:document.getElementById('f-due').value,
-    priority:document.getElementById('f-priority').value,
-    status:document.getElementById('f-status').value,
-    note:document.getElementById('f-note').value.trim(),
-  };
-  if(editingTaskId){Object.assign(tasks.find(z=>z.id===editingTaskId),data);toast('Task updated ✓');}
+  const data={name,owner:document.getElementById('f-owner').value.trim(),
+    section:document.getElementById('f-section').value,parent:pv?parseInt(pv):null,
+    start:document.getElementById('f-start').value,due:document.getElementById('f-due').value,
+    priority:document.getElementById('f-priority').value,status:document.getElementById('f-status').value,
+    link:document.getElementById('f-link').value.trim(),note:document.getElementById('f-note').value.trim(),
+    flagged:false};
+  if(editingTaskId){const t=tasks.find(z=>z.id===editingTaskId);Object.assign(t,data);t.flagged=t.flagged||false;toast('Task updated ✓');}
   else{tasks.push({id:nextId(),...data});toast('Task added ✓');}
   save();closeM('task-modal');render();
 }
 
-// ── MODAL HELPERS ──────────────────────────────────────────────────────────────
-function closeM(id){document.getElementById(id).classList.add('hidden');editingTaskId=null;noteTaskId=null;}
+// ── DRAG REORDER ──────────────────────────────────────────────────────────────
+function onDragStart(e,id){dragId=id;e.dataTransfer.effectAllowed='move';document.getElementById('tr-'+id)?.classList.add('dragging');}
+function onDragEnd(e,id){document.getElementById('tr-'+id)?.classList.remove('dragging');document.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));}
+function onDragOver(e,id){e.preventDefault();if(id===dragId)return;document.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));document.getElementById('tr-'+id)?.classList.add('drag-over');}
+function onDrop(e,id){e.preventDefault();if(!dragId||dragId===id)return;const dragged=tasks.find(t=>t.id===dragId),target=tasks.find(t=>t.id===id);if(!dragged||!target||dragged.parent!==target.parent)return;const fi=tasks.indexOf(dragged),ti=tasks.indexOf(target);tasks.splice(fi,1);tasks.splice(ti,0,dragged);dragId=null;save();render();toast('Order updated ✓');}
+function moveUp(id){const t=tasks.find(z=>z.id===id);if(!t||!t.parent)return;const s=tasks.filter(z=>z.parent===t.parent);const i=s.indexOf(t);if(i<=0)return;const p=s[i-1];const ti=tasks.indexOf(t),pi=tasks.indexOf(p);tasks.splice(ti,1);tasks.splice(pi,0,t);save();render();toast('Moved up ✓');}
+function moveDown(id){const t=tasks.find(z=>z.id===id);if(!t||!t.parent)return;const s=tasks.filter(z=>z.parent===t.parent);const i=s.indexOf(t);if(i>=s.length-1)return;const n=s[i+1];const ti=tasks.indexOf(t),ni=tasks.indexOf(n);tasks.splice(ti,1);tasks.splice(ni+1,0,t);save();render();toast('Moved down ✓');}
+
+// ── MODAL HELPERS ─────────────────────────────────────────────────────────────
+function closeM(id){document.getElementById(id).classList.add('hidden');editingTaskId=null;noteTaskId=null;linkTaskId=null;}
 function bgClose(e,id){if(e.target.id===id)closeM(id);}
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape')['task-modal','note-modal','cat-modal','merge-modal','delcat-modal','users-modal']
-    .forEach(id=>document.getElementById(id).classList.add('hidden'));
-});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')['task-modal','note-modal','link-modal','cat-modal','merge-modal','delcat-modal','users-modal'].forEach(id=>document.getElementById(id).classList.add('hidden'));});
 
-// ── RENDER ─────────────────────────────────────────────────────────────────────
-function fd(d){if(!d)return'—';const[,m,day]=d.split('-');return`${m}/${day}`;}
+// ── USERS PANEL ───────────────────────────────────────────────────────────────
+function openUsers(){
+  const allOwners=[...new Set(tasks.map(t=>t.owner).filter(Boolean))].sort();
+  const rows=Object.entries(users).map(([name,info])=>{
+    const opts=allOwners.map(o=>`<option value="${x(o)}"${info.mappedOwner===o?' selected':''}}>${x(o)}</option>`).join('');
+    const isThisAdmin=name===currentUser&&isAdmin;
+    const dotClass=isThisAdmin?'admin':info.mappedOwner?'mapped':'pending';
+    return`<tr>
+      <td><span class="sdot ${dotClass}"></span><strong>${x(name)}</strong></td>
+      <td style="color:var(--text2);font-size:11px">${info.lastSeen||'—'}</td>
+      <td><select class="owner-sel" onchange="mapUser('${x(name)}',this.value)"><option value="">— No access —</option>${opts}</select></td>
+      <td><input class="email-inp" type="email" value="${x(info.email||'')}}" placeholder="email@…" onblur="saveUserEmail('${x(name)}',this.value)"></td>
+      <td style="font-size:11px;color:var(--text2)">${isThisAdmin?'Admin':info.mappedOwner?'Can edit':'Pending'}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('user-table-wrap').innerHTML=`<table class="user-table">
+    <thead><tr><th>Login name</th><th>Last seen</th><th>Assign to owner</th><th>Email for alerts</th><th>Status</th></tr></thead>
+    <tbody>${rows||'<tr><td colspan="5" style="color:var(--text3);padding:14px">No users yet.</td></tr>'}</tbody>
+  </table>`;
+  document.getElementById('users-modal').classList.remove('hidden');
+}
+function mapUser(name,val){if(!users[name])users[name]={mappedOwner:'',lastSeen:'',email:''};users[name].mappedOwner=val;save();openUsers();toast(`${name} mapped ✓`);}
+function saveUserEmail(name,val){if(!users[name])users[name]={mappedOwner:'',lastSeen:'',email:''};users[name].email=val.trim();save();toast('Email saved ✓');}
 
+// ── FILTERS ───────────────────────────────────────────────────────────────────
+function getFiltered(){
+  const q=document.getElementById('s-q').value.toLowerCase();
+  const fs=document.getElementById('s-status').value;
+  const fp=document.getElementById('s-priority').value;
+  const fo=document.getElementById('s-owner').value;
+  const fd2=document.getElementById('s-due').value;
+  return tasks.filter(t=>{
+    if(showFlaggedOnly&&!t.flagged)return false;
+    if(q&&!t.name.toLowerCase().includes(q)&&!(t.owner||'').toLowerCase().includes(q)&&!(t.note||'').toLowerCase().includes(q))return false;
+    if(fs&&t.status!==fs)return false;
+    if(fp&&t.priority!==fp)return false;
+    if(fo&&t.owner!==fo)return false;
+    if(fd2){
+      const d=daysUntil(t.due);
+      if(fd2==='overdue'&&(d===null||d>=0))return false;
+      if(fd2==='due7'&&(d===null||d<0||d>7))return false;
+      if(fd2==='due14'&&(d===null||d<0||d>14))return false;
+    }
+    return true;
+  });
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
 function updateMetrics(){
   const total=tasks.length;
   const done=tasks.filter(t=>t.status==='completed').length;
@@ -866,128 +791,40 @@ function updateMetrics(){
   const del=tasks.filter(t=>t.status==='delayed').length;
   const blk=tasks.filter(t=>t.status==='blocked').length;
   const ns=tasks.filter(t=>t.status==='not-started').length;
-  document.getElementById('m-total').textContent=total;
-  document.getElementById('m-done').textContent=done;
-  document.getElementById('m-prog').textContent=prog;
-  document.getElementById('m-del').textContent=del;
-  document.getElementById('m-blk').textContent=blk;
-  document.getElementById('m-ns').textContent=ns;
-  document.getElementById('m-bar').style.width=(total?Math.round(done/total*100):0)+'%';
+  const flag=tasks.filter(t=>t.flagged).length;
+  const pct=total?Math.round(done/total*100):0;
+  // overall bar
+  document.getElementById('op-bar').style.width=pct+'%';
+  document.getElementById('op-pct').textContent=pct+'%';
+  document.getElementById('s-done').textContent=done;
+  document.getElementById('s-prog').textContent=prog;
+  document.getElementById('s-del').textContent=del;
+  document.getElementById('s-blk').textContent=blk;
+  document.getElementById('s-ns').textContent=ns;
+  document.getElementById('s-flag').textContent=flag;
   const diff=Math.ceil((new Date('2026-06-30')-new Date())/864e5);
   document.getElementById('days-left').textContent=diff>0?`${diff} days to launch`:'🎉 Launch day!';
 }
 function updateOwnerSel(){
   const sel=document.getElementById('s-owner'),cur=sel.value;
   const owners=[...new Set(tasks.map(t=>t.owner).filter(Boolean))].sort();
-  sel.innerHTML='<option value="">All owners</option>'+owners.map(o=>`<option value="${x(o)}"${cur===o?' selected':''}>${x(o)}</option>`).join('');
-}
-function getFiltered(){
-  const q=document.getElementById('s-q').value.toLowerCase();
-  const fs=document.getElementById('s-status').value;
-  const fp=document.getElementById('s-priority').value;
-  const fo=document.getElementById('s-owner').value;
-  return tasks.filter(t=>{
-    if(q&&!t.name.toLowerCase().includes(q)&&!(t.owner||'').toLowerCase().includes(q)&&!(t.note||'').toLowerCase().includes(q))return false;
-    if(fs&&t.status!==fs)return false;
-    if(fp&&t.priority!==fp)return false;
-    if(fo&&t.owner!==fo)return false;
-    return true;
-  });
-}
-
-
-// ── COMPUTED PARENT FIELDS ────────────────────────────────────────────────────
-const PRIO_RANK={critical:4,high:3,medium:2,low:1};
-const STATUS_RANK={blocked:5,delayed:4,'in-progress':3,'not-started':2,completed:1};
-
-function getChildren(pid){return tasks.filter(t=>t.parent===pid);}
-
-function computedDue(t){
-  const kids=getChildren(t.id);
-  if(!kids.length)return t.due||'';
-  const dates=kids.map(k=>k.due).filter(Boolean).sort();
-  return dates.length?dates[dates.length-1]:(t.due||'');
-}
-function computedStatus(t){
-  const kids=getChildren(t.id);
-  if(!kids.length)return t.status;
-  let best=kids[0].status;
-  kids.forEach(k=>{if((STATUS_RANK[k.status]||0)>(STATUS_RANK[best]||0))best=k.status;});
-  return best;
-}
-function computedPriority(t){
-  const kids=getChildren(t.id);
-  if(!kids.length)return t.priority;
-  let best=kids[0].priority;
-  kids.forEach(k=>{if((PRIO_RANK[k.priority]||0)>(PRIO_RANK[best]||0))best=k.priority;});
-  return best;
-}
-function computedOwner(t){
-  if(t.owner)return t.owner;
-  const kids=getChildren(t.id);
-  if(!kids.length)return '';
-  const owners=[...new Set(kids.map(k=>k.owner).filter(Boolean))];
-  if(!owners.length)return '';
-  return owners.length===1?owners[0]:'Multiple';
-}
-
-// ── DRAG-TO-REORDER ───────────────────────────────────────────────────────────
-let dragId=null;
-function onDragStart(e,id){dragId=id;e.dataTransfer.effectAllowed='move';document.getElementById('tr-'+id)?.classList.add('dragging');}
-function onDragEnd(e,id){document.getElementById('tr-'+id)?.classList.remove('dragging');document.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));}
-function onDragOver(e,id){e.preventDefault();if(id===dragId)return;document.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));document.getElementById('tr-'+id)?.classList.add('drag-over');}
-function onDrop(e,id){
-  e.preventDefault();
-  if(!dragId||dragId===id)return;
-  const dragged=tasks.find(t=>t.id===dragId);
-  const target=tasks.find(t=>t.id===id);
-  if(!dragged||!target||dragged.parent!==target.parent)return;
-  const fi=tasks.indexOf(dragged),ti=tasks.indexOf(target);
-  tasks.splice(fi,1);tasks.splice(ti,0,dragged);
-  dragId=null;save();render();toast('Order updated ✓');
-}
-function moveUp(id){
-  const t=tasks.find(z=>z.id===id);if(!t||!t.parent)return;
-  const sibs=tasks.filter(z=>z.parent===t.parent);
-  const i=sibs.indexOf(t);if(i<=0)return;
-  const prev=sibs[i-1];
-  const ti=tasks.indexOf(t),pi=tasks.indexOf(prev);
-  tasks.splice(ti,1);tasks.splice(pi,0,t);
-  save();render();toast('Moved up ✓');
-}
-function moveDown(id){
-  const t=tasks.find(z=>z.id===id);if(!t||!t.parent)return;
-  const sibs=tasks.filter(z=>z.parent===t.parent);
-  const i=sibs.indexOf(t);if(i>=sibs.length-1)return;
-  const next=sibs[i+1];
-  const ti=tasks.indexOf(t),ni=tasks.indexOf(next);
-  tasks.splice(ti,1);tasks.splice(ni+1,0,t);
-  save();render();toast('Moved down ✓');
+  sel.innerHTML='<option value="">All owners</option>'+owners.map(o=>`<option value="${x(o)}"${cur===o?' selected':''}}>${x(o)}</option>`).join('');
 }
 
 function render(){
   updateMetrics();updateOwnerSel();
   const filtered=getFiltered();
   const fids=new Set(filtered.map(t=>t.id));
-  const fa=document.getElementById('s-q').value||document.getElementById('s-status').value||document.getElementById('s-priority').value||document.getElementById('s-owner').value;
+  const fa=document.getElementById('s-q').value||document.getElementById('s-status').value||document.getElementById('s-priority').value||document.getElementById('s-owner').value||document.getElementById('s-due').value||showFlaggedOnly;
   let html='';
-
-  console.log('RENDER called — tasks:',tasks.length,'sections:',SECTIONS.length,'sectionOpen:',JSON.stringify(sectionOpen));
-
-  if(!SECTIONS||SECTIONS.length===0){
-    document.getElementById('main-body').innerHTML='<div style="text-align:center;padding:2rem;color:red">No sections loaded</div>';
-    return;
-  }
-  if(!tasks||tasks.length===0){
-    document.getElementById('main-body').innerHTML='<div style="text-align:center;padding:2rem;color:red">No tasks loaded</div>';
-    return;
-  }
 
   SECTIONS.forEach(sec=>{
     const allSec=tasks.filter(t=>t.section===sec.id);
+    if(!allSec.length)return;
     if(fa&&!filtered.some(t=>t.section===sec.id))return;
     const done=allSec.filter(t=>t.status==='completed').length;
-    const isOpen=true; // force open always
+    const pct=allSec.length?Math.round(done/allSec.length*100):0;
+    const isOpen=sectionOpen[sec.id]!==false;
 
     const parents=allSec.filter(t=>!t.parent);
     let ordered=[];
@@ -999,162 +836,137 @@ function render(){
       <div class="sec-hdr">
         <span class="sec-num">${sec.num}</span>
         <div class="sec-title-area">
-          <span class="sec-title" id="sec-te-${sec.id}"
-            onclick="${isAdmin?`startSecRename('${sec.id}')`:'void(0)'}"
-            title="${isAdmin?'Click to rename':''}">
-            ${x(sec.title)}
-          </span>
+          <span class="sec-title" id="sec-te-${sec.id}" onclick="${isAdmin?`startSecRename('${sec.id}')`:'void(0)'}" title="${isAdmin?'Click to rename':''}">${x(sec.title)}</span>
+          <div class="sec-pbar-wrap"><div class="sec-pbar${pct===100?' done':''}" style="width:${pct}%"></div></div>
         </div>
-        <span class="sec-meta">${done}/${allSec.length} done</span>
+        <span class="sec-meta">${done}/${allSec.length} &nbsp;${pct}%</span>
         ${isAdmin?`<div class="sec-acts">
           <button class="sab" onclick="startSecRename('${sec.id}')">✏ Rename</button>
           <button class="sab amber" onclick="openMerge('${sec.id}')">⇄ Merge</button>
           <button class="sab red" onclick="openDelCat('${sec.id}')">🗑 Delete</button>
           <button class="sab" onclick="openAddTask('${sec.id}',null)">+ Task</button>
-        </div>`:''}
+        </div>`:''
+        }
         <span class="sec-chev${isOpen?' open':''}" id="chev-${sec.id}" onclick="toggleSection('${sec.id}')">▶</span>
       </div>
       <div class="tlist${isOpen?' open':''}" id="tlist-${sec.id}">
         <div class="t-head">
           <span></span><span></span><span class="th">#</span>
-          <span class="th">Task</span>
-          <span class="th">Owner</span>
-          <span class="th">Start</span>
-          <span class="th">Due</span>
-          <span class="th">Status</span>
-          <span class="th">Priority</span>
-          <span class="th">Note / update</span>
+          <span class="th">Task</span><span class="th">Owner</span>
+          <span class="th">Start</span><span class="th">Due</span>
+          <span class="th">Status</span><span class="th">Priority</span>
+          <span class="th">Note</span>
+          <span class="th" title="Evidence link">🔗</span>
+          <span class="th" title="Flag for review">🚩</span>
           <span class="th">Actions</span>
         </div>
         ${display.length?display.map(t=>{
           const isSub=!!t.parent;
           const hasKids=tasks.some(c=>c.parent===t.id);
           const editable=canEdit(t);
-          const notePreview=t.note?(t.note.length>50?t.note.substring(0,50)+'…':t.note):'';
-
-          // computed values for parents
-          const dispDue   = hasKids ? computedDue(t)      : (t.due||'');
-          const dispStatus= hasKids ? computedStatus(t)    : t.status;
-          const dispPrio  = hasKids ? computedPriority(t)  : t.priority;
-          const dispOwner = hasKids ? computedOwner(t)     : (t.owner||'');
-          const isComputed= hasKids;
-
-          // subtask sequence number among siblings
-          const siblings  = isSub ? tasks.filter(z=>z.parent===t.parent) : [];
-          const seqNum    = isSub ? (siblings.indexOf(t)+1) : 0;
-
-          return `<div class="t-row" id="tr-${t.id}"
-            draggable="${isSub?'true':'false'}"
+          const notePreview=t.note?(t.note.length>45?t.note.substring(0,45)+'…':t.note):'';
+          const dispDue=hasKids?computedDue(t):(t.due||'');
+          const dispStatus=hasKids?computedStatus(t):t.status;
+          const dispPrio=hasKids?computedPriority(t):t.priority;
+          const dispOwner=hasKids?computedOwner(t):(t.owner||'');
+          const isComputed=hasKids;
+          const siblings=isSub?tasks.filter(z=>z.parent===t.parent):[];
+          const seqNum=isSub?(siblings.indexOf(t)+1):0;
+          const dc=dueClass(dispDue,dispStatus);
+          const rowCls=(t.flagged?'flagged-row ':'')+( dc==='overdue'?'overdue':dc==='due-soon'?'due-soon':'');
+          return `<div class="t-row ${rowCls}" id="tr-${t.id}" draggable="${isSub?'true':'false'}"
             ondragstart="${isSub?`onDragStart(event,${t.id})`:''}"
             ondragend="${isSub?`onDragEnd(event,${t.id})`:''}"
             ondragover="${isSub?`onDragOver(event,${t.id})`:''}"
             ondrop="${isSub?`onDrop(event,${t.id})`:''}"
             >
-            <input type="checkbox" class="chk"
-              ${dispStatus==='completed'?'checked':''}
-              ${!editable?'disabled':''}
-              onchange="toggleDone(${t.id})">
+            <input type="checkbox" class="chk" ${dispStatus==='completed'?'checked':''} ${!editable?'disabled':''} onchange="toggleDone(${t.id})">
             <div class="subdot-w">${isSub?'<div class="subdot"></div>':''}</div>
-            <div style="display:flex;align-items:center;justify-content:center">
+            <div style="display:flex;align-items:center;justify-content:center;font-size:9px">
               ${isSub?`<span class="sub-seq">${seqNum}</span>`:''}
             </div>
 
             <div class="icell" id="ic-name-${t.id}">
-              ${isSub?`<span class="drag-handle" title="Drag to reorder">⠿</span>`:''}
+              ${isSub?`<span class="drag-handle">⠿</span>`:''}
               <span class="ival${dispStatus==='completed'?' done':''}${!isSub&&hasKids?' bold':''}${!editable?' ro':''}"
-                onclick="${editable?`inlineEdit(${t.id},'name')`:'void(0)'}"
-                title="${x(t.name)}">${x(t.name)}</span>
+                onclick="${editable?`inlineEdit(${t.id},'name')`:'void(0)'}" title="${x(t.name)}">${x(t.name)}</span>
               ${editable?`<span class="pencil" onclick="inlineEdit(${t.id},'name')">✏</span>`:''}
             </div>
 
             <div class="icell" id="ic-owner-${t.id}">
               ${isComputed&&!t.owner
-                ? `<span class="ival computed" title="${x(dispOwner)}">${x(dispOwner)||'—'}</span>`
-                : `<span class="ival${!editable?' ro':''}"
-                    onclick="${editable?`inlineEdit(${t.id},'owner')`:'void(0)'}"
-                    title="${x(t.owner||dispOwner)}">${x(t.owner||dispOwner||'—')}</span>
-                  ${editable?`<span class="pencil" onclick="inlineEdit(${t.id},'owner')">✏</span>`:''}`
-              }
+                ?`<span class="ival ro" style="font-style:italic">${x(dispOwner)||'—'}</span>`
+                :`<span class="ival${!editable?' ro':''}" onclick="${editable?`inlineEdit(${t.id},'owner')`:'void(0)'}" title="${x(t.owner||dispOwner)}">${x(t.owner||dispOwner||'—')}</span>
+                 ${editable?`<span class="pencil" onclick="inlineEdit(${t.id},'owner')">✏</span>`:''}` }
             </div>
 
             <span style="font-size:11px;color:var(--text2);align-self:center">${fd(t.start)}</span>
-            <span style="font-size:11px;color:var(--text2);align-self:center${isComputed&&!t.due?';font-style:italic':''}"
-              title="${isComputed&&!t.due?'Derived from latest subtask due date':''}">${fd(dispDue)}</span>
+            <span style="align-self:center">${dueBadge(dispDue,dispStatus)}</span>
 
             ${isComputed
-              ? `<span class="dsel ${dispStatus} computed" style="display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;border-radius:8px;padding:3px 4px"
-                  title="Inherited from subtasks">${STATUS_LBL[dispStatus]}</span>`
-              : `<select id="dsel-s-${t.id}" class="dsel ${t.status}"
-                  onchange="chStatus(${t.id},this.value)"
-                  ${!editable?'disabled':''}>
-                  ${STATUS_OPTS.map(s=>`<option value="${s}"${t.status===s?' selected':''}>${STATUS_LBL[s]}</option>`).join('')}
-                </select>`
-            }
+              ?`<span class="dsel ${dispStatus}" style="display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;border-radius:8px;padding:3px 4px" title="Inherited">${STATUS_LBL[dispStatus]}</span>`
+              :`<select class="dsel ${t.status}" onchange="chStatus(${t.id},this.value)" ${!editable?'disabled':''}>
+                ${STATUS_OPTS.map(s=>`<option value="${s}"${t.status===s?' selected':''}}>${STATUS_LBL[s]}</option>`).join('')}
+               </select>`}
 
             ${isComputed
-              ? `<span class="dsel ${dispPrio} computed" style="display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;border-radius:8px;padding:3px 4px"
-                  title="Inherited from subtasks">${dispPrio.charAt(0).toUpperCase()+dispPrio.slice(1)}</span>`
-              : `<select id="dsel-p-${t.id}" class="dsel ${t.priority}"
-                  onchange="chPriority(${t.id},this.value)"
-                  ${!editable?'disabled':''}>
-                  ${PRIO_OPTS.map(p=>`<option value="${p}"${t.priority===p?' selected':''}>${p.charAt(0).toUpperCase()+p.slice(1)}</option>`).join('')}
-                </select>`
-            }
+              ?`<span class="dsel ${dispPrio}" style="display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;border-radius:8px;padding:3px 4px" title="Inherited">${dispPrio.charAt(0).toUpperCase()+dispPrio.slice(1)}</span>`
+              :`<select class="dsel ${t.priority}" onchange="chPriority(${t.id},this.value)" ${!editable?'disabled':''}>
+                ${PRIO_OPTS.map(p=>`<option value="${p}"${t.priority===p?' selected':''}}>${p.charAt(0).toUpperCase()+p.slice(1)}</option>`).join('')}
+               </select>`}
 
             <div class="note-cell" onclick="${editable?`openNote(${t.id})`:''}" style="cursor:${editable?'pointer':'default'};align-self:center">
-              <span class="note-val${!notePreview?' empty':''}${!editable?' ro':''}" title="${x(t.note||'')}">
+              <span class="note-val${!notePreview?' empty':''}" title="${x(t.note||'')}">
                 ${notePreview?x(notePreview):'Add note…'}
               </span>
-              ${editable?`<span class="pencil" style="opacity:${t.note?'.7':'0'};margin-top:0">✏</span>`:''}
+              ${editable?`<span class="pencil" style="opacity:${t.note?'.7':'0'}">✏</span>`:''}
+            </div>
+
+            <div class="link-cell">
+              ${editable||t.link
+                ?`<span class="link-icon${t.link?' has-link':''}" onclick="${editable?`openLink(${t.id})`:''}" title="${t.link?'Open evidence link':'Add evidence link'}">${t.link?'🔗':'○'}</span>`
+                :'<span style="color:var(--text3);font-size:11px">—</span>'
+              }
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:center">
+              <button class="flag-btn${t.flagged?' flagged':''}" onclick="toggleFlag(${t.id})" title="${t.flagged?'Remove flag':'Flag for review'}">🚩</button>
             </div>
 
             <div class="racts">
               ${editable?`<button class="ract" onclick="openEditTask(${t.id})">Edit</button>`:''}
-              <button class="ract" onclick="openAddTask('${sec.id}',${t.id})">+ Sub</button>
-              ${isSub&&editable?`<button class="ract" onclick="moveUp(${t.id})" title="Move up">↑</button><button class="ract" onclick="moveDown(${t.id})" title="Move down">↓</button>`:''}
+              <button class="ract" onclick="openAddTask('${sec.id}',${t.id})">+Sub</button>
+              ${isSub&&editable?`<button class="ract" onclick="moveUp(${t.id})">↑</button><button class="ract" onclick="moveDown(${t.id})">↓</button>`:''}
               ${isAdmin?`<button class="ract del" onclick="delTask(${t.id})">✕</button>`:''}
             </div>
           </div>`;
-        }).join(''):`<div style="padding:10px 14px;font-size:12px;color:var(--text3)">No tasks match filters</div>`}
+        }).join(''): '<div style="padding:10px 14px;font-size:12px;color:var(--text3)">No tasks match filters</div>'}
       </div>
     </div>`;
   });
-
-  document.getElementById('main-body').innerHTML=html||
-    '<div style="text-align:center;padding:2rem;color:var(--text2);font-size:13px">No tasks match your filters.</div>';
+  document.getElementById('main-body').innerHTML = html || '<div style="text-align:center;padding:2rem;color:var(--text2);font-size:13px">No tasks match your filters.</div>';
 }
 
-function toggleSection(id){
-  sectionOpen[id]=!sectionOpen[id];
-  document.getElementById('tlist-'+id)?.classList.toggle('open',sectionOpen[id]);
-  document.getElementById('chev-'+id)?.classList.toggle('open',sectionOpen[id]);
-}
+function toggleSection(id){sectionOpen[id]=!sectionOpen[id];document.getElementById('tlist-'+id)?.classList.toggle('open',sectionOpen[id]);document.getElementById('chev-'+id)?.classList.toggle('open',sectionOpen[id]);}
 function collapseAll(){SECTIONS.forEach(s=>sectionOpen[s.id]=false);render();}
-function expandAll(){SECTIONS.forEach(s=>sectionOpen[s.id]=true);render();console.log('Expanded',SECTIONS.length,'sections');}
+function expandAll(){SECTIONS.forEach(s=>sectionOpen[s.id]=true);render();}
 
-// ── EXPORT ─────────────────────────────────────────────────────────────────────
+// ── EXPORT ────────────────────────────────────────────────────────────────────
 function exportCSV(){
-  const headers=['ID','Section','Parent','Task','Owner','Start','Due','Priority','Status','Note'];
-  const rows=tasks.map(t=>[
-    t.id,
-    SECTIONS.find(s=>s.id===t.section)?.title||t.section,
-    t.parent||'',
-    `"${(t.name||'').replace(/"/g,'""')}"`,
-    `"${(t.owner||'').replace(/"/g,'""')}"`,
+  const headers=['ID','Section','Parent','Task','Owner','Start','Due','Priority','Status','Note','Link','Flagged'];
+  const rows=tasks.map(t=>[t.id,SECTIONS.find(s=>s.id===t.section)?.title||t.section,t.parent||'',
+    `"${(t.name||'').replace(/"/g,'""')}"`,'
+    `"${(t.owner||'').replace(/"/g,'""')}"`,'
     t.start||'',t.due||'',t.priority,t.status,
-    `"${(t.note||'').replace(/"/g,'""')}"`
-  ]);
+    `"${(t.note||'').replace(/"/g,'""')}"`,'
+    t.link||'',t.flagged?'yes':'no']);
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([[headers,...rows].map(r=>r.join(',')).join('\n')],{type:'text/csv'}));
   a.download='ga_checklist.csv';a.click();
 }
 
-// ── TOAST ──────────────────────────────────────────────────────────────────────
-function toast(msg){
-  const el=document.getElementById('toast');
-  el.textContent=msg;el.classList.add('show');
-  clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2200);
-}
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2500);}
 </script>
 </body>
 </html>
