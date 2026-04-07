@@ -870,13 +870,14 @@ function render(){
           const isSub=!!t.parent;
           const hasKids=tasks.some(c=>c.parent===t.id);
           const editable=canEdit(t);
-          const notePreview=t.note?(t.note.length>45?t.note.substring(0,45)+'…':t.note):'';
+          
           const dispStatus=hasKids?computedStatus(t):t.status;
           const dispPrio=hasKids?computedPriority(t):t.priority;
           const dc=isSub?dueClass(t.due,t.status):'';
           const rowCls=(t.flagged?'flagged-row ':'')+( dc==='overdue'?'overdue':dc==='due-soon'?'due-soon':'');
           const siblings=isSub?tasks.filter(z=>z.parent===t.parent):[];
           const seqNum=isSub?(siblings.indexOf(t)+1):0;
+          const notePreview=t.note?(t.note.length>45?t.note.substring(0,45)+'…':t.note):'';
 
           // ── PARENT ROW: title + mini progress bar only ─────────────────────
           if(hasKids && !isSub){
@@ -910,7 +911,6 @@ function render(){
           }
 
           // ── SUBTASK ROW ────────────────────────────────────────────────────
-          const notePreview=t.note?(t.note.length>45?t.note.substring(0,45)+'…':t.note):'';
           return `<div class="t-row ${rowCls}" id="tr-${t.id}" draggable="true"
             ondragstart="onDragStart(event,${t.id})"
             ondragend="onDragEnd(event,${t.id})"
