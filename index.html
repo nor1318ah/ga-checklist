@@ -480,7 +480,7 @@ function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').repla
 function fd(d){if(!d)return'—';const p=d.split('-');return p[1]+'/'+p[2];}
 function secById(id){return SECTIONS.find(s=>s.id===id);}
 function nextId(){return Math.max(0,...tasks.map(t=>t.id))+1;}
-function getChildren(pid){return tasks.filter(t=>t.parent===pid);}
+function getChildren(pid){const n=Number(pid);return tasks.filter(t=>t.parent!==null&&t.parent!==undefined&&Number(t.parent)===n);}
 function daysUntil(due){if(!due)return null;const today=new Date();today.setHours(0,0,0,0);return Math.ceil((new Date(due)-today)/864e5);}
 function dueCls(due,status){if(!due||status==='completed')return'';const d=daysUntil(due);if(d<0)return'overdue';if(d<=7)return'due-soon';return'';}
 function dueBadgeHtml(due,status){
@@ -512,7 +512,7 @@ async function loadData(){
         tasks=d.tasks;
         if(d.sections&&d.sections.length>0)SECTIONS=d.sections;
         if(d.users)users=d.users;
-        tasks.forEach(t=>{if(!t.note)t.note='';if(!t.link)t.link='';if(t.flagged===undefined)t.flagged=false;});
+        tasks.forEach(t=>{if(!t.note)t.note='';if(!t.link)t.link='';if(t.flagged===undefined)t.flagged=false;t.id=parseInt(t.id)||t.id;if(t.parent!==null&&t.parent!==undefined)t.parent=parseInt(t.parent)||null;});
       }else{await saveNow();}
     }else{await saveNow();}
   }catch(e){console.error('Load error:',e);}
@@ -550,7 +550,7 @@ async function doLogin(){
     tasks=d.tasks;
     if(d.sections&&d.sections.length>0)SECTIONS=d.sections;
     if(d.users)users=d.users;
-    tasks.forEach(t=>{if(!t.note)t.note='';if(!t.link)t.link='';if(t.flagged===undefined)t.flagged=false;});
+    tasks.forEach(t=>{if(!t.note)t.note='';if(!t.link)t.link='';if(t.flagged===undefined)t.flagged=false;t.id=parseInt(t.id)||t.id;if(t.parent!==null&&t.parent!==undefined)t.parent=parseInt(t.parent)||null;});
     SECTIONS.forEach(s=>{if(sectionOpen[s.id]===undefined)sectionOpen[s.id]=true;});
     render();
   });
@@ -953,9 +953,9 @@ function render(){
     let ordered=[];
     parents.forEach(function(p){
       ordered.push(p);
-      allSec.filter(c=>c.parent===p.id).forEach(c=>ordered.push(c));
+      allSec.filter(c=>Number(c.parent)===Number(p.id)).forEach(c=>ordered.push(c));
     });
-    allSec.filter(t=>t.parent&&!parents.find(p=>p.id===t.parent)).forEach(t=>ordered.push(t));
+    allSec.filter(t=>t.parent&&!parents.find(p=>Number(p.id)===Number(t.parent))).forEach(t=>ordered.push(t));
     const display=fa?ordered.filter(t=>fids.has(t.id)):ordered;
 
     html+='<div class="section">';
@@ -982,11 +982,11 @@ function render(){
       html+='<div class="t-head"><span></span><span></span><span class="th">#</span><span class="th">Task</span><span class="th">Owner</span><span class="th">Start</span><span class="th">Due</span><span class="th">Status</span><span class="th">Priority</span><span class="th">Note</span><span class="th" title="Evidence">🔗</span><span class="th">🚩</span><span class="th">Actions</span></div>';
       display.forEach(function(t){
         const isSub=!!t.parent;
-        const hasKids=tasks.some(c=>c.parent===t.id);
+        const hasKids=tasks.some(c=>c.parent!==null&&c.parent!==undefined&&Number(c.parent)===Number(t.id));
         if(hasKids&&!isSub){
           html+=buildParentRow(t,sec.id);
         } else if(isSub){
-          const siblings=tasks.filter(z=>z.parent===t.parent);
+          const siblings=tasks.filter(z=>Number(z.parent)===Number(t.parent));
           const seqNum=siblings.indexOf(t)+1;
           html+=buildSubtaskRow(t,sec.id,seqNum);
         } else {
