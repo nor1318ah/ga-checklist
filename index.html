@@ -123,7 +123,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .tlist.open{display:block}
 .t-head{display:grid;grid-template-columns:18px 13px 22px minmax(0,1fr) 100px 58px 62px 108px 82px minmax(0,110px) 28px 28px 92px;gap:4px;padding:4px 14px;background:var(--bg2);border-bottom:0.5px solid var(--border)}
 .th{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.3px;font-weight:700;align-self:center}
-.parent-row{display:grid;grid-template-columns:18px 13px 22px minmax(0,1fr) 30px;gap:4px;align-items:center;padding:8px 14px;border-bottom:0.5px solid var(--border);background:var(--bg2)}
+.parent-row{display:flex;align-items:center;padding:9px 14px;border-bottom:0.5px solid var(--border);background:var(--bg2);gap:10px;min-width:0}
 .parent-row:hover{background:var(--bg3)}
 .t-row{display:grid;grid-template-columns:18px 13px 22px minmax(0,1fr) 100px 58px 62px 108px 82px minmax(0,110px) 28px 28px 92px;gap:4px;align-items:start;padding:6px 14px;border-bottom:0.5px solid var(--border);transition:background .1s}
 .t-row:last-child{border-bottom:none}
@@ -821,37 +821,33 @@ function buildParentRow(t, secId) {
   const kidsPct = kids.length ? Math.round(kidsDone/kids.length*100) : 0;
   const pStatus = computedStatus(t);
   const pPrio = computedPriority(t);
+  const PLBL = {'critical-must':'Must Have',should:'Should Have',good:'Good to Have',nice:'Nice to Have'};
   const flagCls = t.flagged ? ' flagged-row' : '';
-
   let html = '<div class="parent-row'+flagCls+'" id="tr-'+t.id+'">';
-  html += '<input type="checkbox" class="chk" '+(pStatus==='completed'?'checked':'')+' disabled>';
-  html += '<div></div><div></div>';
-  html += '<div style="min-width:0">';
-  // title line
-  html += '<div style="display:flex;align-items:center;gap:6px;min-width:0;margin-bottom:4px">';
+  // title
   if(isAdmin){
-    html += '<span id="sec-te-name-'+t.id+'" style="font-size:13px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer" onclick="inlineEdit('+t.id+',\'name\')" title="'+esc(t.name)+'">'+esc(t.name)+'</span>';
-    html += '<span class="pencil" onclick="inlineEdit('+t.id+',\'name\')" style="opacity:.4">✏</span>';
+    html += '<span id="ic-name-'+t.id+'" style="font-size:13px;font-weight:700;flex:0 0 auto;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer" onclick="inlineEdit('+t.id+',\'name\')" title="'+esc(t.name)+'">'+esc(t.name)+'</span>';
   } else {
-    html += '<span style="font-size:13px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(t.name)+'">'+esc(t.name)+'</span>';
+    html += '<span style="font-size:13px;font-weight:700;flex:0 0 auto;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(t.name)+'">'+esc(t.name)+'</span>';
   }
-  html += '<span class="dsel '+pStatus+'" style="font-size:10px;font-weight:700;border-radius:8px;padding:2px 8px;flex-shrink:0">'+STATUS_LBL[pStatus]+'</span>';
-  html += '<span class="dsel '+pPrio+'" style="font-size:10px;font-weight:700;border-radius:8px;padding:2px 8px;flex-shrink:0">'+({'critical-must':'Must Have',should:'Should Have',good:'Good to Have',nice:'Nice to Have'}[pPrio]||pPrio)+'</span>';
-  html += '<button class="flag-btn'+(t.flagged?' on':'')+'" onclick="toggleFlag('+t.id+')" title="'+(t.flagged?'Remove flag':'Flag for review')+'">🚩</button>';
-  html += '<div class="racts" style="flex-shrink:0">';
-  html += '<button class="ract" onclick="openAddTask(\''+secId+'\','+t.id+')">+Sub</button>';
-  if(isAdmin) html += '<button class="ract del" onclick="delTask('+t.id+')">✕</button>';
+  // progress bar
+  html += '<div style="flex:1;height:6px;background:var(--border);border-radius:6px;overflow:hidden;min-width:40px">';
+  html += '<div style="height:100%;width:'+kidsPct+'%;background:'+(kidsPct===100?'var(--green)':'var(--blue)')+';border-radius:6px;transition:width .4s"></div>';
   html += '</div>';
+  // count
+  html += '<span style="font-size:11px;color:var(--text2);white-space:nowrap;flex-shrink:0">'+kidsDone+'/'+kids.length+' · '+kidsPct+'%</span>';
+  // status badge
+  html += '<span class="dsel '+pStatus+'" style="font-size:10px;font-weight:700;border-radius:8px;padding:2px 8px;flex-shrink:0;white-space:nowrap">'+STATUS_LBL[pStatus]+'</span>';
+  // priority badge
+  html += '<span class="dsel '+pPrio+'" style="font-size:10px;font-weight:700;border-radius:8px;padding:2px 8px;flex-shrink:0;white-space:nowrap">'+(PLBL[pPrio]||pPrio)+'</span>';
+  // flag
+  html += '<button class="flag-btn'+(t.flagged?' on':'')+'" onclick="toggleFlag('+t.id+')" style="flex-shrink:0">🚩</button>';
+  // actions
+  if(isAdmin){
+    html += '<button class="ract" onclick="openAddTask(\''+secId+'\','+t.id+')" style="flex-shrink:0">+Sub</button>';
+    html += '<button class="ract del" onclick="delTask('+t.id+')" style="flex-shrink:0">✕</button>';
+  }
   html += '</div>';
-  // progress bar line
-  html += '<div style="display:flex;align-items:center;gap:8px">';
-  html += '<div style="flex:1;max-width:240px;height:5px;background:var(--border);border-radius:5px;overflow:hidden">';
-  html += '<div style="height:100%;width:'+kidsPct+'%;background:'+(kidsPct===100?'var(--green)':'var(--blue)')+';border-radius:5px;transition:width .4s"></div>';
-  html += '</div>';
-  html += '<span style="font-size:10px;color:var(--text2);white-space:nowrap">'+kidsDone+'/'+kids.length+' tasks &nbsp;·&nbsp; '+kidsPct+'%</span>';
-  html += '</div>';
-  html += '</div>';
-  html += '</div>'; // end parent-row
   return html;
 }
 
