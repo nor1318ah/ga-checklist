@@ -1006,16 +1006,33 @@ function expandAll(){SECTIONS.forEach(s=>sectionOpen[s.id]=true);render();}
 
 function exportCSV(){
   const q=function(s){return '"'+String(s||'').replace(/"/g,'""')+'"';};
-  const headers=['ID','Section','Parent','Task','Owner','Start','Due','Priority','Status','Note','Link','Flagged'];
+  const PRIO_LBL={'critical-must':'Must Have',should:'Should Have',good:'Good to Have',nice:'Nice to Have'};
+  const STATUS_LBL2={'not-started':'Not Started','in-progress':'In Progress',delayed:'Delayed',blocked:'Blocked',completed:'Completed'};
+  const headers=['ID','Section','Parent Task ID','Task','Owner','Start Date','Due Date','Priority','Status','Note','Link','Flagged'];
+  // always export from live tasks array — reflects all Firebase updates
   const rows=tasks.map(function(t){
-    return [t.id, (SECTIONS.find(s=>s.id===t.section)||{}).title||t.section, t.parent||'',
-      q(t.name), q(t.owner), t.start||'', t.due||'', t.priority, t.status,
-      q(t.note), t.link||'', t.flagged?'yes':'no'];
+    const secTitle=(SECTIONS.find(s=>s.id===t.section)||{}).title||t.section;
+    return [
+      t.id,
+      q(secTitle),
+      t.parent||'',
+      q(t.name),
+      q(t.owner||''),
+      t.start||'',
+      t.due||'',
+      q(PRIO_LBL[t.priority]||t.priority),
+      q(STATUS_LBL2[t.status]||t.status),
+      q(t.note||''),
+      t.link||'',
+      t.flagged?'Yes':'No'
+    ];
   });
   const csv=[headers,...rows].map(r=>r.join(',')).join('\n');
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-  a.download='ga_checklist.csv';a.click();
+  a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download='ga_checklist_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+  toast('CSV exported — '+tasks.length+' tasks ✓');
 }
 
 function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2500);}
