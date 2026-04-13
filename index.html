@@ -1004,18 +1004,38 @@ function toggleSection(id){sectionOpen[id]=!sectionOpen[id];const el=document.ge
 function collapseAll(){SECTIONS.forEach(s=>sectionOpen[s.id]=false);render();}
 function expandAll(){SECTIONS.forEach(s=>sectionOpen[s.id]=true);render();}
 
-function exportCSV(){
-  const q=function(s){return '"'+String(s||'').replace(/"/g,'""')+'"';};
+async function exportCSV(){
+  toast('Fetching latest data…');
   const PRIO_LBL={'critical-must':'Must Have',should:'Should Have',good:'Good to Have',nice:'Nice to Have'};
   const STATUS_LBL2={'not-started':'Not Started','in-progress':'In Progress',delayed:'Delayed',blocked:'Blocked',completed:'Completed'};
-  const headers=['ID','Section','Parent Task ID','Task','Owner','Start Date','Due Date','Priority','Status','Note','Link','Flagged'];
-  // always export from live tasks array — reflects all Firebase updates
-  const rows=tasks.map(function(t){
-    const secTitle=(SECTIONS.find(s=>s.id===t.section)||{}).title||t.section;
+  // always pull fresh from Firebase so export reflects every update
+  let exportTasks = tasks;
+  let exportSections = SECTIONS;
+  try{
+    const snap = await db.collection('checklist').doc('state_v4').get();
+    if(snap.exists){
+      const d = snap.data();
+      if(d && Array.isArray(d.tasks) && d.tasks.length > 0){
+        exportTasks = d.tasks;
+        if(d.sections && d.sections.length > 0) exportSections = d.sections;
+      }
+    }
+  }catch(e){ console.error('Export fetch error:',e); }
+
+  const q=function(s){return '"'+String(s||'').replace(/"/g,'""')+'"';};
+  const secMap={};
+  exportSections.forEach(s=>secMap[s.id]=s.title);
+  const idToTask={};
+  exportTasks.forEach(t=>idToTask[t.id]=t);
+
+  const headers=['ID','Section','Parent Task','Task','Owner','Start Date','Due Date','Priority','Status','Note','Link','Flagged'];
+  const rows=exportTasks.map(function(t){
+    const secTitle=secMap[t.section]||t.section;
+    const parentTask=t.parent?(idToTask[t.parent]||{}).name||t.parent:'';
     return [
       t.id,
       q(secTitle),
-      t.parent||'',
+      q(parentTask),
       q(t.name),
       q(t.owner||''),
       t.start||'',
@@ -1029,10 +1049,10 @@ function exportCSV(){
   });
   const csv=[headers,...rows].map(r=>r.join(',')).join('\n');
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}));
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
   a.download='ga_checklist_'+new Date().toISOString().slice(0,10)+'.csv';
   a.click();
-  toast('CSV exported — '+tasks.length+' tasks ✓');
+  toast('Exported '+exportTasks.length+' tasks ✓');
 }
 
 function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2500);}
