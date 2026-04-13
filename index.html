@@ -197,6 +197,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .toast.show{opacity:1}
 @media(max-width:900px){.metrics{grid-template-columns:repeat(3,1fr)}}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 <div id="login-screen">
@@ -340,7 +341,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
     <button class="flag-filter" id="flag-btn" onclick="toggleFlagFilter()">🚩 Flagged</button>
     <button class="tbtn" onclick="collapseAll()">Collapse all</button>
     <button class="tbtn" onclick="expandAll()">Expand all</button>
-    <button class="tbtn" onclick="exportCSV()">Export CSV</button>
+    <button class="tbtn" onclick="exportExcel()">⬇ Export Excel</button>
   </div>
   <div class="body" id="main-body"></div>
 </div>
@@ -1004,55 +1005,157 @@ function toggleSection(id){sectionOpen[id]=!sectionOpen[id];const el=document.ge
 function collapseAll(){SECTIONS.forEach(s=>sectionOpen[s.id]=false);render();}
 function expandAll(){SECTIONS.forEach(s=>sectionOpen[s.id]=true);render();}
 
-async function exportCSV(){
+async function exportExcel(){
   toast('Fetching latest data…');
   const PRIO_LBL={'critical-must':'Must Have',should:'Should Have',good:'Good to Have',nice:'Nice to Have'};
-  const STATUS_LBL2={'not-started':'Not Started','in-progress':'In Progress',delayed:'Delayed',blocked:'Blocked',completed:'Completed'};
-  // always pull fresh from Firebase so export reflects every update
-  let exportTasks = tasks;
-  let exportSections = SECTIONS;
+  const STAT_LBL={'not-started':'Not Started','in-progress':'In Progress',delayed:'Delayed',blocked:'Blocked',completed:'Completed'};
+
+  let exportTasks=tasks, exportSections=SECTIONS;
   try{
-    const snap = await db.collection('checklist').doc('state_v4').get();
+    const snap=await db.collection('checklist').doc('state_v4').get();
     if(snap.exists){
-      const d = snap.data();
-      if(d && Array.isArray(d.tasks) && d.tasks.length > 0){
-        exportTasks = d.tasks;
-        if(d.sections && d.sections.length > 0) exportSections = d.sections;
+      const d=snap.data();
+      if(d&&Array.isArray(d.tasks)&&d.tasks.length>0){
+        exportTasks=d.tasks;
+        if(d.sections&&d.sections.length>0) exportSections=d.sections;
       }
     }
-  }catch(e){ console.error('Export fetch error:',e); }
+  }catch(e){console.error('Export fetch:',e);}
 
-  const q=function(s){return '"'+String(s||'').replace(/"/g,'""')+'"';};
-  const secMap={};
-  exportSections.forEach(s=>secMap[s.id]=s.title);
-  const idToTask={};
-  exportTasks.forEach(t=>idToTask[t.id]=t);
+  const secMap={};exportSections.forEach(s=>secMap[s.id]=s.title);
+  const idMap={};exportTasks.forEach(t=>idMap[t.id]=t);
+  const total=exportTasks.length;
+  const done=exportTasks.filter(t=>t.status==='completed').length;
 
-  const headers=['ID','Section','Parent Task','Task','Owner','Start Date','Due Date','Priority','Status','Note','Link','Flagged'];
-  const rows=exportTasks.map(function(t){
-    const secTitle=secMap[t.section]||t.section;
-    const parentTask=t.parent?(idToTask[t.parent]||{}).name||t.parent:'';
-    return [
+  // Build workbook data
+  const wb={SheetNames:[],Sheets:{}};
+
+  // ── SHEET 1: Dashboard ────────────────────────────────────────────────────
+  const dash=[];
+  dash.push(['GA Launch Checklist — Dashboard','','','','','']);
+  dash.push(['Target launch: June 30, 2026','','','','','']);
+  dash.push([]);
+  dash.push(['OVERALL PROGRESS','','','','','']);
+  dash.push(['Total Tasks','Completed','In Progress','Delayed','Blocked','Not Started']);
+  dash.push([
+    total,
+    exportTasks.filter(t=>t.status==='completed').length,
+    exportTasks.filter(t=>t.status==='in-progress').length,
+    exportTasks.filter(t=>t.status==='delayed').length,
+    exportTasks.filter(t=>t.status==='blocked').length,
+    exportTasks.filter(t=>t.status==='not-started').length
+  ]);
+  dash.push(['% Complete',total?Math.round(done/total*100)+'%':'0%','','','','']);
+  dash.push([]);
+  dash.push(['PRIORITY BREAKDOWN','','','','','']);
+  dash.push(['Priority','Count','','','','']);
+  ['critical-must','should','good','nice'].forEach(p=>{
+    dash.push([PRIO_LBL[p]||p, exportTasks.filter(t=>t.priority===p).length,'','','','']);
+  });
+  dash.push([]);
+  dash.push(['SECTION BREAKDOWN','','','','','','','','']);
+  dash.push(['#','Section','Total','Completed','In Progress','Delayed','Blocked','Not Started','% Done']);
+  exportSections.forEach(sec=>{
+    const st=exportTasks.filter(t=>t.section===sec.id);
+    const sd=st.filter(t=>t.status==='completed').length;
+    dash.push([
+      sec.num, sec.title, st.length, sd,
+      st.filter(t=>t.status==='in-progress').length,
+      st.filter(t=>t.status==='delayed').length,
+      st.filter(t=>t.status==='blocked').length,
+      st.filter(t=>t.status==='not-started').length,
+      st.length?Math.round(sd/st.length*100)+'%':'0%'
+    ]);
+  });
+  wb.SheetNames.push('Dashboard');
+  wb.Sheets['Dashboard']=XLSX.utils.aoa_to_sheet(dash);
+  wb.Sheets['Dashboard']['!cols']=[{wch:30},{wch:10},{wch:12},{wch:12},{wch:12},{wch:14},{wch:12},{wch:14},{wch:8}];
+
+  // ── SHEET 2: All Tasks ────────────────────────────────────────────────────
+  const allRows=[['ID','Section','Parent Task','Task Name','Owner','Start Date','Due Date','Priority','Status','Note','Link','Flagged']];
+  exportTasks.forEach(t=>{
+    const parent=t.parent?idMap[t.parent]:null;
+    allRows.push([
       t.id,
-      q(secTitle),
-      q(parentTask),
-      q(t.name),
-      q(t.owner||''),
+      secMap[t.section]||t.section,
+      parent?parent.name:'',
+      t.name,
+      t.owner||'',
       t.start||'',
       t.due||'',
-      q(PRIO_LBL[t.priority]||t.priority),
-      q(STATUS_LBL2[t.status]||t.status),
-      q(t.note||''),
+      PRIO_LBL[t.priority]||t.priority,
+      STAT_LBL[t.status]||t.status,
+      t.note||'',
       t.link||'',
       t.flagged?'Yes':'No'
-    ];
+    ]);
   });
-  const csv=[headers,...rows].map(r=>r.join(',')).join('\n');
+  wb.SheetNames.push('All Tasks');
+  wb.Sheets['All Tasks']=XLSX.utils.aoa_to_sheet(allRows);
+  wb.Sheets['All Tasks']['!cols']=[
+    {wch:5},{wch:28},{wch:28},{wch:50},{wch:18},{wch:10},{wch:10},{wch:14},{wch:12},{wch:35},{wch:25},{wch:8}
+  ];
+
+  // ── SHEET PER SECTION ─────────────────────────────────────────────────────
+  exportSections.forEach(sec=>{
+    const secTasks=exportTasks.filter(t=>t.section===sec.id);
+    if(!secTasks.length)return;
+    const secDone=secTasks.filter(t=>t.status==='completed').length;
+    const secPct=secTasks.length?Math.round(secDone/secTasks.length*100):0;
+    const rows=[];
+    rows.push([sec.num+'. '+sec.title,'','','','','','','','']);
+    rows.push([secDone+'/'+secTasks.length+' tasks completed · '+secPct+'% done','','','','','','','','']);
+    rows.push(['Task','Owner','Start','Due','Priority','Status','Note','Link','Flagged']);
+
+    const parents=secTasks.filter(t=>!t.parent);
+    parents.forEach(p=>{
+      const kids=secTasks.filter(c=>Number(c.parent)===Number(p.id));
+      if(kids.length){
+        const kDone=kids.filter(k=>k.status==='completed').length;
+        rows.push(['▶ '+p.name+' ('+kDone+'/'+kids.length+' · '+Math.round(kDone/kids.length*100)+'%)','','','','','','','','']);
+        kids.forEach((k,i)=>{
+          rows.push([
+            '   '+(i+1)+'. '+k.name,
+            k.owner||'', k.start||'', k.due||'',
+            PRIO_LBL[k.priority]||k.priority,
+            STAT_LBL[k.status]||k.status,
+            k.note||'', k.link||'',
+            k.flagged?'Yes':''
+          ]);
+        });
+        rows.push([]);
+      } else {
+        rows.push([
+          p.name, p.owner||'', p.start||'', p.due||'',
+          PRIO_LBL[p.priority]||p.priority,
+          STAT_LBL[p.status]||p.status,
+          p.note||'', p.link||'',
+          p.flagged?'Yes':''
+        ]);
+      }
+    });
+
+    // sheet name max 31 chars
+    let sName=sec.title.length>28?sec.title.substring(0,28)+'...':sec.title;
+    // ensure unique
+    if(wb.SheetNames.includes(sName)) sName=sName.substring(0,25)+'_'+sec.num;
+    wb.SheetNames.push(sName);
+    const ws=XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols']=[{wch:50},{wch:16},{wch:10},{wch:10},{wch:14},{wch:12},{wch:35},{wch:22},{wch:6}];
+    wb.Sheets[sName]=ws;
+  });
+
+  // Download
+  const wbout=XLSX.write(wb,{bookType:'xlsx',type:'binary'});
+  const buf=new ArrayBuffer(wbout.length);
+  const view=new Uint8Array(buf);
+  for(let i=0;i<wbout.length;i++) view[i]=wbout.charCodeAt(i)&0xff;
+  const blob=new Blob([buf],{type:'application/octet-stream'});
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
-  a.download='ga_checklist_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.href=URL.createObjectURL(blob);
+  a.download='GA_Checklist_'+new Date().toISOString().slice(0,10)+'.xlsx';
   a.click();
-  toast('Exported '+exportTasks.length+' tasks ✓');
+  toast('Excel exported — '+exportTasks.length+' tasks ✓');
 }
 
 function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2500);}
