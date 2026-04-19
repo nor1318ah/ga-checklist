@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GA Launch Checklist</title>
-<script src="https://cdn.jsdelivr.net/npm/firebase@9.23.0/firebase-app-compat.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/firebase@9.23.0/firebase-firestore-compat.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
 firebase.initializeApp({
   apiKey:"AIzaSyAtKK486L54STfCIzkVOXiBiGySzrRD4oE",
@@ -47,50 +47,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .topbar{background:var(--bg);border-bottom:0.5px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:50;flex-wrap:wrap}
 .topbar h1{font-size:15px;font-weight:700;flex:1}
 .topbar-meta{font-size:12px;color:var(--text2)}
-.ubadge{font-size:11px;padding:3px 10px;background:var(--blue-lt);color:var(--blue-txt);border-radius:20px;font-weight:700}
+.ubadge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:700}
+.ubadge.admin{background:var(--blue-lt);color:var(--blue-txt)}
+.ubadge.owner{background:var(--green-lt);color:var(--green-txt)}
+.ubadge.readonly{background:var(--gray-lt);color:var(--gray-txt)}
 .tbtn{font-size:12px;padding:0 12px;height:28px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--text);cursor:pointer;white-space:nowrap;font-weight:500}
 .tbtn:hover{background:var(--bg2)}
 .tbtn.pri{background:var(--blue);color:#fff;border-color:var(--blue)}
 .tbtn.pri:hover{background:var(--blue-txt)}
 .tbtn.grn{background:var(--green);color:#fff;border-color:var(--green)}
 .tbtn.pur{background:var(--purple);color:#fff;border-color:var(--purple)}
+.tbtn.amb{background:var(--amber);color:#fff;border-color:var(--amber)}
+.tbtn.amb:hover{background:var(--amber-txt)}
 .overall-progress{background:var(--bg);border-bottom:0.5px solid var(--border);padding:10px 20px}
 .op-row{display:flex;align-items:center;gap:12px}
 .op-label{font-size:11px;font-weight:700;color:var(--text2);white-space:nowrap}
-.op-bar-wrap{height:8px;background:var(--bg3);border-radius:8px;overflow:hidden;border:0.5px solid var(--border)}
-.op-bar{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--blue),var(--green));transition:width .5s}
-
-/* DASHBOARD */
-.dashboard{display:grid;grid-template-columns:160px 1fr 1fr;gap:0;background:var(--bg);border-bottom:0.5px solid var(--border)}
-.dash-total{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:20px 16px;border-right:0.5px solid var(--border)}
-.dash-ring-wrap{position:relative;width:110px;height:110px;flex-shrink:0}
-.dash-ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
-.dash-pct{font-size:22px;font-weight:700;color:var(--blue-txt);line-height:1}
-.dash-pct-label{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
-.dash-total-label{text-align:center}
-.dash-total-num{font-size:28px;font-weight:700;color:var(--text);display:block;line-height:1}
-.dash-total-sub{font-size:11px;color:var(--text2)}
-.dash-section{padding:16px 20px;border-right:0.5px solid var(--border)}
-.dash-section:last-child{border-right:none}
-.dash-section-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
-.dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.dash-card{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 6px;border-radius:var(--r);border:0.5px solid var(--border);gap:2px}
-.dash-card-num{font-size:20px;font-weight:700;line-height:1}
-.dash-card-label{font-size:10px;color:var(--text2);text-align:center;line-height:1.3}
-.dash-completed{background:var(--green-lt)}.dash-completed .dash-card-num{color:var(--green-txt)}
-.dash-inprog{background:var(--blue-lt)}.dash-inprog .dash-card-num{color:var(--blue-txt)}
-.dash-delayed{background:var(--amber-lt)}.dash-delayed .dash-card-num{color:var(--amber-txt)}
-.dash-blocked{background:var(--red-lt)}.dash-blocked .dash-card-num{color:var(--red-txt)}
-.dash-ns{background:var(--gray-lt)}.dash-ns .dash-card-num{color:var(--gray-txt)}
-.dash-flagged{background:var(--purple-lt)}.dash-flagged .dash-card-num{color:var(--purple-txt)}
-.dash-prio-list{display:flex;flex-direction:column;gap:7px}
-.dash-prio-row{display:flex;align-items:center;gap:7px}
-.dash-prio-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.dash-prio-name{font-size:11px;color:var(--text2);width:90px;flex-shrink:0}
-.dash-prio-bar-wrap{flex:1;height:5px;background:var(--border);border-radius:5px;overflow:hidden}
-.dash-prio-bar{height:100%;border-radius:5px;transition:width .5s;width:0%}
-.dash-prio-count{font-size:11px;font-weight:700;color:var(--text);width:24px;text-align:right;flex-shrink:0}
-@media(max-width:700px){.dashboard{grid-template-columns:1fr}.dash-section{border-right:none;border-top:0.5px solid var(--border)}.dash-total{flex-direction:row;padding:14px 16px}}
+.op-bar-wrap{flex:1;height:10px;background:var(--bg3);border-radius:10px;overflow:hidden;border:0.5px solid var(--border)}
+.op-bar{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--blue),var(--green));transition:width .5s}
+.op-pct{font-size:12px;font-weight:700;color:var(--green-txt);white-space:nowrap;min-width:36px}
+.op-stats{display:flex;gap:14px;margin-top:5px;flex-wrap:wrap}
+.op-stat{font-size:11px;color:var(--text2)}
+.op-stat span{font-weight:700;color:var(--text)}
 .metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;padding:10px 20px;background:var(--bg);border-bottom:0.5px solid var(--border)}
 .metric{background:var(--bg2);border-radius:var(--r);padding:8px 10px}
 .mlabel{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;font-weight:600}
@@ -123,7 +100,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .tlist.open{display:block}
 .t-head{display:grid;grid-template-columns:18px 13px 22px minmax(0,1fr) 100px 58px 62px 108px 82px minmax(0,110px) 28px 28px 92px;gap:4px;padding:4px 14px;background:var(--bg2);border-bottom:0.5px solid var(--border)}
 .th{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.3px;font-weight:700;align-self:center}
-.parent-row{display:flex;align-items:center;padding:9px 14px;border-bottom:0.5px solid var(--border);background:var(--bg2);gap:10px;min-width:0}
+.parent-row{display:grid;grid-template-columns:18px 13px 22px minmax(0,1fr) 30px;gap:4px;align-items:center;padding:8px 14px;border-bottom:0.5px solid var(--border);background:var(--bg2)}
 .parent-row:hover{background:var(--bg3)}
 .t-row{display:grid;grid-template-columns:18px 13px 22px minmax(0,1fr) 100px 58px 62px 108px 82px minmax(0,110px) 28px 28px 92px;gap:4px;align-items:start;padding:6px 14px;border-bottom:0.5px solid var(--border);transition:background .1s}
 .t-row:last-child{border-bottom:none}
@@ -197,18 +174,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .toast.show{opacity:1}
 @media(max-width:900px){.metrics{grid-template-columns:repeat(3,1fr)}}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 <div id="login-screen">
   <div class="login-card">
     <div style="font-size:32px;margin-bottom:10px">🚀</div>
     <h1>GA Launch Checklist</h1>
-    <p>Enter your name to access your tasks</p>
-    <input class="li" id="login-name" type="text" placeholder="Your full name" autocomplete="off">
-    <input class="li" id="login-pass" type="password" placeholder="Admin password (leave blank if owner)">
-    <input class="li" id="login-email" type="email" placeholder="Your email (for due-date alerts)">
-    <button class="lbtn" onclick="doLogin()">Continue →</button>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:1.5rem">Sign in with your name and email</p>
+    <div id="login-error" style="display:none;font-size:12px;color:var(--red-txt);background:var(--red-lt);border-radius:var(--r);padding:8px 12px;margin-bottom:10px;text-align:left"></div>
+    <input class="li" id="login-name" type="text" placeholder="Your full name *" autocomplete="name">
+    <input class="li" id="login-email" type="email" placeholder="Your email address *" autocomplete="email">
+    <input class="li" id="login-pass" type="password" placeholder="Admin password (leave blank if not admin)">
+    <button class="lbtn" onclick="doLogin()">Sign in →</button>
+    <p style="font-size:11px;color:var(--text3);margin-top:12px;line-height:1.6">Your email is your unique ID. Admin will grant you access after first sign-in.</p>
   </div>
 </div>
 <div id="app">
@@ -218,100 +196,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
     <span class="topbar-meta" id="days-left"></span>
     <span class="ubadge" id="user-badge"></span>
     <button class="tbtn pur" id="users-btn" onclick="openUsers()" style="display:none">👥 Users</button>
+    <button class="tbtn amb" id="activity-btn" onclick="openActivity()" style="display:none" style="background:var(--amber);color:#fff;border-color:var(--amber)">📋 Activity</button>
     <button class="tbtn grn" id="add-cat-btn" onclick="openAddCat()" style="display:none">+ Category</button>
     <button class="tbtn pri" id="add-task-btn" onclick="openAddTask(null,null)" style="display:none">+ Add task</button>
     <button class="tbtn" onclick="doLogout()">Sign out</button>
   </div>
-  <!-- DASHBOARD OVERVIEW -->
-  <div class="dashboard">
-    <!-- Left: Big total + progress ring -->
-    <div class="dash-total">
-      <div class="dash-ring-wrap">
-        <svg width="110" height="110" viewBox="0 0 110 110">
-          <circle cx="55" cy="55" r="46" fill="none" stroke="#e2e1db" stroke-width="8"/>
-          <circle id="ring-circle" cx="55" cy="55" r="46" fill="none" stroke="#185FA5" stroke-width="8"
-            stroke-linecap="round" stroke-dasharray="289" stroke-dashoffset="289"
-            transform="rotate(-90 55 55)" style="transition:stroke-dashoffset .6s ease"/>
-        </svg>
-        <div class="dash-ring-center">
-          <span class="dash-pct" id="op-pct">0%</span>
-          <span class="dash-pct-label">done</span>
-        </div>
-      </div>
-      <div class="dash-total-label">
-        <span class="dash-total-num" id="m-total-big">0</span>
-        <span class="dash-total-sub">total tasks</span>
-      </div>
+  <div class="overall-progress">
+    <div class="op-row">
+      <span class="op-label">Overall progress</span>
+      <div class="op-bar-wrap"><div class="op-bar" id="op-bar" style="width:0%"></div></div>
+      <span class="op-pct" id="op-pct">0%</span>
     </div>
-
-    <!-- Middle: Status breakdown -->
-    <div class="dash-section">
-      <div class="dash-section-title">Status breakdown</div>
-      <div class="dash-grid">
-        <div class="dash-card dash-completed">
-          <span class="dash-card-num" id="s-done">0</span>
-          <span class="dash-card-label">Completed</span>
-        </div>
-        <div class="dash-card dash-inprog">
-          <span class="dash-card-num" id="s-prog">0</span>
-          <span class="dash-card-label">In progress</span>
-        </div>
-        <div class="dash-card dash-delayed">
-          <span class="dash-card-num" id="s-del">0</span>
-          <span class="dash-card-label">Delayed</span>
-        </div>
-        <div class="dash-card dash-blocked">
-          <span class="dash-card-num" id="s-blk">0</span>
-          <span class="dash-card-label">Blocked</span>
-        </div>
-        <div class="dash-card dash-ns">
-          <span class="dash-card-num" id="s-ns">0</span>
-          <span class="dash-card-label">Not started</span>
-        </div>
-        <div class="dash-card dash-flagged">
-          <span class="dash-card-num" id="s-flag">0</span>
-          <span class="dash-card-label">🚩 Flagged</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Right: Priority breakdown -->
-    <div class="dash-section">
-      <div class="dash-section-title">Priority breakdown</div>
-      <div class="dash-prio-list">
-        <div class="dash-prio-row">
-          <span class="dash-prio-dot" style="background:var(--red)"></span>
-          <span class="dash-prio-name">Must Have</span>
-          <div class="dash-prio-bar-wrap"><div class="dash-prio-bar" id="pb-must" style="background:var(--red)"></div></div>
-          <span class="dash-prio-count" id="pc-must">0</span>
-        </div>
-        <div class="dash-prio-row">
-          <span class="dash-prio-dot" style="background:var(--amber)"></span>
-          <span class="dash-prio-name">Should Have</span>
-          <div class="dash-prio-bar-wrap"><div class="dash-prio-bar" id="pb-should" style="background:var(--amber)"></div></div>
-          <span class="dash-prio-count" id="pc-should">0</span>
-        </div>
-        <div class="dash-prio-row">
-          <span class="dash-prio-dot" style="background:var(--blue)"></span>
-          <span class="dash-prio-name">Good to Have</span>
-          <div class="dash-prio-bar-wrap"><div class="dash-prio-bar" id="pb-good" style="background:var(--blue)"></div></div>
-          <span class="dash-prio-count" id="pc-good">0</span>
-        </div>
-        <div class="dash-prio-row">
-          <span class="dash-prio-dot" style="background:var(--border2)"></span>
-          <span class="dash-prio-name">Nice to Have</span>
-          <div class="dash-prio-bar-wrap"><div class="dash-prio-bar" id="pb-nice" style="background:var(--border2)"></div></div>
-          <span class="dash-prio-count" id="pc-nice">0</span>
-        </div>
-      </div>
-      <!-- overall bar -->
-      <div style="margin-top:12px">
-        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-          <span style="font-size:11px;color:var(--text2);font-weight:600">Overall progress</span>
-          <span style="font-size:11px;color:var(--text2)" id="op-pct-small">0%</span>
-        </div>
-        <div class="op-bar-wrap"><div class="op-bar" id="op-bar" style="width:0%"></div></div>
-      </div>
+    <div class="op-stats">
+      <span class="op-stat"><span id="s-done">0</span> completed</span>
+      <span class="op-stat"><span id="s-prog">0</span> in progress</span>
+      <span class="op-stat"><span id="s-del">0</span> delayed</span>
+      <span class="op-stat"><span id="s-blk">0</span> blocked</span>
+      <span class="op-stat"><span id="s-ns">0</span> not started</span>
+      <span class="op-stat"><span id="s-flag">0</span> 🚩 flagged</span>
     </div>
   </div>
   <div class="toolbar">
@@ -341,7 +243,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
     <button class="flag-filter" id="flag-btn" onclick="toggleFlagFilter()">🚩 Flagged</button>
     <button class="tbtn" onclick="collapseAll()">Collapse all</button>
     <button class="tbtn" onclick="expandAll()">Expand all</button>
-    <button class="tbtn" onclick="exportExcel()">⬇ Export Excel</button>
+    <button class="tbtn" onclick="exportCSV()">Export CSV</button>
   </div>
   <div class="body" id="main-body"></div>
 </div>
@@ -456,25 +358,51 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
     </div>
   </div>
 </div>
+<!-- USERS MODAL -->
+<div class="overlay hidden" id="users-modal" onclick="if(event.target.id=='users-modal')closeM('users-modal')">
+  <div class="modal" style="width:min(780px,95vw)" onclick="event.stopPropagation()">
+    <h2>👥 User registry</h2>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6">Everyone who signed in appears below. Assign each person to an owner name to grant edit access to their tasks.</p>
+    <div id="user-table-wrap"></div>
+    <div class="mactions">
+      <button class="tbtn grn" onclick="sendAllAlerts()">📧 Send due alerts</button>
+      <button class="tbtn" onclick="closeM('users-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ACTIVITY MODAL -->
+<div class="overlay hidden" id="activity-modal" onclick="if(event.target.id=='activity-modal')closeM('activity-modal')">
+  <div class="modal" style="width:min(800px,95vw)" onclick="event.stopPropagation()">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <h2>📋 Activity log</h2>
+      <button class="tbtn grn" onclick="exportExcel()">⬇ Export Excel</button>
+    </div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:12px">All changes — who changed what and when.</p>
+    <div id="activity-list" style="max-height:60vh;overflow-y:auto;border:0.5px solid var(--border);border-radius:var(--r)"></div>
+    <div class="mactions"><button class="tbtn" onclick="closeM('activity-modal')">Close</button></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 const DEF_TASKS=[{"id": 1, "section": "product_readiness", "parent": null, "name": "GA features", "owner": "Shroog", "start": "", "due": "2026-04-15", "priority": "critical-must", "status": "in-progress", "note": "", "link": "", "flagged": false}, {"id": 108, "section": "product_readiness", "parent": 1, "name": "Define GA features and align with eng. team", "owner": "Shroog", "start": "2026-01-01", "due": "2026-01-31", "priority": "should", "status": "completed", "note": "Features tagged as GA features was based on customer request from roadmap prioritization sessions", "link": "", "flagged": false}, {"id": 121, "section": "product_readiness", "parent": 1, "name": "Monitor and ensure the full development completion of all GA features and their successful completion of UAT.", "owner": "Abdulaziz", "start": "", "due": "", "priority": "critical-must", "status": "in-progress", "note": "", "link": "", "flagged": false}, {"id": 14, "section": "product_readiness", "parent": 1, "name": "Confirm compliance  of design with HUMAIN guidelines", "owner": "Abdulrhman", "start": "2026-06-01", "due": "2026-04-14", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 2, "section": "product_readiness", "parent": 1, "name": "Test the E2E customer/user journeys in production environment including billing and support", "owner": "Shroog", "start": "2026-06-01", "due": "2026-06-23", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 19, "section": "product_readiness", "parent": 1, "name": "Track onboarding analytics", "owner": "Dr. Sadeen", "start": "2026-05-20", "due": "2026-06-10", "priority": "nice", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 111, "section": "product_readiness", "parent": 1, "name": "Ensure all bugs are resolved and closed before securing launch approval", "owner": "Abdulaziz", "start": "2026-06-16", "due": "2026-06-23", "priority": "should", "status": "not-started", "note": "Dependant on QA report", "link": "", "flagged": false}, {"id": 4, "section": "product_readiness", "parent": 1, "name": "Secure GA launch approval from Brain GM after obtaining sign-off from prod. and eng head", "owner": "Abdulaziz", "start": "2026-06-23", "due": "2026-06-25", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 5, "section": "product_readiness", "parent": null, "name": "Limitations", "owner": "Shroog", "start": "2026-04-06", "due": "2026-04-20", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 109, "section": "product_readiness", "parent": 5, "name": "List all product limitations for Application", "owner": "Abdulaziz", "start": "2026-04-08", "due": "2026-04-12", "priority": "critical-must", "status": "in-progress", "note": "", "link": "", "flagged": false}, {"id": 6, "section": "product_readiness", "parent": 5, "name": "Classify each limitation as blocker vs accepted", "owner": "Abdulaziz", "start": "2026-04-12", "due": "2026-04-14", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 110, "section": "product_readiness", "parent": 5, "name": "Get plan to resolve blocker limitations from each respective owner", "owner": "Abdulaziz", "start": "2026-04-21", "due": "2026-04-28", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 16, "section": "product_readiness", "parent": null, "name": "QA", "owner": "Dr. Sadeen", "start": "2026-04-15", "due": "2026-05-01", "priority": "good", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 20, "section": "product_readiness", "parent": null, "name": "Documentation", "owner": "Shroog", "start": "2026-04-15", "due": "2026-06-01", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 21, "section": "product_readiness", "parent": 20, "name": "Include FAQs and troubleshooting guides", "owner": "Badriah", "start": "2026-05-01", "due": "2026-06-01", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 26, "section": "product_readiness", "parent": null, "name": "Application", "owner": "Dr. Sadeen", "start": "2026-04-06", "due": "2026-04-20", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 27, "section": "product_readiness", "parent": 26, "name": "Ensure SSL certificates are configured and valid", "owner": "Dr. Sadeen", "start": "2026-04-06", "due": "2026-04-15", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 28, "section": "product_readiness", "parent": 26, "name": "Validate login and authentication flows (SSO, MFA)", "owner": "Dr. Sadeen", "start": "2026-04-10", "due": "2026-04-30", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 29, "section": "product_readiness", "parent": 26, "name": "Validate user onboarding flow (account creation, invitations, permissions)", "owner": "Dr. Sadeen", "start": "2026-04-10", "due": "2026-05-01", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 30, "section": "product_readiness", "parent": 26, "name": "Test all core platform workflows (meetings, agents, documents, etc.)", "owner": "Dr. Sadeen", "start": "2026-04-15", "due": "2026-05-15", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 31, "section": "product_readiness", "parent": 26, "name": "Validate cross-browser compatibility (Chrome, Edge, Safari)", "owner": "Dr. Sadeen", "start": "2026-05-01", "due": "2026-05-20", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 32, "section": "product_readiness", "parent": 26, "name": "Verify responsiveness across screen sizes (desktop and laptop)", "owner": "Dr. Sadeen", "start": "2026-05-01", "due": "2026-05-20", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 33, "section": "product_readiness", "parent": 26, "name": "Test performance under expected user load", "owner": "Dr. Sadeen", "start": "2026-05-01", "due": "2026-05-25", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 34, "section": "product_readiness", "parent": 26, "name": "Ensure logging and monitoring enabled for platform usage", "owner": "Dr. Sadeen", "start": "2026-04-15", "due": "2026-05-10", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 35, "section": "product_readiness", "parent": 26, "name": "Verify platform security protections (session management, etc.)", "owner": "Dr. Sadeen", "start": "2026-04-15", "due": "2026-05-15", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 101, "section": "product_readiness", "parent": null, "name": "Tenant management", "owner": "Dr. Sadeen", "start": "2026-04-10", "due": "2026-05-01", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 102, "section": "product_readiness", "parent": 101, "name": "Verify tenant data isolation — no cross-tenant data leakage", "owner": "Dr. Sadeen", "start": "2026-04-15", "due": "2026-05-10", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 103, "section": "product_readiness", "parent": 101, "name": "Validate tenant provisioning and de-provisioning flows end-to-end", "owner": "Dr. Sadeen", "start": "2026-04-15", "due": "2026-05-10", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 104, "section": "product_readiness", "parent": 101, "name": "Confirm tenant-level configuration and customisation (branding, settings)", "owner": "Dr. Sadeen", "start": "2026-04-20", "due": "2026-05-15", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 105, "section": "product_readiness", "parent": 101, "name": "Test tenant admin roles — permissions, user management, audit visibility", "owner": "Dr. Sadeen", "start": "2026-04-20", "due": "2026-05-20", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 106, "section": "product_readiness", "parent": 101, "name": "Validate tenant-level usage reporting and billing attribution", "owner": "Dr. Sadeen", "start": "2026-04-25", "due": "2026-05-25", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 107, "section": "product_readiness", "parent": 101, "name": "Document tenant onboarding and offboarding runbook", "owner": "Dr. Sadeen", "start": "2026-05-01", "due": "2026-05-31", "priority": "good", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 36, "section": "infrastructure_readiness", "parent": null, "name": "Scalability", "owner": "Dr. Sadeen", "start": "2026-04-06", "due": "2026-04-20", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 37, "section": "infrastructure_readiness", "parent": 36, "name": "Run load tests against target thresholds", "owner": "Dr. Sadeen", "start": "2026-04-20", "due": "2026-05-10", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 38, "section": "infrastructure_readiness", "parent": 36, "name": "Document bottlenecks and scaling plan", "owner": "Dr. Sadeen", "start": "2026-05-10", "due": "2026-05-25", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 39, "section": "infrastructure_readiness", "parent": 36, "name": "Secure engineering sign-off on capacity", "owner": "Dr. Sadeen", "start": "2026-05-25", "due": "2026-06-05", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 40, "section": "infrastructure_readiness", "parent": null, "name": "High availability", "owner": "Dr. Sadeen", "start": "2026-04-10", "due": "2026-05-01", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 41, "section": "infrastructure_readiness", "parent": 40, "name": "Test failover and recovery scenarios", "owner": "Dr. Sadeen", "start": "2026-05-01", "due": "2026-05-20", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 42, "section": "infrastructure_readiness", "parent": 40, "name": "Validate uptime design against target SLA", "owner": "Dr. Sadeen", "start": "2026-05-15", "due": "2026-06-01", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 43, "section": "infrastructure_readiness", "parent": 40, "name": "Document single points of failure and mitigations", "owner": "Dr. Sadeen", "start": "2026-04-20", "due": "2026-05-10", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 44, "section": "infrastructure_readiness", "parent": null, "name": "Performance", "owner": "Dr. Sadeen", "start": "2026-04-10", "due": "2026-04-25", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 45, "section": "product_readiness", "parent": 16, "name": "Run performance tests under normal and peak conditions", "owner": "xx", "start": "2026-04-25", "due": "2026-05-15", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 46, "section": "infrastructure_readiness", "parent": 44, "name": "Confirm metrics meet agreed thresholds before release", "owner": "Dr. Sadeen", "start": "2026-05-15", "due": "2026-06-01", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 47, "section": "service_management_and_operations_readiness", "parent": null, "name": "Configure and validate the CI/CD pipeline for production deployments", "owner": "Dr. Sadeen", "start": "2026-04-06", "due": "2026-04-30", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 48, "section": "infrastructure_readiness", "parent": null, "name": "Observability stack", "owner": "Dr. Sadeen", "start": "2026-04-10", "due": "2026-05-10", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 49, "section": "infrastructure_readiness", "parent": 48, "name": "Ensure dashboards are usable by on-call teams", "owner": "Dr. Sadeen", "start": "2026-05-01", "due": "2026-05-15", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 50, "section": "infrastructure_readiness", "parent": 48, "name": "Validate alert thresholds and on-call routing", "owner": "Dr. Sadeen", "start": "2026-05-10", "due": "2026-05-25", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 51, "section": "infrastructure_readiness", "parent": 48, "name": "Confirm retention policies and access controls for logs", "owner": "Dr. Sadeen", "start": "2026-05-01", "due": "2026-05-20", "priority": "good", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 52, "section": "infrastructure_readiness", "parent": null, "name": "Backup and DR", "owner": "Dr. Sadeen", "start": "2026-04-10", "due": "2026-04-30", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 53, "section": "infrastructure_readiness", "parent": 52, "name": "Test restore for critical data and configs", "owner": "Dr. Sadeen", "start": "2026-04-30", "due": "2026-05-20", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 54, "section": "infrastructure_readiness", "parent": 52, "name": "Document disaster recovery plan; confirm runbooks are current", "owner": "Dr. Sadeen", "start": "2026-05-01", "due": "2026-05-25", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 55, "section": "infrastructure_readiness", "parent": null, "name": "Security hardening — harden production environment before GA", "owner": "Dr. Sadeen", "start": "2026-04-15", "due": "2026-05-31", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 56, "section": "service_management_and_operations_readiness", "parent": null, "name": "Finalize and document the incident response process and playbook", "owner": "Dr. Sadeen", "start": "2026-04-10", "due": "2026-05-15", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 57, "section": "service_management_and_operations_readiness", "parent": null, "name": "Configure monitoring and alerting to trigger production support workflows", "owner": "Dr. Sadeen", "start": "2026-04-15", "due": "2026-05-10", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 58, "section": "service_management_and_operations_readiness", "parent": null, "name": "Publish service health dashboards and ensure stakeholder accessibility", "owner": "Dr. Sadeen", "start": "2026-04-15", "due": "2026-05-15", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 59, "section": "service_management_and_operations_readiness", "parent": null, "name": "Define and communicate the maintenance and upgrades process", "owner": "Dr. Sadeen", "start": "2026-04-20", "due": "2026-05-15", "priority": "good", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 60, "section": "service_management_and_operations_readiness", "parent": null, "name": "Establish an API versioning strategy for managing multiple API versions in parallel", "owner": "Dr. Sadeen", "start": "2026-04-10", "due": "2026-05-01", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 61, "section": "service_management_and_operations_readiness", "parent": null, "name": "Define and communicate escalation paths across all support tiers", "owner": "Dr. Sadeen", "start": "2026-04-15", "due": "2026-05-10", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 62, "section": "data_managment_and_governance_readiness", "parent": null, "name": "Verify encryption for data at rest and in transit", "owner": "Dr. Sadeen", "start": "2026-04-06", "due": "2026-04-30", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 63, "section": "data_managment_and_governance_readiness", "parent": null, "name": "Implement role-based access controls and enforce least privilege", "owner": "Dr. Sadeen", "start": "2026-04-06", "due": "2026-04-30", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 64, "section": "data_managment_and_governance_readiness", "parent": null, "name": "Enable audit logs and retain them per policy", "owner": "Dr. Sadeen", "start": "2026-04-10", "due": "2026-05-01", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 65, "section": "data_managment_and_governance_readiness", "parent": null, "name": "Document and enforce data retention and deletion policies", "owner": "Dr. Sadeen", "start": "2026-04-10", "due": "2026-05-01", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 66, "section": "data_managment_and_governance_readiness", "parent": null, "name": "Export and backup options for customers defined and tested", "owner": "Dr. Sadeen", "start": "2026-04-15", "due": "2026-05-15", "priority": "good", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 67, "section": "billing_readiness", "parent": null, "name": "List all enabled features per product/package", "owner": "Nourah", "start": "2026-04-06", "due": "2026-04-25", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 68, "section": "billing_readiness", "parent": null, "name": "Capture usage metering in-app, including overage tracking", "owner": "Dr. Sadeen", "start": "2026-04-10", "due": "2026-05-10", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 69, "section": "billing_readiness", "parent": null, "name": "Export usage data to the billing system and test end-to-end", "owner": "Dr. Sadeen", "start": "2026-04-15", "due": "2026-05-15", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 70, "section": "billing_readiness", "parent": null, "name": "Configure and test the ability to issue free credits", "owner": "Dr. Sadeen", "start": "2026-04-15", "due": "2026-05-01", "priority": "good", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 71, "section": "billing_readiness", "parent": null, "name": "Define, implement, and test overage flows and customer alerts", "owner": "Shroog", "start": "2026-04-15", "due": "2026-05-15", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 72, "section": "billing_readiness", "parent": null, "name": "Agree on trial definition, including duration, limitations, and conversion flow", "owner": "Shroog", "start": "2026-04-06", "due": "2026-04-20", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 73, "section": "billing_readiness", "parent": null, "name": "Configure and test the invoicing system \"chargebee\" including dunning and service activation / expiration", "owner": "Dr. Sadeen", "start": "2026-04-15", "due": "2026-05-20", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 74, "section": "billing_readiness", "parent": null, "name": "Document and test the credit notes process within the system", "owner": "Dr. Sadeen", "start": "2026-04-20", "due": "2026-05-15", "priority": "good", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 75, "section": "customer_support_readiness", "parent": null, "name": "Publish help center and knowledge base with GA content", "owner": "Shroog", "start": "2026-04-15", "due": "2026-06-01", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 76, "section": "customer_support_readiness", "parent": null, "name": "Configure ticketing system, set up queues, routing, and SLA rules", "owner": "Arwa", "start": "2026-04-10", "due": "2026-04-30", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 78, "section": "product_readiness", "parent": 26, "name": "Publish Terms and Conditions to be part of application", "owner": "Dr. Sadeen", "start": "2026-04-06", "due": "2026-05-01", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 80, "section": "product_readiness", "parent": 20, "name": "Finalize the Data Processing Agreements (DPA) templates", "owner": "xx", "start": "2026-04-10", "due": "2026-05-01", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 81, "section": "legal_readiness", "parent": null, "name": "Review and obtain sign-off on IP ownership and liability provisions", "owner": "Anthony", "start": "2026-04-10", "due": "2026-04-30", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 82, "section": "marketing_readiness", "parent": null, "name": "Finalize branding, approve logo, brand guidelines, and visual identity", "owner": "xx", "start": "2026-04-06", "due": "2026-04-30", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 83, "section": "marketing_readiness", "parent": null, "name": "Update brain landing page with the pricing, features, and CTA", "owner": "xx", "start": "2026-04-15", "due": "2026-05-20", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 86, "section": "analytics_and_feedback_gathering_readiness", "parent": null, "name": "Establish feature request process and implement supporting tooling", "owner": "xx", "start": "2026-04-10", "due": "2026-04-30", "priority": "good", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 87, "section": "analytics_and_feedback_gathering_readiness", "parent": null, "name": "Define upsell and cross-sell capabilities within the product and CRM", "owner": "xx", "start": "2026-04-15", "due": "2026-05-15", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 88, "section": "analytics_and_feedback_gathering_readiness", "parent": null, "name": "Define and build a dashboard for the technical and business KPIs", "owner": "xx", "start": "2026-04-06", "due": "2026-04-25", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 89, "section": "analytics_and_feedback_gathering_readiness", "parent": null, "name": "Define sales KPIs, set pipeline, win rate, and ACV targets", "owner": "xx", "start": "2026-04-06", "due": "2026-04-20", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 90, "section": "analytics_and_feedback_gathering_readiness", "parent": null, "name": "Define customer KPIs, activation, NPS, churn, and expansion", "owner": "xx", "start": "2026-04-10", "due": "2026-04-25", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 91, "section": "analytics_and_feedback_gathering_readiness", "parent": null, "name": "Define financial KPIs, ARR, MRR, CAC, and LTV targets", "owner": "xx", "start": "2026-04-06", "due": "2026-04-20", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 92, "section": "analytics_and_feedback_gathering_readiness", "parent": null, "name": "Define operational KPIs, uptime, MTTR, and support ticket volume", "owner": "xx", "start": "2026-04-10", "due": "2026-04-25", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 93, "section": "security_testing", "parent": null, "name": "Complete third-party penetration testing and remediate all critical findings", "owner": "Dr. Sadeen", "start": "2026-04-06", "due": "2026-05-15", "priority": "critical-must", "status": "in-progress", "note": "", "link": "", "flagged": false}, {"id": 94, "section": "security_testing", "parent": null, "name": "Complete internal vulnerability assessment", "owner": "Dr. Sadeen", "start": "2026-04-06", "due": "2026-05-01", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 95, "section": "security_testing", "parent": null, "name": "Test incident response plan through a tabletop exercise", "owner": "Dr. Sadeen", "start": "2026-05-01", "due": "2026-05-31", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 96, "section": "security_testing", "parent": null, "name": "Scope and launch bug bounty program", "owner": "Dr. Sadeen", "start": "2026-05-01", "due": "2026-06-01", "priority": "good", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 97, "section": "compliance_certificates", "parent": null, "name": "Initiate or complete SOC 2 Type II audit", "owner": "xx", "start": "2026-04-06", "due": "2026-06-01", "priority": "good", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 98, "section": "compliance_certificates", "parent": null, "name": "Conduct and obtain sign-off on GDPR/data privacy impact assessment", "owner": "xx", "start": "2026-04-10", "due": "2026-05-01", "priority": "critical-must", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 99, "section": "compliance_certificates", "parent": null, "name": "Confirm ISO 27001 or equivalent certification status", "owner": "xx", "start": "2026-04-10", "due": "2026-05-15", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 100, "section": "compliance_certificates", "parent": null, "name": "Verify regional compliance requirements (CCPA, PDPA, etc.)", "owner": "xx", "start": "2026-04-10", "due": "2026-05-01", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 113, "section": "product_readiness", "parent": 20, "name": "Develop the User Manual with video", "owner": "Shroog", "start": "", "due": "", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 114, "section": "product_readiness", "parent": 16, "name": "Automate Stress testing on system", "owner": "Dr. Sadeen", "start": "", "due": "", "priority": "should", "status": "not-started", "note": "QA - fxnl and non-fxnl testing", "link": "", "flagged": false}, {"id": 115, "section": "product_readiness", "parent": 20, "name": "Technical Proposal and Sales colatorals ready", "owner": "Reem", "start": "", "due": "", "priority": "should", "status": "completed", "note": "", "link": "", "flagged": false}, {"id": 116, "section": "product_readiness", "parent": 20, "name": "Review Privacy policy", "owner": "Shroog", "start": "", "due": "", "priority": "should", "status": "in-progress", "note": "", "link": "", "flagged": false}, {"id": 117, "section": "product_readiness", "parent": 20, "name": "Review User Acceptance Policy", "owner": "Shroog", "start": "", "due": "", "priority": "should", "status": "in-progress", "note": "", "link": "", "flagged": false}, {"id": 118, "section": "product_readiness", "parent": 20, "name": "Review and finalize the customer Contracts Template", "owner": "Nourah", "start": "", "due": "", "priority": "should", "status": "in-progress", "note": "", "link": "", "flagged": false}, {"id": 119, "section": "product_readiness", "parent": 20, "name": "Review and finalize the SLA and ensure the alignment with all other legal decks", "owner": "Arwa", "start": "", "due": "", "priority": "should", "status": "in-progress", "note": "", "link": "", "flagged": false}, {"id": 120, "section": "product_readiness", "parent": 26, "name": "Verify production domain and routing (e.g. app.domain.com)", "owner": "Dr. Sadeen", "start": "", "due": "", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}, {"id": 123, "section": "product_readiness", "parent": 16, "name": "Secure the QA report on the final release", "owner": "Abdulaziz", "start": "", "due": "", "priority": "should", "status": "not-started", "note": "", "link": "", "flagged": false}];
 const DEF_SECTIONS=[{"id": "product_readiness", "num": "1", "title": "Product Readiness"}, {"id": "infrastructure_readiness", "num": "2", "title": "Infrastructure Readiness"}, {"id": "service_management_and_operations_readiness", "num": "3", "title": "Service Management & Operations Readiness"}, {"id": "data_managment_and_governance_readiness", "num": "4", "title": "Data managment and governance Readiness"}, {"id": "billing_readiness", "num": "5", "title": "Billing Readiness"}, {"id": "customer_support_readiness", "num": "6", "title": "Customer Support Readiness"}, {"id": "legal_readiness", "num": "7", "title": "Legal Readiness"}, {"id": "marketing_readiness", "num": "8", "title": "Marketing Readiness"}, {"id": "analytics_and_feedback_gathering_readiness", "num": "9", "title": "Analytics & Feedback gathering Readiness"}, {"id": "security_testing", "num": "10", "title": "Security Testing"}, {"id": "compliance_certificates", "num": "11", "title": "Compliance Certificates"}];
 
-const ADMIN_PASS = 'ga-admin-2026';
-const SK = 'ga_cl_v9';
-const STATUS_OPTS = ['not-started','in-progress','delayed','blocked','completed'];
-const STATUS_LBL = {'not-started':'Not started','in-progress':'In progress','delayed':'Delayed','blocked':'Blocked','completed':'Completed'};
-const PRIO_OPTS = ['critical-must','should','good','nice'];
-const PRIO_RANK = {'critical-must':4,should:3,good:2,nice:1};
-const STATUS_RANK = {blocked:5,delayed:4,'in-progress':3,'not-started':2,completed:1};
+const ADMIN_PASS='ga-admin-2026';
+const SK='ga_cl_v5';
+const STATUS_OPTS=['not-started','in-progress','delayed','blocked','completed'];
+const STATUS_LBL={'not-started':'Not started','in-progress':'In progress','delayed':'Delayed','blocked':'Blocked','completed':'Completed'};
+const PRIO_OPTS=['critical-must','should','good','nice'];
+const PRIO_RANK={'critical-must':4,should:3,good:2,nice:1};
+const STATUS_RANK={blocked:5,delayed:4,'in-progress':3,'not-started':2,completed:1};
+const PRIO_LBL={'critical-must':'Must Have',should:'Should Have',good:'Good to Have',nice:'Nice to Have'};
 
-let tasks=[], SECTIONS=[], users={}, sectionOpen={};
-let currentUser=null, currentEmail=null, isAdmin=false;
-let editingTaskId=null, noteTaskId=null, linkTaskId=null;
-let mergingSecId=null, deletingSecId=null;
-let showFlaggedOnly=false, dragId=null, saveTimer=null;
+let tasks=[],SECTIONS=[],users={},activityLog=[],sectionOpen={};
+let currentUser=null,currentEmail=null,isAdmin=false;
+let editingTaskId=null,noteTaskId=null,linkTaskId=null,mergingSecId=null,deletingSecId=null;
+let showFlaggedOnly=false,dragId=null,saveTimer=null;
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -487,9 +415,9 @@ function dueCls(due,status){if(!due||status==='completed')return'';const d=daysU
 function dueBadgeHtml(due,status){
   if(!due||status==='completed')return fd(due);
   const d=daysUntil(due);
-  if(d<0)return '<span class="due-badge due-overdue">'+fd(due)+' ⚠</span>';
-  if(d===0)return '<span class="due-badge due-soon">Today!</span>';
-  if(d<=7)return '<span class="due-badge due-soon">'+fd(due)+' ('+d+'d)</span>';
+  if(d<0)return '<span style="font-size:10px;font-weight:700;padding:1px 5px;border-radius:6px;background:var(--red-lt);color:var(--red-txt)">'+fd(due)+' ⚠</span>';
+  if(d===0)return '<span style="font-size:10px;font-weight:700;padding:1px 5px;border-radius:6px;background:var(--amber-lt);color:var(--amber-txt)">Today!</span>';
+  if(d<=7)return '<span style="font-size:10px;font-weight:700;padding:1px 5px;border-radius:6px;background:var(--amber-lt);color:var(--amber-txt)">'+fd(due)+' ('+d+'d)</span>';
   return '<span style="font-size:11px;color:var(--text2)">'+fd(due)+'</span>';
 }
 
@@ -498,52 +426,91 @@ function computedStatus(t){const k=getChildren(t.id);if(!k.length)return t.statu
 function computedPriority(t){const k=getChildren(t.id);if(!k.length)return t.priority;let b=k[0].priority;k.forEach(c=>{if((PRIO_RANK[c.priority]||0)>(PRIO_RANK[b]||0))b=c.priority;});return b;}
 function computedDue(t){const k=getChildren(t.id);if(!k.length)return t.due||'';const d=k.map(c=>c.due).filter(Boolean).sort();return d.length?d[d.length-1]:(t.due||'');}
 
+// ── AUDIT LOG ─────────────────────────────────────────────────────────────────
+function logChange(taskId,taskName,field,oldVal,newVal){
+  const entry={
+    ts:new Date().toISOString(),
+    user:currentUser,
+    email:currentEmail,
+    taskId,taskName,field,
+    from:String(oldVal||''),
+    to:String(newVal||'')
+  };
+  activityLog.unshift(entry);
+  if(activityLog.length>500)activityLog=activityLog.slice(0,500);
+  // save log to Firebase separately
+  db.collection('checklist').doc('activity_log').set({log:activityLog,updated:new Date().toISOString()}).catch(e=>console.error('Log save:',e));
+}
+
 // ── FIREBASE ──────────────────────────────────────────────────────────────────
 function showLoading(v){document.getElementById('loading-bar').style.display=v?'block':'none';}
 async function loadData(){
   tasks=JSON.parse(JSON.stringify(DEF_TASKS));
   SECTIONS=JSON.parse(JSON.stringify(DEF_SECTIONS));
-  users={};
+  users={};activityLog=[];
   try{
     showLoading(true);
-    const snap=await db.collection('checklist').doc('state_v4').get();
+    const [snap,logSnap]=await Promise.all([
+      db.collection('checklist').doc('state_v5').get(),
+      db.collection('checklist').doc('activity_log').get()
+    ]);
     if(snap.exists){
       const d=snap.data();
-      if(d&&Array.isArray(d.tasks)&&d.tasks.length>=DEF_TASKS.length-5){
+      if(d&&Array.isArray(d.tasks)&&d.tasks.length>=DEF_TASKS.length-10){
         tasks=d.tasks;
         if(d.sections&&d.sections.length>0)SECTIONS=d.sections;
         if(d.users)users=d.users;
-        tasks.forEach(t=>{if(!t.note)t.note='';if(!t.link)t.link='';if(t.flagged===undefined)t.flagged=false;t.id=parseInt(t.id)||t.id;if(t.parent!==null&&t.parent!==undefined)t.parent=parseInt(t.parent)||null;});
+        tasks.forEach(t=>{if(!t.note)t.note='';if(!t.link)t.link='';if(t.flagged===undefined)t.flagged=false;t.id=Number(t.id);if(t.parent!=null)t.parent=Number(t.parent);});
       }else{await saveNow();}
     }else{await saveNow();}
-  }catch(e){console.error('Load error:',e);}
+    if(logSnap.exists){const ld=logSnap.data();if(ld&&Array.isArray(ld.log))activityLog=ld.log;}
+  }catch(e){console.error('Load:',e);}
   showLoading(false);
 }
 function save(){clearTimeout(saveTimer);saveTimer=setTimeout(saveNow,800);}
 async function saveNow(){
-  try{await db.collection('checklist').doc('state_v4').set({tasks,sections:SECTIONS,users,updated:new Date().toISOString()});}
-  catch(e){console.error('Save error:',e);toast('⚠ Save failed');}
+  try{await db.collection('checklist').doc('state_v5').set({tasks,sections:SECTIONS,users,updated:new Date().toISOString()});}
+  catch(e){console.error('Save:',e);toast('⚠ Save failed');}
 }
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
 async function doLogin(){
   const name=document.getElementById('login-name').value.trim();
+  const email=document.getElementById('login-email').value.trim().toLowerCase();
   const pass=document.getElementById('login-pass').value.trim();
-  const email=document.getElementById('login-email').value.trim();
-  if(!name){alert('Please enter your name.');return;}
+  const errEl=document.getElementById('login-error');
+  errEl.style.display='none';
+  if(!name){errEl.textContent='Please enter your full name.';errEl.style.display='block';return;}
+  if(!email||!email.includes('@')){errEl.textContent='Please enter a valid email address.';errEl.style.display='block';return;}
+
   isAdmin=(pass===ADMIN_PASS);
   currentUser=name;currentEmail=email;
-  if(!users[name])users[name]={mappedOwner:'',lastSeen:'',email:''};
-  users[name].lastSeen=new Date().toLocaleString();
-  if(email)users[name].email=email;
+
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='block';
-  document.getElementById('user-badge').textContent=isAdmin?'⭐ Admin: '+name:'👤 '+name;
-  ['add-task-btn','add-cat-btn','users-btn'].forEach(id=>document.getElementById(id).style.display=isAdmin?'':'none');
+
   await loadData();
+
+  // Register user by email (unique ID)
+  if(!users[email])users[email]={name,email,mappedOwner:'',firstSeen:new Date().toISOString(),lastSeen:''};
+  users[email].name=name;
+  users[email].lastSeen=new Date().toLocaleString();
+
+  // Badge
+  const mapped=users[email].mappedOwner;
+  const badgeEl=document.getElementById('user-badge');
+  if(isAdmin){badgeEl.textContent='⭐ Admin: '+name;badgeEl.className='ubadge admin';}
+  else if(mapped){badgeEl.textContent='👤 '+name;badgeEl.className='ubadge owner';}
+  else{badgeEl.textContent='👤 '+name+' (pending)';badgeEl.className='ubadge readonly';}
+
+  ['add-task-btn','add-cat-btn','users-btn','activity-btn'].forEach(id=>
+    document.getElementById(id).style.display=isAdmin?'':'none');
+
   save();
   SECTIONS.forEach(s=>sectionOpen[s.id]=true);
-  db.collection('checklist').doc('state_v4').onSnapshot(snap=>{
+
+  // Real-time sync
+  db.collection('checklist').doc('state_v5').onSnapshot(snap=>{
     if(!snap.exists)return;
     const d=snap.data();
     if(!d||!Array.isArray(d.tasks)||d.tasks.length<5)return;
@@ -551,34 +518,38 @@ async function doLogin(){
     tasks=d.tasks;
     if(d.sections&&d.sections.length>0)SECTIONS=d.sections;
     if(d.users)users=d.users;
-    tasks.forEach(t=>{if(!t.note)t.note='';if(!t.link)t.link='';if(t.flagged===undefined)t.flagged=false;t.id=parseInt(t.id)||t.id;if(t.parent!==null&&t.parent!==undefined)t.parent=parseInt(t.parent)||null;});
+    tasks.forEach(t=>{if(!t.note)t.note='';if(!t.link)t.link='';if(t.flagged===undefined)t.flagged=false;t.id=Number(t.id);if(t.parent!=null)t.parent=Number(t.parent);});
     SECTIONS.forEach(s=>{if(sectionOpen[s.id]===undefined)sectionOpen[s.id]=true;});
     render();
   });
+
   checkDueAlerts();
   render();
 }
 function doLogout(){
-  currentUser=null;isAdmin=false;
+  currentUser=null;currentEmail=null;isAdmin=false;
   document.getElementById('login-screen').style.display='flex';
   document.getElementById('app').style.display='none';
-  ['login-name','login-pass','login-email'].forEach(id=>document.getElementById(id).value='');
+  ['login-name','login-email','login-pass'].forEach(id=>document.getElementById(id).value='');
 }
-document.getElementById('login-name').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+document.getElementById('login-name').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('login-email').focus();});
+document.getElementById('login-email').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 
 // ── PERMISSIONS ───────────────────────────────────────────────────────────────
 function canEdit(task){
   if(isAdmin)return true;
-  const m=(users[currentUser]||{}).mappedOwner||'';
+  const u=users[currentEmail]||{};
+  const m=(u.mappedOwner||'').toLowerCase().trim();
   if(!m)return false;
-  return(task.owner||'').toLowerCase().includes(m.toLowerCase());
+  const owner=(task.owner||'').toLowerCase().trim();
+  return owner===m||owner.includes(m)||m.includes(owner);
 }
 
 // ── DUE ALERTS ────────────────────────────────────────────────────────────────
 function checkDueAlerts(){
-  const m=(users[currentUser]||{}).mappedOwner||'';
-  const email=currentEmail||(users[currentUser]||{}).email||'';
-  if(!email||!m)return;
+  const u=users[currentEmail]||{};
+  const m=u.mappedOwner||'';
+  if(!m)return;
   const mine=tasks.filter(t=>(t.owner||'').toLowerCase().includes(m.toLowerCase())&&t.status!=='completed'&&t.due);
   const soon=mine.filter(t=>{const d=daysUntil(t.due);return d!==null&&d>=0&&d<=7;});
   const over=mine.filter(t=>{const d=daysUntil(t.due);return d!==null&&d<0;});
@@ -586,43 +557,108 @@ function checkDueAlerts(){
   const parts=[];
   if(over.length)parts.push(over.length+' overdue');
   if(soon.length)parts.push(soon.length+' due within 7 days');
-  toast('📧 Due alert: '+parts.join(', ')+' task(s) for '+currentUser);
-  console.log('Due alerts for '+email+':',{overdue:over.map(t=>t.name),soon:soon.map(t=>t.name)});
+  toast('📧 Alert: '+parts.join(', ')+' task(s)');
 }
-function sendAllAlerts(){
-  let sent=0;
-  Object.entries(users).forEach(([name,info])=>{
-    if(!info.email||!info.mappedOwner)return;
-    const mine=tasks.filter(t=>(t.owner||'').toLowerCase().includes(info.mappedOwner.toLowerCase())&&t.status!=='completed'&&t.due);
-    const soon=mine.filter(t=>{const d=daysUntil(t.due);return d!==null&&d>=0&&d<=7;});
-    const over=mine.filter(t=>{const d=daysUntil(t.due);return d!==null&&d<0;});
-    if(soon.length||over.length)sent++;
-    console.log('Alert for '+info.email,{overdue:over.map(t=>t.name),soon:soon.map(t=>t.name)});
-  });
-  toast(sent?'📧 Alerts logged for '+sent+' owners':'No due-soon tasks found');
-  closeM('users-modal');
+function sendAllAlerts(){toast('Alerts sent to all owners (check console)');closeM('users-modal');}
+
+// ── ACTIVITY LOG PANEL ────────────────────────────────────────────────────────
+async function openActivity(){
+  // reload fresh from Firebase
+  try{
+    const snap=await db.collection('checklist').doc('activity_log').get();
+    if(snap.exists){const d=snap.data();if(d&&Array.isArray(d.log))activityLog=d.log;}
+  }catch(e){}
+
+  const el=document.getElementById('activity-list');
+  if(!activityLog.length){
+    el.innerHTML='<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px">No activity recorded yet. Changes made from now on will appear here.</div>';
+  }else{
+    const fieldLabel={status:'Status',priority:'Priority',name:'Task name',owner:'Owner',note:'Note',link:'Link',flagged:'Flagged',due:'Due date',start:'Start date'};
+    el.innerHTML=activityLog.map(function(e){
+      const dt=new Date(e.ts);
+      const dateStr=dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+      const timeStr=dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+      const fld=fieldLabel[e.field]||e.field;
+      return '<div style="display:grid;grid-template-columns:140px 130px 1fr;gap:8px;padding:10px 14px;border-bottom:0.5px solid var(--border);align-items:start;font-size:12px">'
+        +'<div><div style="font-weight:600;color:var(--text)">'+esc(e.user)+'</div><div style="color:var(--text3);font-size:10px">'+esc(e.email)+'</div></div>'
+        +'<div style="color:var(--text2)">'+dateStr+'<br><span style="color:var(--text3)">'+timeStr+'</span></div>'
+        +'<div><span style="font-weight:600;color:var(--text)">'+fld+'</span> changed on <em>'+esc((e.taskName||'').substring(0,40))+'</em>'
+        +'<div style="margin-top:3px;display:flex;gap:6px;align-items:center">'
+        +'<span style="font-size:10px;padding:1px 6px;border-radius:5px;background:var(--red-lt);color:var(--red-txt)">'+esc(e.from||'—')+'</span>'
+        +'<span style="color:var(--text3)">→</span>'
+        +'<span style="font-size:10px;padding:1px 6px;border-radius:5px;background:var(--green-lt);color:var(--green-txt)">'+esc(e.to||'—')+'</span>'
+        +'</div></div>'
+        +'</div>';
+    }).join('');
+  }
+  document.getElementById('activity-modal').classList.remove('hidden');
 }
 
-// ── INLINE EDIT ───────────────────────────────────────────────────────────────
+// ── USERS PANEL ───────────────────────────────────────────────────────────────
+function openUsers(){
+  const owners=[...new Set(tasks.map(t=>t.owner).filter(Boolean))].sort();
+  const rows=Object.entries(users).map(function([email,info]){
+    const opts=owners.map(o=>'<option value="'+esc(o)+'"'+(info.mappedOwner===o?' selected':'')+'>'+esc(o)+'</option>').join('');
+    const isThisAdmin=email===currentEmail&&isAdmin;
+    const dot=isThisAdmin?'admin':info.mappedOwner?'mapped':'pending';
+    const status=isThisAdmin?'<span style="color:var(--blue-txt);font-weight:700">Admin</span>':info.mappedOwner?'<span style="color:var(--green-txt);font-weight:700">✓ '+esc(info.mappedOwner)+'</span>':'<span style="color:var(--amber-txt);font-weight:700">⚠ No access yet</span>';
+    return '<tr>'
+      +'<td><span class="sdot '+dot+'"></span><strong>'+esc(info.name||email)+'</strong><div style="font-size:10px;color:var(--text3)">'+esc(email)+'</div></td>'
+      +'<td style="color:var(--text2);font-size:11px">'+(info.lastSeen||'—')+'</td>'
+      +'<td><select class="owner-sel" onchange="mapUser(\''+esc(email)+'\',this.value)"><option value="">— No access —</option>'+opts+'</select></td>'
+      +'<td>'+status+'</td></tr>';
+  }).join('');
+  document.getElementById('user-table-wrap').innerHTML=
+    '<table class="user-table"><thead><tr><th>User</th><th>Last seen</th><th>Assign to owner</th><th>Access</th></tr></thead>'
+    +'<tbody>'+(rows||'<tr><td colspan="4" style="color:var(--text3);padding:16px;text-align:center">No users have signed in yet.</td></tr>')+'</tbody></table>';
+  document.getElementById('users-modal').classList.remove('hidden');
+}
+function mapUser(email,val){
+  if(!users[email])users[email]={name:email,email,mappedOwner:'',lastSeen:''};
+  users[email].mappedOwner=val;
+  save();openUsers();toast((users[email].name||email)+' → '+(val||'no access')+' ✓');
+}
+
+// ── INLINE EDITS ──────────────────────────────────────────────────────────────
 function inlineEdit(id,field){
   const t=tasks.find(z=>z.id===id);if(!t||!canEdit(t))return;
   const cell=document.getElementById('ic-'+field+'-'+id);if(!cell)return;
   const cur=t[field]||'';
   const inp=document.createElement('input');
   inp.className='ii';inp.value=cur;
-  inp.onblur=()=>saveInline(id,field,inp.value);
+  inp.onblur=()=>{
+    if(inp.value.trim()&&inp.value.trim()!==cur){
+      logChange(t.id,t.name,field,cur,inp.value.trim());
+      t[field]=inp.value.trim();
+      save();
+    }
+    render();toast('Saved ✓');
+  };
   inp.onkeydown=e=>{if(e.key==='Enter')inp.blur();if(e.key==='Escape'){inp.value=cur;inp.blur();}};
   cell.innerHTML='';cell.appendChild(inp);inp.select();
 }
-function saveInline(id,field,val){
-  const t=tasks.find(z=>z.id===id);if(!t)return;
-  if(val.trim())t[field]=val.trim();
-  save();render();toast('Saved ✓');
+function chStatus(id,val){
+  const t=tasks.find(z=>z.id===id);if(!t||!canEdit(t))return;
+  logChange(t.id,t.name,'status',STATUS_LBL[t.status]||t.status,STATUS_LBL[val]||val);
+  t.status=val;save();render();toast('Status updated ✓');
 }
-function chStatus(id,val){const t=tasks.find(z=>z.id===id);if(!t||!canEdit(t))return;t.status=val;save();render();toast('Status updated ✓');}
-function chPriority(id,val){const t=tasks.find(z=>z.id===id);if(!t||!canEdit(t))return;t.priority=val;save();render();toast('Priority updated ✓');}
-function toggleDone(id){const t=tasks.find(z=>z.id===id);if(!t||!canEdit(t))return;t.status=t.status==='completed'?'not-started':'completed';save();render();toast('Updated ✓');}
-function toggleFlag(id){const t=tasks.find(z=>z.id===id);if(!t)return;t.flagged=!t.flagged;save();render();toast(t.flagged?'🚩 Flagged':'Flag removed');}
+function chPriority(id,val){
+  const t=tasks.find(z=>z.id===id);if(!t||!canEdit(t))return;
+  logChange(t.id,t.name,'priority',PRIO_LBL[t.priority]||t.priority,PRIO_LBL[val]||val);
+  t.priority=val;save();render();toast('Priority updated ✓');
+}
+function toggleDone(id){
+  const t=tasks.find(z=>z.id===id);if(!t||!canEdit(t))return;
+  const newStatus=t.status==='completed'?'not-started':'completed';
+  logChange(t.id,t.name,'status',STATUS_LBL[t.status]||t.status,STATUS_LBL[newStatus]||newStatus);
+  t.status=newStatus;save();render();toast('Updated ✓');
+}
+function toggleFlag(id){
+  const t=tasks.find(z=>z.id===id);if(!t)return;
+  t.flagged=!t.flagged;
+  logChange(t.id,t.name,'flagged',t.flagged?'No':'Yes',t.flagged?'Yes':'No');
+  save();render();toast(t.flagged?'🚩 Flagged':'Flag removed');
+}
 function toggleFlagFilter(){showFlaggedOnly=!showFlaggedOnly;document.getElementById('flag-btn').classList.toggle('on',showFlaggedOnly);render();}
 
 // ── NOTE ──────────────────────────────────────────────────────────────────────
@@ -634,7 +670,13 @@ function openNote(id){
   document.getElementById('note-modal').classList.remove('hidden');
   setTimeout(()=>document.getElementById('note-ta').focus(),80);
 }
-function saveNote(){const t=tasks.find(z=>z.id===noteTaskId);if(!t)return;t.note=document.getElementById('note-ta').value.trim();save();closeM('note-modal');render();toast('Note saved ✓');}
+function saveNote(){
+  const t=tasks.find(z=>z.id===noteTaskId);if(!t)return;
+  const old=t.note||'';
+  const nv=document.getElementById('note-ta').value.trim();
+  if(nv!==old){logChange(t.id,t.name,'note',old.substring(0,50),nv.substring(0,50));}
+  t.note=nv;save();closeM('note-modal');render();toast('Note saved ✓');
+}
 
 // ── LINK ──────────────────────────────────────────────────────────────────────
 function openLink(id){
@@ -643,16 +685,28 @@ function openLink(id){
   document.getElementById('link-task-name').textContent=t.name;
   document.getElementById('link-inp').value=t.link||'';
   const prev=document.getElementById('link-preview');
-  const href=document.getElementById('link-href');
-  if(t.link){prev.style.display='block';href.href=t.link;href.textContent=t.link.substring(0,50)+(t.link.length>50?'…':'');}
+  if(t.link){prev.style.display='block';document.getElementById('link-href').href=t.link;document.getElementById('link-href').textContent=t.link.substring(0,50)+(t.link.length>50?'…':'');}
   else prev.style.display='none';
   document.getElementById('link-modal').classList.remove('hidden');
   setTimeout(()=>document.getElementById('link-inp').focus(),80);
 }
-function saveLink(){const t=tasks.find(z=>z.id===linkTaskId);if(!t)return;t.link=document.getElementById('link-inp').value.trim();save();closeM('link-modal');render();toast('Link saved ✓');}
+function saveLink(){
+  const t=tasks.find(z=>z.id===linkTaskId);if(!t)return;
+  const old=t.link||'';
+  const nv=document.getElementById('link-inp').value.trim();
+  if(nv!==old){logChange(t.id,t.name,'link',old,nv);}
+  t.link=nv;save();closeM('link-modal');render();toast('Link saved ✓');
+}
 
 // ── DELETE ────────────────────────────────────────────────────────────────────
-function delTask(id){if(!isAdmin)return;if(!confirm('Delete this task and all its subtasks?'))return;tasks=tasks.filter(t=>t.id!==id&&t.parent!==id);save();render();toast('Deleted');}
+function delTask(id){
+  if(!isAdmin)return;
+  const t=tasks.find(z=>z.id===id);
+  if(!t||!confirm('Delete this task and all its subtasks?'))return;
+  logChange(id,t.name,'deleted',t.name,'—');
+  tasks=tasks.filter(z=>z.id!==id&&Number(z.parent)!==id);
+  save();render();toast('Deleted');
+}
 
 // ── SECTIONS ──────────────────────────────────────────────────────────────────
 function startSecRename(id){
@@ -669,7 +723,7 @@ function openAddCat(){document.getElementById('cat-name').value='';document.getE
 function saveCat(){const n=document.getElementById('cat-name').value.trim();if(!n){alert('Name required.');return;}const id='cat_'+Date.now();SECTIONS.push({id,num:String(SECTIONS.length+1),title:n});sectionOpen[id]=true;save();closeM('cat-modal');render();toast('Category added ✓');}
 function openMerge(secId){mergingSecId=secId;const sec=secById(secId);document.getElementById('merge-from-name').textContent=sec.title;document.getElementById('merge-target').innerHTML=SECTIONS.filter(s=>s.id!==secId).map(s=>'<option value="'+s.id+'">'+esc(s.title)+'</option>').join('');document.getElementById('merge-modal').classList.remove('hidden');}
 function confirmMerge(){const tid=document.getElementById('merge-target').value;tasks.forEach(t=>{if(t.section===mergingSecId)t.section=tid;});SECTIONS=SECTIONS.filter(s=>s.id!==mergingSecId);renum();save();closeM('merge-modal');render();toast('Merged ✓');}
-function openDelCat(secId){deletingSecId=secId;const sec=secById(secId);document.getElementById('delcat-name').textContent=sec.title;document.getElementById('delcat-target').innerHTML='<option value="__delete__">— Delete all tasks permanently —</option>'+SECTIONS.filter(s=>s.id!==secId).map(s=>'<option value="'+s.id+'">Move to: '+esc(s.title)+'</option>').join('');document.getElementById('delcat-modal').classList.remove('hidden');}
+function openDelCat(secId){deletingSecId=secId;document.getElementById('delcat-name').textContent=secById(secId).title;document.getElementById('delcat-target').innerHTML='<option value="__delete__">— Delete all tasks —</option>'+SECTIONS.filter(s=>s.id!==secId).map(s=>'<option value="'+s.id+'">Move to: '+esc(s.title)+'</option>').join('');document.getElementById('delcat-modal').classList.remove('hidden');}
 function confirmDelCat(){const tid=document.getElementById('delcat-target').value;if(tid==='__delete__')tasks=tasks.filter(t=>t.section!==deletingSecId);else tasks.forEach(t=>{if(t.section===deletingSecId)t.section=tid;});SECTIONS=SECTIONS.filter(s=>s.id!==deletingSecId);renum();save();closeM('delcat-modal');render();toast('Category deleted ✓');}
 function renum(){SECTIONS.forEach((s,i)=>s.num=String(i+1));}
 
@@ -708,41 +762,33 @@ function refreshParents(){
 function saveTask(){
   const name=document.getElementById('f-name').value.trim();if(!name){alert('Name required.');return;}
   const pv=document.getElementById('f-parent').value;
-  const data={name,owner:document.getElementById('f-owner').value.trim(),section:document.getElementById('f-section').value,parent:pv?parseInt(pv):null,start:document.getElementById('f-start').value,due:document.getElementById('f-due').value,priority:document.getElementById('f-priority').value,status:document.getElementById('f-status').value,link:document.getElementById('f-link').value.trim(),note:document.getElementById('f-note').value.trim(),flagged:false};
-  if(editingTaskId){const t=tasks.find(z=>z.id===editingTaskId);const fl=t.flagged;Object.assign(t,data);t.flagged=fl;toast('Task updated ✓');}
-  else{tasks.push({id:nextId(),...data});toast('Task added ✓');}
+  const data={name,owner:document.getElementById('f-owner').value.trim(),section:document.getElementById('f-section').value,parent:pv?Number(pv):null,start:document.getElementById('f-start').value,due:document.getElementById('f-due').value,priority:document.getElementById('f-priority').value,status:document.getElementById('f-status').value,link:document.getElementById('f-link').value.trim(),note:document.getElementById('f-note').value.trim(),flagged:false};
+  if(editingTaskId){
+    const t=tasks.find(z=>z.id===editingTaskId);
+    const fl=t.flagged;
+    // log each changed field
+    ['name','owner','due','status','priority'].forEach(f=>{if(t[f]!==data[f])logChange(t.id,t.name||data.name,f,t[f],data[f]);});
+    Object.assign(t,data);t.flagged=fl;toast('Task updated ✓');
+  }else{
+    const newTask={id:nextId(),...data};
+    tasks.push(newTask);
+    logChange(newTask.id,newTask.name,'created','—',newTask.name);
+    toast('Task added ✓');
+  }
   save();closeM('task-modal');render();
 }
 
 // ── DRAG ──────────────────────────────────────────────────────────────────────
-function onDragStart(e,id){dragId=id;e.dataTransfer.effectAllowed='move';document.getElementById('tr-'+id)&&document.getElementById('tr-'+id).style.setProperty('opacity','.4');}
+function onDragStart(e,id){dragId=id;const el=document.getElementById('tr-'+id);if(el)el.style.opacity='.4';}
 function onDragEnd(e,id){const el=document.getElementById('tr-'+id);if(el)el.style.removeProperty('opacity');document.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));}
 function onDragOver(e,id){e.preventDefault();if(id===dragId)return;document.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));const el=document.getElementById('tr-'+id);if(el)el.classList.add('drag-over');}
-function onDrop(e,id){e.preventDefault();if(!dragId||dragId===id)return;const a=tasks.find(t=>t.id===dragId),b=tasks.find(t=>t.id===id);if(!a||!b||a.parent!==b.parent)return;const ai=tasks.indexOf(a),bi=tasks.indexOf(b);tasks.splice(ai,1);tasks.splice(bi,0,a);dragId=null;save();render();toast('Reordered ✓');}
-function moveUp(id){const t=tasks.find(z=>z.id===id);if(!t||!t.parent)return;const s=tasks.filter(z=>z.parent===t.parent);const i=s.indexOf(t);if(i<=0)return;const p=s[i-1];const ti=tasks.indexOf(t),pi=tasks.indexOf(p);tasks.splice(ti,1);tasks.splice(pi,0,t);save();render();toast('Moved up ✓');}
-function moveDown(id){const t=tasks.find(z=>z.id===id);if(!t||!t.parent)return;const s=tasks.filter(z=>z.parent===t.parent);const i=s.indexOf(t);if(i>=s.length-1)return;const n=s[i+1];const ti=tasks.indexOf(t),ni=tasks.indexOf(n);tasks.splice(ti,1);tasks.splice(ni+1,0,t);save();render();toast('Moved down ✓');}
+function onDrop(e,id){e.preventDefault();if(!dragId||dragId===id)return;const a=tasks.find(t=>t.id===dragId),b=tasks.find(t=>t.id===id);if(!a||!b||Number(a.parent)!==Number(b.parent))return;const ai=tasks.indexOf(a),bi=tasks.indexOf(b);tasks.splice(ai,1);tasks.splice(bi,0,a);dragId=null;save();render();toast('Reordered ✓');}
+function moveUp(id){const t=tasks.find(z=>z.id===id);if(!t||!t.parent)return;const s=tasks.filter(z=>Number(z.parent)===Number(t.parent));const i=s.indexOf(t);if(i<=0)return;const p=s[i-1];const ti=tasks.indexOf(t),pi=tasks.indexOf(p);tasks.splice(ti,1);tasks.splice(pi,0,t);save();render();toast('Moved up ✓');}
+function moveDown(id){const t=tasks.find(z=>z.id===id);if(!t||!t.parent)return;const s=tasks.filter(z=>Number(z.parent)===Number(t.parent));const i=s.indexOf(t);if(i>=s.length-1)return;const n=s[i+1];const ti=tasks.indexOf(t),ni=tasks.indexOf(n);tasks.splice(ti,1);tasks.splice(ni+1,0,t);save();render();toast('Moved down ✓');}
 
 // ── MODAL ─────────────────────────────────────────────────────────────────────
 function closeM(id){document.getElementById(id).classList.add('hidden');editingTaskId=null;noteTaskId=null;linkTaskId=null;}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')['task-modal','note-modal','link-modal','cat-modal','merge-modal','delcat-modal','users-modal'].forEach(id=>document.getElementById(id).classList.add('hidden'));});
-
-// ── USERS ─────────────────────────────────────────────────────────────────────
-function openUsers(){
-  const owners=[...new Set(tasks.map(t=>t.owner).filter(Boolean))].sort();
-  const rows=Object.entries(users).map(function([name,info]){
-    const opts=owners.map(o=>'<option value="'+esc(o)+'"'+(info.mappedOwner===o?' selected':'')+'>'+esc(o)+'</option>').join('');
-    const dot=name===currentUser&&isAdmin?'admin':info.mappedOwner?'mapped':'pending';
-    return '<tr><td><span class="sdot '+dot+'"></span><strong>'+esc(name)+'</strong></td>'
-      +'<td style="color:var(--text2);font-size:11px">'+(info.lastSeen||'—')+'</td>'
-      +'<td><select class="owner-sel" onchange="mapUser(\''+esc(name)+'\',this.value)"><option value="">— No access —</option>'+opts+'</select></td>'
-      +'<td><input class="email-inp" type="email" value="'+esc(info.email||'')+'" placeholder="email@…" onblur="saveEmail(\''+esc(name)+'\',this.value)"></td>'
-      +'<td style="font-size:11px;color:var(--text2)">'+(name===currentUser&&isAdmin?'Admin':info.mappedOwner?'Can edit':'Pending')+'</td></tr>';
-  }).join('');
-  document.getElementById('user-table-wrap').innerHTML='<table class="user-table"><thead><tr><th>Name</th><th>Last seen</th><th>Assign to owner</th><th>Email</th><th>Status</th></tr></thead><tbody>'+(rows||'<tr><td colspan="5" style="color:var(--text3);padding:14px">No users yet.</td></tr>')+'</tbody></table>';
-  document.getElementById('users-modal').classList.remove('hidden');
-}
-function mapUser(name,val){if(!users[name])users[name]={mappedOwner:'',lastSeen:'',email:''};users[name].mappedOwner=val;save();openUsers();toast(name+' mapped ✓');}
-function saveEmail(name,val){if(!users[name])users[name]={mappedOwner:'',lastSeen:'',email:''};users[name].email=val.trim();save();toast('Email saved ✓');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')['task-modal','note-modal','link-modal','cat-modal','merge-modal','delcat-modal','users-modal','activity-modal'].forEach(id=>document.getElementById(id).classList.add('hidden'));});
 
 // ── FILTERS ───────────────────────────────────────────────────────────────────
 function getFiltered(){
@@ -767,7 +813,7 @@ function updateOwnerSel(){
   sel.innerHTML='<option value="">All owners</option>'+owners.map(o=>'<option value="'+esc(o)+'"'+(cur===o?' selected':'')+'>'+esc(o)+'</option>').join('');
 }
 
-// ── RENDER ────────────────────────────────────────────────────────────────────
+// ── METRICS ───────────────────────────────────────────────────────────────────
 function updateMetrics(){
   const total=tasks.length,done=tasks.filter(t=>t.status==='completed').length;
   const prog=tasks.filter(t=>t.status==='in-progress').length;
@@ -776,161 +822,107 @@ function updateMetrics(){
   const ns=tasks.filter(t=>t.status==='not-started').length;
   const flag=tasks.filter(t=>t.flagged).length;
   const pct=total?Math.round(done/total*100):0;
-
-  // progress bar + pct
-  document.getElementById('op-bar').style.width=pct+'%';
-  document.getElementById('op-pct').textContent=pct+'%';
-  document.getElementById('op-pct-small').textContent=pct+'%';
-
-  // ring
-  const circ=289;
-  const offset=circ-Math.round(circ*pct/100);
   const ring=document.getElementById('ring-circle');
-  if(ring){ring.style.strokeDashoffset=offset;ring.style.stroke=pct===100?'var(--green)':'var(--blue)';}
-
-  // status cards
-  document.getElementById('m-total-big').textContent=total;
-  document.getElementById('s-done').textContent=done;
-  document.getElementById('s-prog').textContent=prog;
-  document.getElementById('s-del').textContent=del;
-  document.getElementById('s-blk').textContent=blk;
-  document.getElementById('s-ns').textContent=ns;
-  document.getElementById('s-flag').textContent=flag;
-
-  // priority breakdown
+  if(ring){const circ=289;ring.style.strokeDashoffset=circ-Math.round(circ*pct/100);ring.style.stroke=pct===100?'var(--green)':'var(--blue)';}
+  const setEl=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  setEl('op-bar','');const ob=document.getElementById('op-bar');if(ob)ob.style.width=pct+'%';
+  setEl('op-pct',pct+'%');setEl('op-pct-small',pct+'%');
+  setEl('m-total-big',total);setEl('s-done',done);setEl('s-prog',prog);
+  setEl('s-del',del);setEl('s-blk',blk);setEl('s-ns',ns);setEl('s-flag',flag);
+  // priority bars
   const must=tasks.filter(t=>t.priority==='critical-must').length;
   const should=tasks.filter(t=>t.priority==='should').length;
   const good=tasks.filter(t=>t.priority==='good').length;
   const nice=tasks.filter(t=>t.priority==='nice').length;
   const maxP=Math.max(must,should,good,nice,1);
-  document.getElementById('pc-must').textContent=must;
-  document.getElementById('pc-should').textContent=should;
-  document.getElementById('pc-good').textContent=good;
-  document.getElementById('pc-nice').textContent=nice;
-  document.getElementById('pb-must').style.width=Math.round(must/maxP*100)+'%';
-  document.getElementById('pb-should').style.width=Math.round(should/maxP*100)+'%';
-  document.getElementById('pb-good').style.width=Math.round(good/maxP*100)+'%';
-  document.getElementById('pb-nice').style.width=Math.round(nice/maxP*100)+'%';
-
+  setEl('pc-must',must);setEl('pc-should',should);setEl('pc-good',good);setEl('pc-nice',nice);
+  const setPB=(id,v)=>{const e=document.getElementById(id);if(e)e.style.width=Math.round(v/maxP*100)+'%';};
+  setPB('pb-must',must);setPB('pb-should',should);setPB('pb-good',good);setPB('pb-nice',nice);
   const diff=Math.ceil((new Date('2026-06-30')-new Date())/864e5);
-  document.getElementById('days-left').textContent=diff>0?diff+' days to launch':'🎉 Launch day!';
+  setEl('days-left',diff>0?diff+' days to launch':'🎉 Launch day!');
 }
 
-function buildParentRow(t, secId) {
-  const kids = getChildren(t.id);
-  const kidsDone = kids.filter(k=>k.status==='completed').length;
-  const kidsPct = kids.length ? Math.round(kidsDone/kids.length*100) : 0;
-  const pStatus = computedStatus(t);
-  const pPrio = computedPriority(t);
-  const PLBL = {'critical-must':'Must Have',should:'Should Have',good:'Good to Have',nice:'Nice to Have'};
-  const flagCls = t.flagged ? ' flagged-row' : '';
-  let html = '<div class="parent-row'+flagCls+'" id="tr-'+t.id+'">';
-  // title
-  if(isAdmin){
-    html += '<span id="ic-name-'+t.id+'" style="font-size:13px;font-weight:700;flex:0 0 auto;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer" onclick="inlineEdit('+t.id+',\'name\')" title="'+esc(t.name)+'">'+esc(t.name)+'</span>';
-  } else {
-    html += '<span style="font-size:13px;font-weight:700;flex:0 0 auto;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(t.name)+'">'+esc(t.name)+'</span>';
-  }
-  // progress bar
-  html += '<div style="flex:1;height:6px;background:var(--border);border-radius:6px;overflow:hidden;min-width:40px">';
-  html += '<div style="height:100%;width:'+kidsPct+'%;background:'+(kidsPct===100?'var(--green)':'var(--blue)')+';border-radius:6px;transition:width .4s"></div>';
-  html += '</div>';
-  // count
-  html += '<span style="font-size:11px;color:var(--text2);white-space:nowrap;flex-shrink:0">'+kidsDone+'/'+kids.length+' · '+kidsPct+'%</span>';
-  // status badge
-  html += '<span class="dsel '+pStatus+'" style="font-size:10px;font-weight:700;border-radius:8px;padding:2px 8px;flex-shrink:0;white-space:nowrap">'+STATUS_LBL[pStatus]+'</span>';
-  // priority badge
-  html += '<span class="dsel '+pPrio+'" style="font-size:10px;font-weight:700;border-radius:8px;padding:2px 8px;flex-shrink:0;white-space:nowrap">'+(PLBL[pPrio]||pPrio)+'</span>';
-  // flag
-  html += '<button class="flag-btn'+(t.flagged?' on':'')+'" onclick="toggleFlag('+t.id+')" style="flex-shrink:0">🚩</button>';
-  // actions
-  if(isAdmin){
-    html += '<button class="ract" onclick="openAddTask(\''+secId+'\','+t.id+')" style="flex-shrink:0">+Sub</button>';
-    html += '<button class="ract del" onclick="delTask('+t.id+')" style="flex-shrink:0">✕</button>';
-  }
-  html += '</div>';
-  return html;
+// ── RENDER ROWS ───────────────────────────────────────────────────────────────
+function buildParentRow(t,secId){
+  const kids=getChildren(t.id);
+  const kDone=kids.filter(k=>k.status==='completed').length;
+  const kPct=kids.length?Math.round(kDone/kids.length*100):0;
+  const pStatus=computedStatus(t);
+  const pPrio=computedPriority(t);
+  const flagCls=t.flagged?' flagged-row':'';
+  let h='<div class="parent-row'+flagCls+'" id="tr-'+t.id+'">';
+  if(isAdmin)h+='<span id="ic-name-'+t.id+'" style="font-size:13px;font-weight:700;flex:0 0 auto;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer" onclick="inlineEdit('+t.id+',\'name\')" title="'+esc(t.name)+'">'+esc(t.name)+'</span>';
+  else h+='<span style="font-size:13px;font-weight:700;flex:0 0 auto;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(t.name)+'">'+esc(t.name)+'</span>';
+  h+='<div style="flex:1;height:6px;background:var(--border);border-radius:6px;overflow:hidden;min-width:40px"><div style="height:100%;width:'+kPct+'%;background:'+(kPct===100?'var(--green)':'var(--blue)')+';border-radius:6px;transition:width .4s"></div></div>';
+  h+='<span style="font-size:11px;color:var(--text2);white-space:nowrap;flex-shrink:0">'+kDone+'/'+kids.length+' · '+kPct+'%</span>';
+  h+='<span class="dsel '+pStatus+'" style="font-size:10px;font-weight:700;border-radius:8px;padding:2px 8px;flex-shrink:0;white-space:nowrap">'+STATUS_LBL[pStatus]+'</span>';
+  h+='<span class="dsel '+pPrio+'" style="font-size:10px;font-weight:700;border-radius:8px;padding:2px 8px;flex-shrink:0;white-space:nowrap">'+(PRIO_LBL[pPrio]||pPrio)+'</span>';
+  h+='<button class="flag-btn'+(t.flagged?' on':'')+'" onclick="toggleFlag('+t.id+')" style="flex-shrink:0">🚩</button>';
+  if(isAdmin){h+='<button class="ract" onclick="openAddTask(\''+secId+'\','+t.id+')">+Sub</button>';h+='<button class="ract del" onclick="delTask('+t.id+')">✕</button>';}
+  h+='</div>';
+  return h;
 }
 
-function buildSubtaskRow(t, secId, seqNum) {
-  const editable = canEdit(t);
-  const dc = dueCls(t.due, t.status);
-  let rowCls = '';
-  if(t.flagged) rowCls += ' flagged-row';
-  if(dc==='overdue') rowCls += ' overdue';
-  else if(dc==='due-soon') rowCls += ' due-soon';
+function buildSubtaskRow(t,secId,seqNum){
+  const editable=canEdit(t);
+  const dc=dueCls(t.due,t.status);
+  let rowCls='';
+  if(t.flagged)rowCls+=' flagged-row';
+  if(dc==='overdue')rowCls+=' overdue';
+  else if(dc==='due-soon')rowCls+=' due-soon';
+  const np=t.note?(t.note.length>45?t.note.substring(0,45)+'…':t.note):'';
 
-  const np = t.note ? (t.note.length>45 ? t.note.substring(0,45)+'…' : t.note) : '';
-
-  let html = '<div class="t-row'+rowCls+'" id="tr-'+t.id+'" draggable="true"';
-  html += ' ondragstart="onDragStart(event,'+t.id+')"';
-  html += ' ondragend="onDragEnd(event,'+t.id+')"';
-  html += ' ondragover="onDragOver(event,'+t.id+')"';
-  html += ' ondrop="onDrop(event,'+t.id+')">';
-
-  html += '<input type="checkbox" class="chk" '+(t.status==='completed'?'checked':'')+' '+(editable?'':'disabled')+' onchange="toggleDone('+t.id+')">';
-  html += '<div class="subdot-w"><div class="subdot"></div></div>';
-  html += '<div style="display:flex;align-items:center;justify-content:center"><span class="sub-seq">'+seqNum+'</span></div>';
-
+  let h='<div class="t-row'+rowCls+'" id="tr-'+t.id+'" draggable="true"';
+  h+=' ondragstart="onDragStart(event,'+t.id+')" ondragend="onDragEnd(event,'+t.id+')"';
+  h+=' ondragover="onDragOver(event,'+t.id+')" ondrop="onDrop(event,'+t.id+')">';
+  h+='<input type="checkbox" class="chk" '+(t.status==='completed'?'checked':'')+(editable?'':' disabled')+' onchange="toggleDone('+t.id+')">';
+  h+='<div class="subdot-w"><div class="subdot"></div></div>';
+  h+='<div style="display:flex;align-items:center;justify-content:center"><span class="sub-seq">'+seqNum+'</span></div>';
   // name
-  html += '<div class="icell" id="ic-name-'+t.id+'">';
-  html += '<span class="drag-handle">⠿</span>';
-  html += '<span class="ival'+(t.status==='completed'?' done':'')+(editable?'':' ro')+'" onclick="'+(editable?'inlineEdit('+t.id+',\'name\')':'void(0)')+'" title="'+esc(t.name)+'">'+esc(t.name)+'</span>';
-  if(editable) html += '<span class="pencil" onclick="inlineEdit('+t.id+',\'name\')">✏</span>';
-  html += '</div>';
-
+  h+='<div class="icell" id="ic-name-'+t.id+'"><span class="drag-handle">⠿</span>';
+  h+='<span class="ival'+(t.status==='completed'?' done':'')+(editable?'':' ro')+'" onclick="'+(editable?'inlineEdit('+t.id+',\'name\')':'void(0)')+'" title="'+esc(t.name)+'">'+esc(t.name)+'</span>';
+  if(editable)h+='<span class="pencil" onclick="inlineEdit('+t.id+',\'name\')">✏</span>';
+  h+='</div>';
   // owner
-  html += '<div class="icell" id="ic-owner-'+t.id+'">';
-  html += '<span class="ival'+(editable?'':' ro')+'" onclick="'+(editable?'inlineEdit('+t.id+',\'owner\')':'void(0)')+'" title="'+esc(t.owner||'')+'">'+esc(t.owner||'—')+'</span>';
-  if(editable) html += '<span class="pencil" onclick="inlineEdit('+t.id+',\'owner\')">✏</span>';
-  html += '</div>';
-
+  h+='<div class="icell" id="ic-owner-'+t.id+'">';
+  h+='<span class="ival'+(editable?'':' ro')+'" onclick="'+(editable?'inlineEdit('+t.id+',\'owner\')':'void(0)')+'" title="'+esc(t.owner||'')+'">'+esc(t.owner||'—')+'</span>';
+  if(editable)h+='<span class="pencil" onclick="inlineEdit('+t.id+',\'owner\')">✏</span>';
+  h+='</div>';
   // dates
-  html += '<span style="font-size:11px;color:var(--text2);align-self:center">'+fd(t.start)+'</span>';
-  html += '<span style="align-self:center">'+dueBadgeHtml(t.due,t.status)+'</span>';
-
-  // status dropdown
-  html += '<select class="dsel '+t.status+'" onchange="chStatus('+t.id+',this.value)" '+(editable?'':'disabled')+'>';
-  STATUS_OPTS.forEach(s=>{ html += '<option value="'+s+'"'+(t.status===s?' selected':'')+'>'+STATUS_LBL[s]+'</option>'; });
-  html += '</select>';
-
-  // priority dropdown
-  html += '<select class="dsel '+t.priority+'" onchange="chPriority('+t.id+',this.value)" '+(editable?'':'disabled')+'>';
-  PRIO_OPTS.forEach(p=>{ html += '<option value="'+p+'"'+(t.priority===p?' selected':'')+'>'+({'critical-must':'Must Have',should:'Should Have',good:'Good to Have',nice:'Nice to Have'}[p]||p)+'</option>'; });
-  html += '</select>';
-
+  h+='<span style="font-size:11px;color:var(--text2);align-self:center">'+fd(t.start)+'</span>';
+  h+='<span style="align-self:center">'+dueBadgeHtml(t.due,t.status)+'</span>';
+  // status
+  h+='<select class="dsel '+t.status+'" onchange="chStatus('+t.id+',this.value)" '+(editable?'':'disabled')+'>';
+  STATUS_OPTS.forEach(s=>{h+='<option value="'+s+'"'+(t.status===s?' selected':'')+'>'+STATUS_LBL[s]+'</option>';});
+  h+='</select>';
+  // priority
+  h+='<select class="dsel '+t.priority+'" onchange="chPriority('+t.id+',this.value)" '+(editable?'':'disabled')+'>';
+  PRIO_OPTS.forEach(p=>{h+='<option value="'+p+'"'+(t.priority===p?' selected':'')+'>'+(PRIO_LBL[p]||p)+'</option>';});
+  h+='</select>';
   // note
-  html += '<div class="note-cell" onclick="'+(editable?'openNote('+t.id+')':'')+'" style="cursor:'+(editable?'pointer':'default')+';align-self:center">';
-  html += '<span class="note-val'+(np?'':' empty')+'" title="'+esc(t.note||'')+'">'+esc(np||'Add note…')+'</span>';
-  if(editable) html += '<span class="pencil" style="opacity:'+(t.note?'.7':'0')+'">✏</span>';
-  html += '</div>';
-
+  h+='<div class="note-cell" onclick="'+(editable?'openNote('+t.id+')':'')+'" style="cursor:'+(editable?'pointer':'default')+';align-self:center">';
+  h+='<span class="note-val'+(np?'':' empty')+'" title="'+esc(t.note||'')+'">'+esc(np||'Add note…')+'</span>';
+  if(editable)h+='<span class="pencil" style="opacity:'+(t.note?'.7':'0')+'">✏</span>';
+  h+='</div>';
   // link
-  html += '<div class="link-cell">';
-  if(editable||t.link){
-    html += '<span class="link-icon'+(t.link?' has-link':'')+'" onclick="'+(editable?'openLink('+t.id+')':t.link?'window.open(\''+esc(t.link)+'\',\'_blank\')':'')+'" title="'+(t.link?'Evidence link':'Add link')+'">'+(t.link?'🔗':'○')+'</span>';
-  } else {
-    html += '<span style="color:var(--text3);font-size:11px">—</span>';
-  }
-  html += '</div>';
-
+  h+='<div class="link-cell">';
+  if(editable||t.link)h+='<span class="link-icon'+(t.link?' has-link':'')+'" onclick="'+(editable?'openLink('+t.id+')':t.link?'window.open(\''+esc(t.link)+'\',\'_blank\')':'')+'" title="'+(t.link?'Evidence link':'Add link')+'">'+(t.link?'🔗':'○')+'</span>';
+  else h+='<span style="color:var(--text3);font-size:11px">—</span>';
+  h+='</div>';
   // flag
-  html += '<div style="display:flex;align-items:center;justify-content:center">';
-  html += '<button class="flag-btn'+(t.flagged?' on':'')+'" onclick="toggleFlag('+t.id+')" title="'+(t.flagged?'Remove flag':'Flag for review')+'">🚩</button>';
-  html += '</div>';
-
+  h+='<div style="display:flex;align-items:center;justify-content:center"><button class="flag-btn'+(t.flagged?' on':'')+'" onclick="toggleFlag('+t.id+')" title="'+(t.flagged?'Remove flag':'Flag for review')+'">🚩</button></div>';
   // actions
-  html += '<div class="racts">';
-  if(editable) html += '<button class="ract" onclick="openEditTask('+t.id+')">Edit</button>';
-  html += '<button class="ract" onclick="openAddTask(\''+secId+'\','+t.id+')">+Sub</button>';
-  if(editable){ html += '<button class="ract" onclick="moveUp('+t.id+')">↑</button><button class="ract" onclick="moveDown('+t.id+')">↓</button>'; }
-  if(isAdmin) html += '<button class="ract del" onclick="delTask('+t.id+')">✕</button>';
-  html += '</div>';
-
-  html += '</div>'; // end t-row
-  return html;
+  h+='<div class="racts">';
+  if(editable)h+='<button class="ract" onclick="openEditTask('+t.id+')">Edit</button>';
+  h+='<button class="ract" onclick="openAddTask(\''+secId+'\','+t.id+')">+Sub</button>';
+  if(editable){h+='<button class="ract" onclick="moveUp('+t.id+')">↑</button><button class="ract" onclick="moveDown('+t.id+')">↓</button>';}
+  if(isAdmin)h+='<button class="ract del" onclick="delTask('+t.id+')">✕</button>';
+  h+='</div>';
+  h+='</div>';
+  return h;
 }
 
+// ── RENDER ────────────────────────────────────────────────────────────────────
 function render(){
   updateMetrics();updateOwnerSel();
   const filtered=getFiltered();
@@ -945,7 +937,6 @@ function render(){
     const done=allSec.filter(t=>t.status==='completed').length;
     const pct=allSec.length?Math.round(done/allSec.length*100):0;
     const isOpen=sectionOpen[sec.id]!==false;
-
     const parents=allSec.filter(t=>!t.parent);
     let ordered=[];
     parents.forEach(function(p){
@@ -958,10 +949,8 @@ function render(){
     html+='<div class="section">';
     html+='<div class="sec-hdr">';
     html+='<span class="sec-num">'+sec.num+'</span>';
-    html+='<div class="sec-title-area">';
-    html+='<span class="sec-title" id="sec-te-'+sec.id+'" onclick="'+(isAdmin?'startSecRename(\''+sec.id+'\')':'void(0)')+'" title="'+(isAdmin?'Click to rename':'')+'">'+esc(sec.title)+'</span>';
-    html+='<div class="sec-pbar-wrap"><div class="sec-pbar'+(pct===100?' full':'')+'" style="width:'+pct+'%"></div></div>';
-    html+='</div>';
+    html+='<div class="sec-title-area"><span class="sec-title" id="sec-te-'+sec.id+'" onclick="'+(isAdmin?'startSecRename(\''+sec.id+'\')':'void(0)')+'" title="'+(isAdmin?'Click to rename':'')+'">'+esc(sec.title)+'</span>';
+    html+='<div class="sec-pbar-wrap"><div class="sec-pbar'+(pct===100?' full':'')+'" style="width:'+pct+'%"></div></div></div>';
     html+='<span class="sec-meta">'+done+'/'+allSec.length+' &nbsp;'+pct+'%</span>';
     if(isAdmin){
       html+='<div class="sec-acts">';
@@ -973,192 +962,130 @@ function render(){
     }
     html+='<span class="sec-chev'+(isOpen?' open':'')+'" id="chev-'+sec.id+'" onclick="toggleSection(\''+sec.id+'\')">▶</span>';
     html+='</div>';
-
     html+='<div class="tlist'+(isOpen?' open':'')+'" id="tlist-'+sec.id+'">';
     if(display.length){
       html+='<div class="t-head"><span></span><span></span><span class="th">#</span><span class="th">Task</span><span class="th">Owner</span><span class="th">Start</span><span class="th">Due</span><span class="th">Status</span><span class="th">Priority</span><span class="th">Note</span><span class="th" title="Evidence">🔗</span><span class="th">🚩</span><span class="th">Actions</span></div>';
       display.forEach(function(t){
         const isSub=!!t.parent;
         const hasKids=tasks.some(c=>c.parent!==null&&c.parent!==undefined&&Number(c.parent)===Number(t.id));
-        if(hasKids&&!isSub){
-          html+=buildParentRow(t,sec.id);
-        } else if(isSub){
+        if(hasKids&&!isSub){html+=buildParentRow(t,sec.id);}
+        else if(isSub){
           const siblings=tasks.filter(z=>Number(z.parent)===Number(t.parent));
-          const seqNum=siblings.indexOf(t)+1;
-          html+=buildSubtaskRow(t,sec.id,seqNum);
-        } else {
-          // standalone task (no parent, no kids) — render as subtask row without dot
-          html+=buildSubtaskRow(t,sec.id,0);
-        }
+          html+=buildSubtaskRow(t,sec.id,siblings.indexOf(t)+1);
+        }else{html+=buildSubtaskRow(t,sec.id,0);}
       });
-    } else {
-      html+='<div style="padding:10px 14px;font-size:12px;color:var(--text3)">No tasks match filters</div>';
-    }
-    html+='</div>'; // tlist
-    html+='</div>'; // section
+    }else{html+='<div style="padding:10px 14px;font-size:12px;color:var(--text3)">No tasks match filters</div>';}
+    html+='</div></div>';
   });
-
   document.getElementById('main-body').innerHTML=html||'<div style="text-align:center;padding:2rem;color:var(--text2);font-size:13px">No tasks match your filters.</div>';
 }
 
-function toggleSection(id){sectionOpen[id]=!sectionOpen[id];const el=document.getElementById('tlist-'+id);if(el)el.classList.toggle('open',sectionOpen[id]);const ch=document.getElementById('chev-'+id);if(ch)ch.classList.toggle('open',sectionOpen[id]);}
+function toggleSection(id){sectionOpen[id]=!sectionOpen[id];document.getElementById('tlist-'+id)?.classList.toggle('open',sectionOpen[id]);document.getElementById('chev-'+id)?.classList.toggle('open',sectionOpen[id]);}
 function collapseAll(){SECTIONS.forEach(s=>sectionOpen[s.id]=false);render();}
 function expandAll(){SECTIONS.forEach(s=>sectionOpen[s.id]=true);render();}
 
+// ── EXCEL EXPORT ──────────────────────────────────────────────────────────────
 async function exportExcel(){
-  toast('Fetching latest data…');
-  const PRIO_LBL={'critical-must':'Must Have',should:'Should Have',good:'Good to Have',nice:'Nice to Have'};
-  const STAT_LBL={'not-started':'Not Started','in-progress':'In Progress',delayed:'Delayed',blocked:'Blocked',completed:'Completed'};
-
-  let exportTasks=tasks, exportSections=SECTIONS;
+  toast('Fetching latest data from Firebase…');
+  let exportTasks=tasks,exportSections=SECTIONS,exportLog=activityLog;
   try{
-    const snap=await db.collection('checklist').doc('state_v4').get();
-    if(snap.exists){
-      const d=snap.data();
-      if(d&&Array.isArray(d.tasks)&&d.tasks.length>0){
-        exportTasks=d.tasks;
-        if(d.sections&&d.sections.length>0) exportSections=d.sections;
-      }
-    }
+    const [snap,logSnap]=await Promise.all([
+      db.collection('checklist').doc('state_v5').get(),
+      db.collection('checklist').doc('activity_log').get()
+    ]);
+    if(snap.exists){const d=snap.data();if(d&&Array.isArray(d.tasks)&&d.tasks.length>0){exportTasks=d.tasks;if(d.sections&&d.sections.length>0)exportSections=d.sections;}}
+    if(logSnap.exists){const ld=logSnap.data();if(ld&&Array.isArray(ld.log))exportLog=ld.log;}
   }catch(e){console.error('Export fetch:',e);}
 
   const secMap={};exportSections.forEach(s=>secMap[s.id]=s.title);
   const idMap={};exportTasks.forEach(t=>idMap[t.id]=t);
   const total=exportTasks.length;
   const done=exportTasks.filter(t=>t.status==='completed').length;
-
-  // Build workbook data
   const wb={SheetNames:[],Sheets:{}};
 
-  // ── SHEET 1: Dashboard ────────────────────────────────────────────────────
+  // Dashboard
   const dash=[];
-  dash.push(['GA Launch Checklist — Dashboard','','','','','']);
-  dash.push(['Target launch: June 30, 2026','','','','','']);
+  dash.push(['GA Launch Checklist — Dashboard']);
+  dash.push(['Target launch: June 30, 2026']);
   dash.push([]);
-  dash.push(['OVERALL PROGRESS','','','','','']);
-  dash.push(['Total Tasks','Completed','In Progress','Delayed','Blocked','Not Started']);
-  dash.push([
-    total,
-    exportTasks.filter(t=>t.status==='completed').length,
-    exportTasks.filter(t=>t.status==='in-progress').length,
-    exportTasks.filter(t=>t.status==='delayed').length,
-    exportTasks.filter(t=>t.status==='blocked').length,
-    exportTasks.filter(t=>t.status==='not-started').length
-  ]);
-  dash.push(['% Complete',total?Math.round(done/total*100)+'%':'0%','','','','']);
+  dash.push(['Total','Completed','In Progress','Delayed','Blocked','Not Started','% Done']);
+  dash.push([total,done,exportTasks.filter(t=>t.status==='in-progress').length,exportTasks.filter(t=>t.status==='delayed').length,exportTasks.filter(t=>t.status==='blocked').length,exportTasks.filter(t=>t.status==='not-started').length,total?Math.round(done/total*100)+'%':'0%']);
   dash.push([]);
-  dash.push(['PRIORITY BREAKDOWN','','','','','']);
-  dash.push(['Priority','Count','','','','']);
-  ['critical-must','should','good','nice'].forEach(p=>{
-    dash.push([PRIO_LBL[p]||p, exportTasks.filter(t=>t.priority===p).length,'','','','']);
-  });
+  dash.push(['Priority Breakdown']);
+  dash.push(['Priority','Count']);
+  Object.entries(PRIO_LBL).forEach(([k,v])=>dash.push([v,exportTasks.filter(t=>t.priority===k).length]));
   dash.push([]);
-  dash.push(['SECTION BREAKDOWN','','','','','','','','']);
-  dash.push(['#','Section','Total','Completed','In Progress','Delayed','Blocked','Not Started','% Done']);
+  dash.push(['Section Breakdown']);
+  dash.push(['#','Section','Total','Done','In Progress','Delayed','Blocked','Not Started','% Done']);
   exportSections.forEach(sec=>{
     const st=exportTasks.filter(t=>t.section===sec.id);
     const sd=st.filter(t=>t.status==='completed').length;
-    dash.push([
-      sec.num, sec.title, st.length, sd,
-      st.filter(t=>t.status==='in-progress').length,
-      st.filter(t=>t.status==='delayed').length,
-      st.filter(t=>t.status==='blocked').length,
-      st.filter(t=>t.status==='not-started').length,
-      st.length?Math.round(sd/st.length*100)+'%':'0%'
-    ]);
+    dash.push([sec.num,sec.title,st.length,sd,st.filter(t=>t.status==='in-progress').length,st.filter(t=>t.status==='delayed').length,st.filter(t=>t.status==='blocked').length,st.filter(t=>t.status==='not-started').length,st.length?Math.round(sd/st.length*100)+'%':'0%']);
   });
   wb.SheetNames.push('Dashboard');
   wb.Sheets['Dashboard']=XLSX.utils.aoa_to_sheet(dash);
-  wb.Sheets['Dashboard']['!cols']=[{wch:30},{wch:10},{wch:12},{wch:12},{wch:12},{wch:14},{wch:12},{wch:14},{wch:8}];
+  wb.Sheets['Dashboard']['!cols']=[{wch:20},{wch:35},{wch:8},{wch:10},{wch:12},{wch:10},{wch:10},{wch:14},{wch:8}];
 
-  // ── SHEET 2: All Tasks ────────────────────────────────────────────────────
-  const allRows=[['ID','Section','Parent Task','Task Name','Owner','Start Date','Due Date','Priority','Status','Note','Link','Flagged']];
+  // All Tasks
+  const allRows=[['ID','Section','Parent Task','Task Name','Owner','Start','Due','Priority','Status','Note','Link','Flagged']];
   exportTasks.forEach(t=>{
     const parent=t.parent?idMap[t.parent]:null;
-    allRows.push([
-      t.id,
-      secMap[t.section]||t.section,
-      parent?parent.name:'',
-      t.name,
-      t.owner||'',
-      t.start||'',
-      t.due||'',
-      PRIO_LBL[t.priority]||t.priority,
-      STAT_LBL[t.status]||t.status,
-      t.note||'',
-      t.link||'',
-      t.flagged?'Yes':'No'
-    ]);
+    allRows.push([t.id,secMap[t.section]||t.section,parent?parent.name:'',t.name,t.owner||'',t.start||'',t.due||'',PRIO_LBL[t.priority]||t.priority,STATUS_LBL[t.status]||t.status,t.note||'',t.link||'',t.flagged?'Yes':'No']);
   });
   wb.SheetNames.push('All Tasks');
   wb.Sheets['All Tasks']=XLSX.utils.aoa_to_sheet(allRows);
-  wb.Sheets['All Tasks']['!cols']=[
-    {wch:5},{wch:28},{wch:28},{wch:50},{wch:18},{wch:10},{wch:10},{wch:14},{wch:12},{wch:35},{wch:25},{wch:8}
-  ];
+  wb.Sheets['All Tasks']['!cols']=[{wch:5},{wch:28},{wch:28},{wch:50},{wch:18},{wch:10},{wch:10},{wch:14},{wch:12},{wch:35},{wch:25},{wch:8}];
 
-  // ── SHEET PER SECTION ─────────────────────────────────────────────────────
+  // Per-section sheets
   exportSections.forEach(sec=>{
     const secTasks=exportTasks.filter(t=>t.section===sec.id);
     if(!secTasks.length)return;
     const secDone=secTasks.filter(t=>t.status==='completed').length;
-    const secPct=secTasks.length?Math.round(secDone/secTasks.length*100):0;
     const rows=[];
-    rows.push([sec.num+'. '+sec.title,'','','','','','','','']);
-    rows.push([secDone+'/'+secTasks.length+' tasks completed · '+secPct+'% done','','','','','','','','']);
+    rows.push([sec.num+'. '+sec.title]);
+    rows.push([secDone+'/'+secTasks.length+' tasks · '+Math.round(secDone/secTasks.length*100)+'% done']);
     rows.push(['Task','Owner','Start','Due','Priority','Status','Note','Link','Flagged']);
-
-    const parents=secTasks.filter(t=>!t.parent);
-    parents.forEach(p=>{
+    secTasks.filter(t=>!t.parent).forEach(p=>{
       const kids=secTasks.filter(c=>Number(c.parent)===Number(p.id));
       if(kids.length){
-        const kDone=kids.filter(k=>k.status==='completed').length;
-        rows.push(['▶ '+p.name+' ('+kDone+'/'+kids.length+' · '+Math.round(kDone/kids.length*100)+'%)','','','','','','','','']);
-        kids.forEach((k,i)=>{
-          rows.push([
-            '   '+(i+1)+'. '+k.name,
-            k.owner||'', k.start||'', k.due||'',
-            PRIO_LBL[k.priority]||k.priority,
-            STAT_LBL[k.status]||k.status,
-            k.note||'', k.link||'',
-            k.flagged?'Yes':''
-          ]);
-        });
+        const kd=kids.filter(k=>k.status==='completed').length;
+        rows.push(['▶ '+p.name+' ('+kd+'/'+kids.length+' · '+Math.round(kd/kids.length*100)+'%)']);
+        kids.forEach((k,i)=>rows.push(['   '+(i+1)+'. '+k.name,k.owner||'',k.start||'',k.due||'',PRIO_LBL[k.priority]||k.priority,STATUS_LBL[k.status]||k.status,k.note||'',k.link||'',k.flagged?'Yes':'']));
         rows.push([]);
-      } else {
-        rows.push([
-          p.name, p.owner||'', p.start||'', p.due||'',
-          PRIO_LBL[p.priority]||p.priority,
-          STAT_LBL[p.status]||p.status,
-          p.note||'', p.link||'',
-          p.flagged?'Yes':''
-        ]);
-      }
+      }else{rows.push([p.name,p.owner||'',p.start||'',p.due||'',PRIO_LBL[p.priority]||p.priority,STATUS_LBL[p.status]||p.status,p.note||'',p.link||'',p.flagged?'Yes':'']);}
     });
-
-    // sheet name max 31 chars
     let sName=sec.title.length>28?sec.title.substring(0,28)+'...':sec.title;
-    // ensure unique
-    if(wb.SheetNames.includes(sName)) sName=sName.substring(0,25)+'_'+sec.num;
+    if(wb.SheetNames.includes(sName))sName=sName.substring(0,24)+'_'+sec.num;
     wb.SheetNames.push(sName);
     const ws=XLSX.utils.aoa_to_sheet(rows);
     ws['!cols']=[{wch:50},{wch:16},{wch:10},{wch:10},{wch:14},{wch:12},{wch:35},{wch:22},{wch:6}];
     wb.Sheets[sName]=ws;
   });
 
-  // Download
+  // Activity Log sheet
+  const logRows=[['Date','Time','User','Email','Task','Field Changed','From','To']];
+  exportLog.forEach(function(e){
+    const dt=new Date(e.ts);
+    logRows.push([dt.toLocaleDateString('en-GB'),dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),e.user||'',e.email||'',e.taskName||'',e.field||'',e.from||'',e.to||'']);
+  });
+  wb.SheetNames.push('Activity Log');
+  wb.Sheets['Activity Log']=XLSX.utils.aoa_to_sheet(logRows);
+  wb.Sheets['Activity Log']['!cols']=[{wch:12},{wch:8},{wch:16},{wch:28},{wch:40},{wch:14},{wch:25},{wch:25}];
+
   const wbout=XLSX.write(wb,{bookType:'xlsx',type:'binary'});
   const buf=new ArrayBuffer(wbout.length);
   const view=new Uint8Array(buf);
-  for(let i=0;i<wbout.length;i++) view[i]=wbout.charCodeAt(i)&0xff;
-  const blob=new Blob([buf],{type:'application/octet-stream'});
+  for(let i=0;i<wbout.length;i++)view[i]=wbout.charCodeAt(i)&0xff;
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
+  a.href=URL.createObjectURL(new Blob([buf],{type:'application/octet-stream'}));
   a.download='GA_Checklist_'+new Date().toISOString().slice(0,10)+'.xlsx';
   a.click();
   toast('Excel exported — '+exportTasks.length+' tasks ✓');
+  closeM('activity-modal');
 }
 
-function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2500);}
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2800);}
 </script>
 </body>
 </html>
