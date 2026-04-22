@@ -425,6 +425,7 @@ const PRIO_RANK={'critical-must':4,should:3,good:2,nice:1};
 const STATUS_RANK={blocked:5,delayed:4,'in-progress':3,'not-started':2,completed:1};
 
 let tasks=[],SECTIONS=[],users={},activityLog=[],sectionOpen={};
+let _mappedOwner=''; // cached at login, stable across data reloads
 let currentUser=null,currentEmail=null,isAdmin=false;
 let editingTaskId=null,noteTaskId=null,linkTaskId=null,mergingSecId=null,deletingSecId=null;
 let showFlaggedOnly=false,dragId=null,saveTimer=null;
@@ -572,7 +573,7 @@ async function doLogin(){
 
   // Admin login — gets GitHub token access
   if(pass===ADMIN_PASS){
-    isAdmin=true;currentEmail=email;currentUser='Admin';
+    isAdmin=true;currentEmail=email;currentUser='Admin';_mappedOwner='';
     GH_TOKEN='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';
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app').style.display='block';
@@ -612,6 +613,7 @@ async function doLogin(){
   // Valid — set token so they can save changes
   GH_TOKEN='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';
   isAdmin=false;currentEmail=email;currentUser=u.mappedOwner||email;
+  _mappedOwner=u.mappedOwner||''; // cache this — stays valid even after data reload
   u.lastSeen=new Date().toLocaleString();
   const mapped=u.mappedOwner;
   const badge=document.getElementById('user-badge');
@@ -628,8 +630,9 @@ document.getElementById('login-pass').addEventListener('keydown',e=>{if(e.key===
 
 function canEdit(task){
   if(isAdmin)return true;
-  const u=users[currentEmail]||{};
-  const m=(u.mappedOwner||'').toLowerCase().trim();
+  // Use _mappedOwner cached at login — don't rely on users object
+  // which may change after polling
+  const m=(_mappedOwner||'').toLowerCase().trim();
   if(!m)return false;
   const owner=(task.owner||'').toLowerCase().trim();
   return owner===m||owner.includes(m)||m.includes(owner);
@@ -724,6 +727,7 @@ function setUserPassword(email,val){
 function mapUser(email,val){
   if(!users[email])users[email]={email,password:'',mappedOwner:'',lastSeen:''};
   users[email].mappedOwner=val;
+  if(email===currentEmail){_mappedOwner=val;} // update live if mapping yourself
   save();openUsers();toast(email+' → '+(val||'no access')+' ✓');
 }
 
