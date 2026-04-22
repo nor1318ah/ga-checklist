@@ -835,7 +835,7 @@ function openUsers(){
       owners.forEach(o=>{
         ownerOpts+='<option value="'+esc(o)+'"'+(info.mappedOwner===o?' selected':'')+'>'+esc(o)+'</option>';
       });
-      const ownerCell='<select onchange="mapUser(\''+esc(email)+'\'\',this.value)" '
+      const safeEmail=email.replace(/'/g,"\'");const ownerCell='<select onchange="mapUser(\"'+safeEmail+'\",this.value)" '
         +'style="width:100%;padding:5px 8px;border:'+(hasMapped?'0.5px solid var(--border2)':'2px solid var(--red)')+';border-radius:var(--r);font-size:12px;background:'+(hasMapped?'var(--bg)':'#fff0f0')+'">'
         +ownerOpts+'</select>';
       
@@ -852,7 +852,7 @@ function openUsers(){
         +'<td style="padding:10px 8px">'+pwCell+'</td>'
         +'<td style="padding:10px 8px;min-width:180px">'+ownerCell+'</td>'
         +'<td style="padding:10px 8px">'+accessCell+'</td>'
-        +'<td style="padding:10px 8px"><button onclick="removeUser(\''+esc(email)+'\')" style="background:var(--red-lt);color:var(--red-txt);border:0.5px solid var(--red);border-radius:var(--r);padding:3px 8px;font-size:11px;cursor:pointer">Remove</button></td>'
+        +'<td style="padding:10px 8px"><button onclick="removeUser(\"'+email+'\")" style="background:var(--red-lt);color:var(--red-txt);border:0.5px solid var(--red);border-radius:var(--r);padding:3px 8px;font-size:11px;cursor:pointer">Remove</button></td>'
         +'</tr>';
     });
   }
