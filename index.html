@@ -555,65 +555,67 @@ function logChange(taskId,taskName,field,oldVal,newVal){
 function showLoading(v){document.getElementById('loading-bar').style.display=v?'block':'none';}
 
 async function ghGet(){
-  const branches=[GH_BRANCH,'main','gh-pages','master'];
-  const headers={'Accept':'application/vnd.github.v3+json'};
-  if(GH_TOKEN)headers['Authorization']='token '+GH_TOKEN;
-  for(const branch of branches){
-    const url='https://api.github.com/repos/'+GH_REPO+'/contents/'+GH_FILE+'?ref='+branch+'&t='+Date.now();
-    try{
+  // Try GitHub first
+  try{
+    const headers={'Accept':'application/vnd.github.v3+json','Authorization':'token '+GH_TOKEN};
+    for(const branch of [GH_BRANCH,'main','gh-pages','master']){
+      const url='https://api.github.com/repos/'+GH_REPO+'/contents/'+GH_FILE+'?ref='+branch+'&t='+Date.now();
       const r=await fetch(url,{headers});
-      if(r.status===404)continue;
       if(!r.ok)continue;
       const meta=await r.json();
-      GH_SHA=meta.sha;
-      GH_BRANCH=branch; // remember working branch
+      GH_SHA=meta.sha;GH_BRANCH=branch;
       const decoded=atob(meta.content.replace(/\n/g,''));
       return JSON.parse(decoded);
-    }catch(e){continue;}
-  }
-  return null; // file not found on any branch
+    }
+  }catch(e){console.warn('GitHub read failed, using localStorage:',e);}
+  // Fallback: localStorage
+  try{
+    const ls=localStorage.getItem(LS_KEY);
+    if(ls)return JSON.parse(ls);
+  }catch(e){}
+  return null;
 }
+
 
 async function ghPut(data){
-  if(!GH_TOKEN){console.warn('No token');toast('⚠ Not saved — no token');return;}
-  const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(data,null,2))));
-  const tryBranch=async(branch,sha)=>{
-    const body={message:'GA Checklist update',content:encoded,branch};
-    if(sha)body.sha=sha;
-    const r=await fetch('https://api.github.com/repos/'+GH_REPO+'/contents/'+GH_FILE,{
-      method:'PUT',
-      headers:{'Authorization':'token '+GH_TOKEN,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
-      body:JSON.stringify(body)
-    });
-    return r;
-  };
+  // PRIMARY: save to localStorage immediately (always works)
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify(data));
+  }catch(e){console.warn('localStorage save failed:',e);}
 
-  // First try with current SHA and branch
-  let r=await tryBranch(GH_BRANCH, GH_SHA);
-
-  // If 409/422 (SHA conflict), fetch fresh SHA and retry
-  if(r.status===409||r.status===422){
-    console.warn('SHA conflict - fetching fresh SHA');
-    const fresh=await ghGet();
-    r=await tryBranch(GH_BRANCH, GH_SHA);
-  }
-
-  // If branch not found, try alternatives
-  if(r.status===404||r.status===422){
-    for(const b of ['main','gh-pages','master']){
-      if(b===GH_BRANCH)continue;
-      r=await tryBranch(b,'');
-      if(r.ok){GH_BRANCH=b;break;}
+  // SECONDARY: save to GitHub (async, best effort)
+  if(!GH_TOKEN)return;
+  try{
+    const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(data,null,2))));
+    // Try each branch
+    for(const branch of ['main','gh-pages','master']){
+      const body={message:'GA Checklist update '+new Date().toISOString(),content:encoded,branch};
+      if(GH_SHA)body.sha=GH_SHA;
+      const r=await fetch('https://api.github.com/repos/'+GH_REPO+'/contents/'+GH_FILE,{
+        method:'PUT',
+        headers:{'Authorization':'token '+GH_TOKEN,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
+        body:JSON.stringify(body)
+      });
+      if(r.status===409||r.status===422){
+        // SHA conflict — get fresh SHA
+        const meta=await fetch('https://api.github.com/repos/'+GH_REPO+'/contents/'+GH_FILE+'?ref='+branch,{
+          headers:{'Authorization':'token '+GH_TOKEN,'Accept':'application/vnd.github.v3+json'}
+        });
+        if(meta.ok){const m=await meta.json();GH_SHA=m.sha;GH_BRANCH=branch;body.sha=GH_SHA;
+          const r2=await fetch('https://api.github.com/repos/'+GH_REPO+'/contents/'+GH_FILE,{method:'PUT',headers:{'Authorization':'token '+GH_TOKEN,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},body:JSON.stringify(body)});
+          if(r2.ok){const res=await r2.json();if(res.content)GH_SHA=res.content.sha;GH_BRANCH=branch;return;}
+        }
+        continue;
+      }
+      if(!r.ok)continue;
+      const result=await r.json();
+      if(result.content)GH_SHA=result.content.sha;
+      GH_BRANCH=branch;
+      return;
     }
-  }
-
-  if(!r.ok){
-    const e=await r.json().catch(()=>({}));
-    throw new Error('Save failed '+r.status+': '+(e.message||JSON.stringify(e)));
-  }
-  const result=await r.json();
-  if(result.content)GH_SHA=result.content.sha;
+  }catch(e){console.warn('GitHub save failed (using localStorage):',e);}
 }
+
 
 async function loadData(){
   tasks=JSON.parse(JSON.stringify(DEF_TASKS));
@@ -649,14 +651,9 @@ async function loadData(){
 function save(){clearTimeout(saveTimer);saveTimer=setTimeout(saveNow,1500);}
 
 async function saveNow(){
-  try{
-    const data={version:DATA_VERSION,tasks,sections:SECTIONS,users,activityLog,updated:new Date().toISOString()};
-    await ghPut(data);
-    toast('Saved ✓');
-  }catch(e){
-    console.error('Save error:',e);
-    toast('⚠ Save failed: '+e.message);
-  }
+  const data={version:DATA_VERSION,tasks,sections:SECTIONS,users,activityLog,updated:new Date().toISOString()};
+  await ghPut(data);
+  toast('Saved ✓');
 }
 
 // Poll for changes every 30s (so other users see updates)
@@ -709,7 +706,6 @@ async function doLogin(){
   // Regular user
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='block';
-  GH_TOKEN='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';
   await loadData();
 
   const u=users[email];
@@ -725,11 +721,9 @@ async function doLogin(){
   if(u.password&&u.password!==pass){
     document.getElementById('login-screen').style.display='flex';
     document.getElementById('app').style.display='none';
-    GH_TOKEN='';
     err.textContent='Incorrect password.';err.style.display='block';return;
   }
 
-  // Valid user
   isAdmin=false;currentEmail=email;
   _mappedOwner=u.mappedOwner||'';
   currentUser=_mappedOwner||email;
