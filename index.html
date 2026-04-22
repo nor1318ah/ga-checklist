@@ -90,8 +90,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .tbtn:hover{background:rgba(255,255,255,.15)}
 .tbtn.pri{background:var(--lime);color:var(--dark);border-color:var(--lime);font-weight:700}
 .tbtn.grn{background:var(--blue);color:#fff;border-color:var(--blue)}
-.tbtn.pur{background:var(--purple);color:#fff;border-color:var(--purple)}
-.tbtn.amb{background:var(--amber);color:#fff;border-color:var(--amber)}
+.tbtn.pur{background:#2ABFB0;color:#0A1F1A;border-color:#2ABFB0;font-weight:700}
+.tbtn.amb{background:#8A6A00;color:#fff;border-color:#8A6A00;font-weight:700}
 .tbtn.amb:hover{background:var(--amber-txt)}
 /* DASHBOARD */
 .dashboard{display:grid;grid-template-columns:160px 1fr 1fr;background:var(--bg);border-bottom:0.5px solid var(--border);border-top:3px solid var(--lime)}
@@ -155,7 +155,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .t-head{display:grid;grid-template-columns:18px 13px 22px minmax(0,1fr) 100px 58px 62px 108px 82px minmax(0,110px) 28px 28px 28px 92px;gap:4px;padding:4px 14px;background:var(--bg2);border-bottom:0.5px solid var(--border)}
 .th{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.3px;font-weight:700;align-self:center}
 /* PARENT ROW — L2: just title + bar + count */
-.parent-row{display:flex;align-items:center;gap:10px;padding:9px 16px;border-bottom:0.5px solid var(--border);background:var(--bg2);min-height:40px;overflow:visible;border-left:3px solid var(--lime)}
+.parent-row{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:0.5px solid var(--border);background:var(--bg2);min-height:44px;border-left:3px solid var(--lime);overflow:hidden}
 .parent-row:hover{background:var(--bg3)}
 /* SUBTASK ROW */
 .t-row{display:grid;grid-template-columns:18px 13px 22px minmax(0,1fr) 100px 58px 62px 108px 82px minmax(0,110px) 28px 28px 28px 92px;gap:4px;align-items:start;padding:6px 14px;border-bottom:0.5px solid var(--border);transition:background .1s}
@@ -453,35 +453,56 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 </div>
 <!-- DELETE MAIN TASK MODAL -->
 <div class="overlay hidden" id="del-main-modal" onclick="if(event.target.id=='del-main-modal')closeM('del-main-modal')">
-  <div class="modal" style="width:min(500px,93vw)" onclick="event.stopPropagation()">
-    <h2>🗑 Delete main task</h2>
-    <p id="dmt-name" style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.4"></p>
-    <div class="warn-box">This task has <strong id="dmt-count">0</strong> subtask(s). What should happen to them?</div>
-    <div class="frow">
-      <label>Subtasks:</label>
-      <select class="finput" id="dmt-move-sel">
-        <option value="">— Delete all subtasks too —</option>
-      </select>
+  <div class="modal" style="width:min(520px,95vw)" onclick="event.stopPropagation()">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <h2>🗑 Delete main task</h2>
+      <button onclick="closeM('del-main-modal')" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text2);line-height:1;padding:4px 8px">✕</button>
+    </div>
+    <div style="background:var(--bg2);border-radius:var(--r);padding:10px 14px;margin-bottom:14px;border-left:3px solid var(--red)">
+      <p id="dmt-name" style="font-size:13px;font-weight:700;color:var(--text);line-height:1.4"></p>
+    </div>
+    <div class="warn-box" style="margin-bottom:16px">This task has <strong id="dmt-count">0</strong> subtask(s). Choose what to do with them:</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+      <label style="display:flex;align-items:center;gap:10px;padding:12px;border:1.5px solid var(--border);border-radius:var(--r);cursor:pointer;font-size:13px" onclick="selectDelOpt('delete')">
+        <input type="radio" name="dmt-opt" id="dmt-opt-delete" value="delete" checked style="accent-color:var(--red)">
+        <div><strong style="color:var(--red-txt)">Delete all subtasks</strong><div style="font-size:11px;color:var(--text2);margin-top:2px">Permanently removes this task and all its subtasks</div></div>
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;padding:12px;border:1.5px solid var(--border);border-radius:var(--r);cursor:pointer;font-size:13px" onclick="selectDelOpt('move')">
+        <input type="radio" name="dmt-opt" id="dmt-opt-move" value="move" style="accent-color:var(--blue)">
+        <div><strong style="color:var(--blue-txt)">Move subtasks to another main task</strong><div style="font-size:11px;color:var(--text2);margin-top:2px">Subtasks stay, only this main task is deleted</div></div>
+      </label>
+    </div>
+    <div id="dmt-move-wrap" style="display:none;margin-bottom:16px">
+      <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;display:block;margin-bottom:6px">Move subtasks to:</label>
+      <select class="finput" id="dmt-move-sel"></select>
     </div>
     <div class="mactions">
       <button class="tbtn" onclick="closeM('del-main-modal')">Cancel</button>
-      <button class="tbtn" onclick="confirmDelMain()" style="background:var(--red);color:#fff;border-color:var(--red)">Delete</button>
+      <button class="tbtn" onclick="confirmDelMain()" style="background:var(--red);color:#fff;border-color:var(--red);font-weight:700">Delete</button>
     </div>
   </div>
 </div>
 
 <!-- DEPENDENCY MODAL -->
 <div class="overlay hidden" id="dep-modal" onclick="if(event.target.id=='dep-modal')closeM('dep-modal')">
-  <div class="modal" style="width:min(560px,93vw)" onclick="event.stopPropagation()">
-    <h2>🔗 Dependencies</h2>
-    <p id="dep-task-name" style="font-size:12px;color:var(--text2);margin-bottom:14px;font-weight:600"></p>
-    <p style="font-size:12px;color:var(--text2);margin-bottom:10px">This task is blocked by / depends on:</p>
-    <div id="dep-current-list" style="margin-bottom:14px"></div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <select class="finput" id="dep-select" style="flex:1"></select>
-      <button class="tbtn pri" onclick="addDep()" style="flex-shrink:0">+ Link</button>
+  <div class="modal" style="width:min(600px,95vw)" onclick="event.stopPropagation()">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <h2>⛓ Dependencies</h2>
+      <button onclick="closeM('dep-modal')" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text2);line-height:1;padding:4px 8px">✕</button>
     </div>
-    <div class="mactions"><button class="tbtn" onclick="closeM('dep-modal')">Done</button></div>
+    <p id="dep-task-name" style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;padding:10px 12px;background:var(--bg2);border-radius:var(--r);border-left:3px solid var(--lime)"></p>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:10px;font-weight:600">This task depends on / is blocked by:</p>
+    <div id="dep-current-list" style="margin-bottom:16px;max-height:280px;overflow-y:auto"></div>
+    <div style="border-top:0.5px solid var(--border);padding-top:14px">
+      <p style="font-size:11px;color:var(--text2);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.4px">Link a blocking task:</p>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select class="finput" id="dep-select" style="flex:1"></select>
+        <button class="tbtn pri" onclick="addDep()" style="flex-shrink:0;height:36px;padding:0 16px">+ Link</button>
+      </div>
+    </div>
+    <div class="mactions" style="margin-top:14px">
+      <button class="tbtn" onclick="closeM('dep-modal')">Done</button>
+    </div>
   </div>
 </div>
 
@@ -878,29 +899,39 @@ function delTask(id){
 }
 
 let _delMainId=null;
+function selectDelOpt(opt){
+  document.getElementById('dmt-opt-'+opt).checked=true;
+  document.getElementById('dmt-move-wrap').style.display=opt==='move'?'block':'none';
+}
 function openDelMainTask(id){
   _delMainId=id;
   const t=tasks.find(z=>z.id===id);
   const kids=getChildren(id);
-  // populate move-to options (other main tasks in same section)
-  const otherMains=tasks.filter(z=>z.section===t.section&&!z.parent&&z.id!==id);
-  const opts=otherMains.map(m=>'<option value="'+m.id+'">'+esc(m.name.length>50?m.name.substring(0,50)+'…':m.name)+'</option>').join('');
-
   document.getElementById('dmt-name').textContent=t.name;
   document.getElementById('dmt-count').textContent=kids.length;
-  document.getElementById('dmt-move-sel').innerHTML='<option value="">— Delete all subtasks too —</option>'+opts;
+  document.getElementById('dmt-opt-delete').checked=true;
+  document.getElementById('dmt-move-wrap').style.display='none';
+  // Build grouped options for move target
+  let opts='<option value="">— Select a main task —</option>';
+  SECTIONS.forEach(function(sec){
+    const mains=tasks.filter(z=>z.section===sec.id&&!z.parent&&z.id!==id);
+    if(!mains.length)return;
+    opts+='<optgroup label="'+esc(sec.num)+'. '+esc(sec.title)+'">';
+    mains.forEach(m=>{opts+='<option value="'+m.id+'">'+esc(m.name.length>55?m.name.substring(0,55)+'…':m.name)+'</option>';});
+    opts+='</optgroup>';
+  });
+  document.getElementById('dmt-move-sel').innerHTML=opts;
   document.getElementById('del-main-modal').classList.remove('hidden');
 }
 function confirmDelMain(){
   const t=tasks.find(z=>z.id===_delMainId);if(!t)return;
-  const moveToId=document.getElementById('dmt-move-sel').value;
-  if(moveToId){
-    // Move subtasks to another main task
+  const opt=document.querySelector('input[name="dmt-opt"]:checked').value;
+  if(opt==='move'){
+    const moveToId=document.getElementById('dmt-move-sel').value;
+    if(!moveToId){toast('Please select a target task');return;}
     const newParent=Number(moveToId);
     tasks.forEach(z=>{if(Number(z.parent)===_delMainId)z.parent=newParent;});
-    toast('Subtasks moved ✓');
   }else{
-    // Delete subtasks too
     tasks=tasks.filter(z=>Number(z.parent)!==_delMainId);
   }
   logChange(_delMainId,t.name,'deleted',t.name,'—');
@@ -992,7 +1023,7 @@ function buildParentRow(t,secId){
   const pStatus=computedStatus(t);
   const flagCls=t.flagged?' flagged-row':'';
   let h='<div class="parent-row'+flagCls+'" id="tr-'+t.id+'">';
-  h+='<span '+(isAdmin?'id="ic-name-'+t.id+'" onclick="inlineEdit('+t.id+',\'name\')" style="cursor:pointer"':'')+' style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:100px;max-width:320px" title="'+esc(t.name)+'">'+esc(t.name)+'</span>';
+  h+='<span '+(isAdmin?'id="ic-name-'+t.id+'" onclick="inlineEdit('+t.id+',\'name\')" style="cursor:pointer"':'')+' style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:0 0 auto;max-width:min(300px,40%)" title="'+esc(t.name)+'">'+esc(t.name)+'</span>';
   h+='<div style="flex:1;height:6px;background:var(--border);border-radius:6px;overflow:hidden;margin:0 12px;min-width:60px"><div style="height:100%;width:'+kPct+'%;background:'+(kPct===100?'var(--green)':'var(--blue)')+';border-radius:6px;transition:width .4s"></div></div>';
   h+='<span style="font-size:11px;color:var(--text2);white-space:nowrap;flex-shrink:0">'+kDone+'/'+kids.length+' subtasks · '+kPct+'%</span>';
   h+='<span class="dsel '+pStatus+'" style="font-size:10px;font-weight:700;border-radius:8px;padding:2px 8px;flex-shrink:0;margin-left:8px;white-space:nowrap">'+STATUS_LBL[pStatus]+'</span>';
@@ -1177,19 +1208,27 @@ function openDeps(id){
 function renderDepList(t){
   const el=document.getElementById('dep-current-list');
   if(!t.deps||!t.deps.length){
-    el.innerHTML='<div style="font-size:12px;color:var(--text3);font-style:italic;padding:8px 0">No dependencies linked yet.</div>';
+    el.innerHTML='<div style="font-size:12px;color:var(--text3);font-style:italic;padding:12px;text-align:center;background:var(--bg2);border-radius:var(--r)">No dependencies linked yet.</div>';
     return;
   }
   el.innerHTML=t.deps.map(did=>{
     const dep=tasks.find(z=>z.id===did);
     if(!dep)return'';
-    const sc='dsel '+dep.status;
-    return '<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border:0.5px solid var(--border);border-radius:var(--r);margin-bottom:6px;background:var(--bg2)">'
-      +'<span style="font-size:18px">🔗</span>'
-      +'<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(dep.name)+'</div>'
-      +'<div style="font-size:10px;color:var(--text2)">Owner: '+esc(dep.owner||'—')+'</div></div>'
-      +'<span class="'+sc+'" style="font-size:10px;font-weight:700;border-radius:8px;padding:2px 8px;flex-shrink:0">'+STATUS_LBL[dep.status]+'</span>'
-      +'<button class="ract del" onclick="removeDep('+depTaskId+','+did+')" style="flex-shrink:0">✕</button>'
+    const sec=SECTIONS.find(s=>s.id===dep.section);
+    const parent=dep.parent?tasks.find(z=>z.id===dep.parent):null;
+    const notDone=dep.status!=='completed';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:0.5px solid var(--border);border-radius:var(--r);margin-bottom:8px;background:var(--bg);border-left:3px solid '+(notDone?'var(--amber)':'var(--green)')+'">'
+      +'<span style="font-size:16px;flex-shrink:0">'+(notDone?'⚠':'✓')+'</span>'
+      +'<div style="flex:1;min-width:0">'
+        +'<div style="font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)">'+esc(dep.name)+'</div>'
+        +'<div style="font-size:10px;color:var(--text2);margin-top:2px">'
+          +(sec?'<span style="background:var(--lime);color:var(--dark);padding:1px 6px;border-radius:4px;font-weight:700;font-size:9px;margin-right:6px">'+esc(sec.num)+'. '+esc(sec.title.length>20?sec.title.substring(0,20)+'…':sec.title)+'</span>':'')
+          +(parent?'<span style="color:var(--text3)">under '+esc(parent.name.length>25?parent.name.substring(0,25)+'…':parent.name)+'</span>':'')
+          +' Owner: '+esc(dep.owner||'—')
+        +'</div>'
+      +'</div>'
+      +'<span class="dsel '+dep.status+'" style="font-size:10px;font-weight:700;border-radius:8px;padding:2px 8px;flex-shrink:0;white-space:nowrap">'+STATUS_LBL[dep.status]+'</span>'
+      +'<button onclick="removeDep('+depTaskId+','+did+')" style="flex-shrink:0;background:var(--red-lt);color:var(--red-txt);border:0.5px solid var(--red);border-radius:var(--r);padding:4px 10px;font-size:11px;cursor:pointer;font-weight:600">Remove</button>'
       +'</div>';
   }).join('');
 }
