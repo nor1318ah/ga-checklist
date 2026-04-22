@@ -596,33 +596,36 @@ async function ghPut(data){
 
 async function loadData(){
   const preUsers = JSON.parse(JSON.stringify(users||{}));
+  // Start with fresh DEF_TASKS
   tasks    = JSON.parse(JSON.stringify(DEF_TASKS));
   SECTIONS = JSON.parse(JSON.stringify(DEF_SECTIONS));
   users    = {}; activityLog = [];
   showLoading(true);
   try{
     const d = await syncLoad();
-    if(d && d.version === DATA_VER){
-      if(Array.isArray(d.tasks) && d.tasks.length >= DEF_TASKS.length - 20){
-        tasks  = d.tasks;
-        if(d.sections && d.sections.length) SECTIONS = d.sections;
-        users  = d.users || {};
-        if(Array.isArray(d.activityLog)) activityLog = d.activityLog;
-        tasks.forEach(t=>{
-          if(!t.note)t.note=''; if(!t.link)t.link='';
-          if(t.flagged===undefined)t.flagged=false;
-          if(!t.deps)t.deps=[];
-          t.id=Number(t.id);
-          if(t.parent!=null)t.parent=Number(t.parent);
-        });
-      } else { await saveNow(); }
+    if(d && Array.isArray(d.tasks) && d.tasks.length >= DEF_TASKS.length - 20){
+      // Valid data found — use it regardless of version
+      tasks  = d.tasks;
+      if(d.sections && d.sections.length) SECTIONS = d.sections;
+      users  = d.users || {};
+      if(Array.isArray(d.activityLog)) activityLog = d.activityLog;
+      tasks.forEach(t=>{
+        if(!t.note)t.note=''; if(!t.link)t.link='';
+        if(t.flagged===undefined)t.flagged=false;
+        if(!t.deps)t.deps=[];
+        t.id=Number(t.id);
+        if(t.parent!=null)t.parent=Number(t.parent);
+      });
     } else {
-      // Version mismatch — reseed, but keep any users
-      if(d && d.users) users = d.users;
+      // No data or empty — save DEF_TASKS to Supabase + localStorage
+      console.log('No data found — seeding from DEF_TASKS');
+      if(d && d.users) users = d.users; // keep any existing users
       await saveNow();
     }
   }catch(e){
     console.error('loadData error:', e);
+    // On error, still use DEF_TASKS (already set above)
+    await saveNow();
   }
   // Always merge pre-existing in-memory users
   Object.keys(preUsers).forEach(k=>{ if(!users[k]) users[k]=preUsers[k]; });
