@@ -756,11 +756,20 @@ document.getElementById('login-pass').addEventListener('keydown',e=>{if(e.key===
 function canEdit(task){
   if(isAdmin)return true;
   const m=(_mappedOwner||'').toLowerCase().trim();
-  if(!m)return false;
-  const owner=(task.owner||'').toLowerCase().trim();
-  if(!owner)return false;
-  // Match: exact, or one contains the other (handles "Dr. Sadeen" vs "Sadeen" etc)
-  return owner===m||owner.includes(m)||m.includes(owner);
+  // If user has a mapped owner, match against task owner
+  if(m){
+    const owner=(task.owner||'').toLowerCase().trim();
+    if(!owner)return false;
+    return owner===m||owner.includes(m)||m.includes(owner);
+  }
+  // No mapped owner but logged in — allow editing tasks where owner
+  // matches the email username (e.g. halhaqbani@humain.com → "halhaqbani")
+  if(currentEmail){
+    const emailUser=currentEmail.split('@')[0].toLowerCase();
+    const owner=(task.owner||'').toLowerCase().trim();
+    if(owner&&(owner.includes(emailUser)||emailUser.includes(owner)))return true;
+  }
+  return false;
 }
 
 // ACTIVITY
@@ -824,10 +833,10 @@ function addUser(){
   const email=document.getElementById('new-user-email').value.trim().toLowerCase();
   const pass=document.getElementById('new-user-pass').value.trim();
   const owner=document.getElementById('new-user-owner').value;
-  if(!email||!email.includes('@')){toast('Enter a valid email');return;}
-  if(!pass){toast('Set a password for this user');return;}
-  if(!owner){toast('Select an owner to map to');return;}
-  if(users[email]){toast('User already exists — edit below');return;}
+  if(!email||!email.includes('@')){toast('⚠ Enter a valid email');return;}
+  if(!pass){toast('⚠ Set a password for this user');return;}
+  if(!owner){toast('⚠ You must select an owner — this gives the user edit access');return;}
+  if(users[email]){toast('User already exists — update below');return;}
   users[email]={email,password:pass,mappedOwner:owner,lastSeen:''};
   document.getElementById('new-user-email').value='';
   document.getElementById('new-user-pass').value='';
@@ -918,7 +927,7 @@ function openDelMainTask(id){
   document.getElementById('dmt-opt-delete').checked=true;
   document.getElementById('dmt-move-wrap').style.display='none';
   // Build grouped options for move target
-  let opts='<option value="">— Select a main task —</option>';
+  let opts='<option value="__section__">Keep in same section (no parent)</option>';
   SECTIONS.forEach(function(sec){
     const mains=tasks.filter(z=>z.section===sec.id&&!z.parent&&z.id!==id);
     if(!mains.length)return;
@@ -934,9 +943,14 @@ function confirmDelMain(){
   const opt=document.querySelector('input[name="dmt-opt"]:checked').value;
   if(opt==='move'){
     const moveToId=document.getElementById('dmt-move-sel').value;
-    if(!moveToId){toast('Please select a target task');return;}
-    const newParent=Number(moveToId);
-    tasks.forEach(z=>{if(Number(z.parent)===_delMainId)z.parent=newParent;});
+    if(!moveToId){toast('Please select an option');return;}
+    if(moveToId==='__section__'){
+      // Keep subtasks in same section but remove parent
+      tasks.forEach(z=>{if(Number(z.parent)===_delMainId)z.parent=null;});
+    }else{
+      const newParent=Number(moveToId);
+      tasks.forEach(z=>{if(Number(z.parent)===_delMainId)z.parent=newParent;});
+    }
   }else{
     tasks=tasks.filter(z=>Number(z.parent)!==_delMainId);
   }
