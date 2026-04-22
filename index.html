@@ -155,7 +155,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .t-head{display:grid;grid-template-columns:18px 13px 22px minmax(0,1fr) 100px 58px 62px 108px 82px minmax(0,110px) 28px 28px 28px 92px;gap:4px;padding:4px 14px;background:var(--bg2);border-bottom:0.5px solid var(--border)}
 .th{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.3px;font-weight:700;align-self:center}
 /* PARENT ROW — L2: just title + bar + count */
-.parent-row{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:0.5px solid var(--border);background:var(--bg2);min-height:44px;border-left:3px solid var(--lime);overflow:hidden}
+.parent-row{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:0.5px solid var(--border);background:var(--bg2);min-height:44px;border-left:3px solid var(--lime)}
 .parent-row:hover{background:var(--bg3)}
 /* SUBTASK ROW */
 .t-row{display:grid;grid-template-columns:18px 13px 22px minmax(0,1fr) 100px 58px 62px 108px 82px minmax(0,110px) 28px 28px 28px 92px;gap:4px;align-items:start;padding:6px 14px;border-bottom:0.5px solid var(--border);transition:background .1s}
@@ -209,7 +209,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 /* MODALS */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:200}
 .modal{background:var(--bg);border-radius:var(--rl);border:0.5px solid var(--border2);padding:1.5rem;width:min(540px,93vw);max-height:92vh;overflow-y:auto}
-.modal h2{font-size:15px;font-weight:700;margin-bottom:1rem}
+.modal h2{font-size:15px;font-weight:700}
 .frow{margin-bottom:11px}
 .frow label{font-size:11px;color:var(--text2);display:block;margin-bottom:4px;font-weight:600}
 .finput{width:100%;font-size:13px;padding:7px 10px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--text)}
@@ -339,7 +339,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 <!-- TASK MODAL -->
 <div class="overlay hidden" id="task-modal" onclick="if(event.target.id=='task-modal')closeM('task-modal')">
   <div class="modal" onclick="event.stopPropagation()">
-    <h2 id="task-modal-title">Add task</h2>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <h2 id="task-modal-title">Add task</h2>
+      <button onclick="closeM('task-modal')" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text2);line-height:1;padding:2px 6px;font-weight:300">✕</button>
+    </div>
     <div class="frow"><label>Task name *</label><input class="finput" id="f-name" type="text"></div>
     <div class="fgrid">
       <div><label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px;font-weight:600">Section *</label><select class="finput" id="f-section" onchange="refreshParents()"></select></div>
@@ -370,7 +373,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 <!-- NOTE MODAL -->
 <div class="overlay hidden" id="note-modal" onclick="if(event.target.id=='note-modal')closeM('note-modal')">
   <div class="modal" style="width:min(460px,93vw)" onclick="event.stopPropagation()">
-    <h2>📝 Note</h2>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <h2>📝 Note</h2>
+      <button onclick="closeM('note-modal')" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text2);line-height:1;padding:2px 6px;font-weight:300">✕</button>
+    </div>
     <p id="note-task-name" style="font-size:12px;color:var(--text2);margin-bottom:12px"></p>
     <div class="frow"><label>Note / update</label><textarea class="finput" id="note-ta" rows="5" style="resize:vertical;font-family:inherit;font-size:13px"></textarea></div>
     <div class="mactions"><button class="tbtn" onclick="closeM('note-modal')">Cancel</button><button class="tbtn pri" onclick="saveNote()">Save</button></div>
@@ -379,7 +385,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 <!-- LINK MODAL -->
 <div class="overlay hidden" id="link-modal" onclick="if(event.target.id=='link-modal')closeM('link-modal')">
   <div class="modal" style="width:min(460px,93vw)" onclick="event.stopPropagation()">
-    <h2>🔗 Evidence link</h2>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <h2>🔗 Evidence link</h2>
+      <button onclick="closeM('link-modal')" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text2);line-height:1;padding:2px 6px;font-weight:300">✕</button>
+    </div>
     <p id="link-task-name" style="font-size:12px;color:var(--text2);margin-bottom:12px"></p>
     <div class="frow"><label>URL</label><input class="finput" id="link-inp" type="url" placeholder="https://…"></div>
     <div id="link-preview" style="display:none;margin-bottom:10px"><a id="link-href" href="#" target="_blank" style="font-size:12px;color:var(--blue)">Open link ↗</a></div>
@@ -415,7 +424,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 <!-- USERS MODAL -->
 <div class="overlay hidden" id="users-modal" onclick="if(event.target.id=='users-modal')closeM('users-modal')">
   <div class="modal" style="width:min(860px,95vw)" onclick="event.stopPropagation()">
-    <h2>👥 User management</h2>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <h2>👥 User management</h2>
+      <button onclick="closeM('users-modal')" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text2);line-height:1;padding:2px 6px;font-weight:300">✕</button>
+    </div>
     <p style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6">
       Add users below. Set their email, password, and map them to a task owner. They sign in with email + password and automatically get access to their tasks.
     </p>
@@ -1121,7 +1133,12 @@ function render(){
         const hasKids=tasks.some(c=>c.parent!=null&&Number(c.parent)===Number(t.id));
         if(hasKids&&!isSub){html+=buildParentRow(t,sec.id);}
         else if(isSub){const siblings=tasks.filter(z=>Number(z.parent)===Number(t.parent));html+=buildSubtaskRow(t,sec.id,siblings.indexOf(t)+1);}
-        else{html+=buildSubtaskRow(t,sec.id,0);}
+        else{
+          // standalone task — number it among other standalones in section
+          const standalones=display.filter(z=>!z.parent&&!tasks.some(c=>Number(c.parent)===Number(z.id)));
+          const stIdx=standalones.indexOf(t)+1;
+          html+=buildSubtaskRow(t,sec.id,stIdx);
+        }
       });
     }else{html+='<div style="padding:10px 14px;font-size:12px;color:var(--text3)">No tasks match filters.</div>';}
     html+='</div></div>';
