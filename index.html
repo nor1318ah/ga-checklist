@@ -382,11 +382,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 </div>
 <!-- USERS MODAL -->
 <div class="overlay hidden" id="users-modal" onclick="if(event.target.id=='users-modal')closeM('users-modal')">
-  <div class="modal" style="width:min(780px,95vw)" onclick="event.stopPropagation()">
-    <h2>👥 User registry</h2>
-    <p style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6">Everyone who signed in appears below. Assign each person to an owner name to grant edit access.</p>
+  <div class="modal" style="width:min(820px,95vw)" onclick="event.stopPropagation()">
+    <h2>👥 User management</h2>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6">
+      Define users here. Set their name, email, and which owner name they map to. When they sign in with that email they automatically get edit access to their tasks.
+    </p>
+    <!-- Add new user row -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 80px;gap:8px;margin-bottom:12px;align-items:end">
+      <div><label style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;display:block;margin-bottom:4px">Full name</label><input class="finput" id="new-user-name" type="text" placeholder="e.g. Shroog"></div>
+      <div><label style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;display:block;margin-bottom:4px">Email</label><input class="finput" id="new-user-email" type="email" placeholder="shroog@company.com"></div>
+      <div><label style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;display:block;margin-bottom:4px">Maps to owner</label>
+        <select class="finput" id="new-user-owner"><option value="">— Select owner —</option></select>
+      </div>
+      <button class="tbtn pri" onclick="addUser()" style="height:36px">+ Add</button>
+    </div>
     <div id="user-table-wrap"></div>
-    <div class="mactions"><button class="tbtn" onclick="closeM('users-modal')">Close</button></div>
+    <div class="mactions">
+      <span style="font-size:11px;color:var(--text3)">Changes save instantly to Firebase</span>
+      <button class="tbtn" onclick="closeM('users-modal')">Done</button>
+    </div>
   </div>
 </div>
 <!-- ACTIVITY MODAL -->
@@ -542,30 +556,50 @@ async function openActivity(){
 // USERS
 function openUsers(){
   const owners=[...new Set(tasks.map(t=>t.owner).filter(Boolean))].sort();
+  // populate the "add user" owner dropdown
+  const ownerSel=document.getElementById('new-user-owner');
+  if(ownerSel){ownerSel.innerHTML='<option value="">— Select owner —</option>'+owners.map(o=>'<option value="'+esc(o)+'">'+esc(o)+'</option>').join('');}
+  // build table — show ALL defined users (not just those who signed in)
   const rows=Object.entries(users).map(function([email,info]){
     const opts=owners.map(o=>'<option value="'+esc(o)+'"'+(info.mappedOwner===o?' selected':'')+'>'+esc(o)+'</option>').join('');
     const isThisAdmin=email===currentEmail&&isAdmin;
     const dot=isThisAdmin?'admin':info.mappedOwner?'mapped':'pending';
-    const status=isThisAdmin?'<span style="color:var(--blue-txt);font-weight:700">Admin</span>':info.mappedOwner?'<span style="color:var(--green-txt);font-weight:700">✓ '+esc(info.mappedOwner)+'</span>':'<span style="color:var(--amber-txt);font-weight:700">⚠ No access yet</span>';
-    return '<tr><td><span class="sdot '+dot+'"></span><strong>'+esc(info.name||email)+'</strong><div style="font-size:10px;color:var(--text3)">'+esc(email)+'</div></td>'
-      +'<td style="color:var(--text2);font-size:11px">'+(info.lastSeen||'—')+'</td>'
-      +'<td><select class="owner-sel" onchange="mapUser(\''+esc(email)+'\',this.value)"><option value="">— No access —</option>'+opts+'</select></td>'
-      +'<td>'+status+'</td></tr>';
+    const signedIn=info.lastSeen?'<span style="color:var(--green-txt)">✓ Signed in</span><div style="font-size:10px;color:var(--text3)">'+info.lastSeen+'</div>':'<span style="color:var(--text3);font-size:11px">Not signed in yet</span>';
+    return '<tr>'
+      +'<td><span class="sdot '+dot+'"></span><strong>'+esc(info.name||email)+'</strong><div style="font-size:10px;color:var(--text3)">'+esc(email)+'</div></td>'
+      +'<td>'+signedIn+'</td>'
+      +'<td><select class="owner-sel" onchange="mapUser(''+esc(email)+'',this.value)"><option value="">— No access —</option>'+opts+'</select></td>'
+      +'<td>'+(isThisAdmin?'<span style="color:var(--blue-txt);font-weight:700">Admin</span>':info.mappedOwner?'<span style="color:var(--green-txt);font-weight:700">✓ Can edit</span>':'<span style="color:var(--amber-txt);font-weight:700">⚠ Pending</span>')+'</td>'
+      +'<td><button class="ract del" onclick="removeUser(''+esc(email)+'')" title="Remove user">✕</button></td>'
+      +'</tr>';
   }).join('');
-  document.getElementById('user-table-wrap').innerHTML='<table class="user-table"><thead><tr><th>User</th><th>Last seen</th><th>Assign to owner</th><th>Access</th></tr></thead><tbody>'+(rows||'<tr><td colspan="4" style="color:var(--text3);padding:16px;text-align:center">No users signed in yet.</td></tr>')+'</tbody></table>';
+  document.getElementById('user-table-wrap').innerHTML=
+    '<table class="user-table"><thead><tr><th>User</th><th>Sign-in status</th><th>Maps to owner</th><th>Access</th><th></th></tr></thead>'
+    +'<tbody>'+(rows||'<tr><td colspan="5" style="color:var(--text3);padding:16px;text-align:center">No users defined yet. Add one above.</td></tr>')+'</tbody></table>';
   document.getElementById('users-modal').classList.remove('hidden');
 }
-function mapUser(email,val){if(!users[email])users[email]={name:email,email,mappedOwner:'',lastSeen:''};users[email].mappedOwner=val;save();openUsers();toast((users[email].name||email)+' → '+(val||'no access')+' ✓');}
-
-// INLINE EDIT
-function inlineEdit(id,field){
-  const t=tasks.find(z=>z.id===id);if(!t||!canEdit(t))return;
-  const cell=document.getElementById('ic-'+field+'-'+id);if(!cell)return;
-  const cur=t[field]||'';
-  const inp=document.createElement('input');inp.className='ii';inp.value=cur;
-  inp.onblur=()=>{if(inp.value.trim()!==cur){logChange(t.id,t.name,field,cur,inp.value.trim());t[field]=inp.value.trim();save();}render();};
-  inp.onkeydown=e=>{if(e.key==='Enter')inp.blur();if(e.key==='Escape'){inp.value=cur;inp.blur();}};
-  cell.innerHTML='';cell.appendChild(inp);inp.select();
+function addUser(){
+  const name=document.getElementById('new-user-name').value.trim();
+  const email=document.getElementById('new-user-email').value.trim().toLowerCase();
+  const owner=document.getElementById('new-user-owner').value;
+  if(!name){toast('Please enter a name');return;}
+  if(!email||!email.includes('@')){toast('Please enter a valid email');return;}
+  if(!owner){toast('Please select an owner to map to');return;}
+  if(users[email]){toast('User with this email already exists');return;}
+  users[email]={name,email,mappedOwner:owner,firstSeen:'',lastSeen:''};
+  document.getElementById('new-user-name').value='';
+  document.getElementById('new-user-email').value='';
+  document.getElementById('new-user-owner').value='';
+  save();openUsers();toast(name+' added → '+owner+' ✓');
+}
+function mapUser(email,val){
+  if(!users[email])users[email]={name:email,email,mappedOwner:'',lastSeen:''};
+  users[email].mappedOwner=val;
+  save();openUsers();toast((users[email].name||email)+' → '+(val||'no access')+' ✓');
+}
+function removeUser(email){
+  if(!confirm('Remove '+((users[email]||{}).name||email)+' from user list?'))return;
+  delete users[email];save();openUsers();toast('User removed');
 }
 function chStatus(id,val){const t=tasks.find(z=>z.id===id);if(!t||!canEdit(t))return;logChange(t.id,t.name,'status',STATUS_LBL[t.status]||t.status,STATUS_LBL[val]||val);t.status=val;save();render();toast('Status updated ✓');}
 function chPriority(id,val){const t=tasks.find(z=>z.id===id);if(!t||!canEdit(t))return;logChange(t.id,t.name,'priority',PRIO_LBL[t.priority]||t.priority,PRIO_LBL[val]||val);t.priority=val;save();render();toast('Priority updated ✓');}
