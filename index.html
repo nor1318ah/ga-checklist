@@ -693,7 +693,7 @@ async function doLogin(){
   // Admin login — gets GitHub token access
   if(pass===ADMIN_PASS){
     isAdmin=true;currentEmail=email;currentUser='Admin';_mappedOwner='';
-    GH_TOKEN='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';
+    GH_TOKEN='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';
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app').style.display='block';
     await loadData();
@@ -709,7 +709,7 @@ async function doLogin(){
   // Regular user
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='block';
-  GH_TOKEN='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';
+  GH_TOKEN='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';
   await loadData();
 
   const u=users[email];
@@ -1023,15 +1023,31 @@ function buildParentRow(t,secId){
   const pStatus=computedStatus(t);
   const flagCls=t.flagged?' flagged-row':'';
   let h='<div class="parent-row'+flagCls+'" id="tr-'+t.id+'">';
-  h+='<span '+(isAdmin?'id="ic-name-'+t.id+'" onclick="inlineEdit('+t.id+',\'name\')" style="cursor:pointer"':'')+' style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:0 0 auto;max-width:min(300px,40%)" title="'+esc(t.name)+'">'+esc(t.name)+'</span>';
-  h+='<div style="flex:1;height:6px;background:var(--border);border-radius:6px;overflow:hidden;margin:0 12px;min-width:60px"><div style="height:100%;width:'+kPct+'%;background:'+(kPct===100?'var(--green)':'var(--blue)')+';border-radius:6px;transition:width .4s"></div></div>';
-  h+='<span style="font-size:11px;color:var(--text2);white-space:nowrap;flex-shrink:0">'+kDone+'/'+kids.length+' subtasks · '+kPct+'%</span>';
+  // title — fixed width, never wraps
+  h+='<div style="width:280px;min-width:0;flex-shrink:0">';
+  if(isAdmin){
+    h+='<span id="ic-name-'+t.id+'" onclick="inlineEdit('+t.id+',\'name\')" style="font-size:13px;font-weight:700;color:var(--text);cursor:pointer;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+esc(t.name)+'">'+esc(t.name)+'</span>';
+  }else{
+    h+='<span style="font-size:13px;font-weight:700;color:var(--text);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+esc(t.name)+'">'+esc(t.name)+'</span>';
+  }
+  h+='</div>';
+  // progress bar fills remaining space
+  h+='<div style="flex:1;height:6px;background:var(--border);border-radius:6px;overflow:hidden;margin:0 12px;min-width:40px">';
+  h+='<div style="height:100%;width:'+kPct+'%;background:'+(kPct===100?'var(--green)':'var(--blue)')+';border-radius:6px;transition:width .4s"></div></div>';
+  // count
+  h+='<span style="font-size:11px;color:var(--text2);white-space:nowrap;flex-shrink:0">'+kDone+'/'+kids.length+' · '+kPct+'%</span>';
+  // status badge
   h+='<span class="dsel '+pStatus+'" style="font-size:10px;font-weight:700;border-radius:8px;padding:2px 8px;flex-shrink:0;margin-left:8px;white-space:nowrap">'+STATUS_LBL[pStatus]+'</span>';
+  // flag
   h+='<button class="flag-btn'+(t.flagged?' on':'')+'" onclick="toggleFlag('+t.id+')" style="flex-shrink:0;margin-left:8px">🚩</button>';
-  if(isAdmin)h+='<button class="ract del" onclick="delTask('+t.id+')" style="flex-shrink:0;margin-left:8px;padding:3px 8px;font-size:11px">🗑 Delete</button>';
+  // delete (admin only) — visible 🗑 button
+  if(isAdmin){
+    h+='<button onclick="delTask('+t.id+')" style="flex-shrink:0;margin-left:6px;background:var(--red-lt);color:var(--red-txt);border:0.5px solid var(--red);border-radius:var(--r);padding:3px 10px;font-size:11px;cursor:pointer;font-weight:600">🗑 Delete</button>';
+  }
   h+='</div>';
   return h;
 }
+
 
 function buildSubtaskRow(t,secId,seq){
   const editable=canEdit(t);
@@ -1208,30 +1224,29 @@ function openDeps(id){
 function renderDepList(t){
   const el=document.getElementById('dep-current-list');
   if(!t.deps||!t.deps.length){
-    el.innerHTML='<div style="font-size:12px;color:var(--text3);font-style:italic;padding:12px;text-align:center;background:var(--bg2);border-radius:var(--r)">No dependencies linked yet.</div>';
+    el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:14px;text-align:center;background:var(--bg2);border-radius:var(--r)">No dependencies linked yet.</div>';
     return;
   }
-  el.innerHTML=t.deps.map(did=>{
+  el.innerHTML=t.deps.map(function(did){
     const dep=tasks.find(z=>z.id===did);
     if(!dep)return'';
     const sec=SECTIONS.find(s=>s.id===dep.section);
-    const parent=dep.parent?tasks.find(z=>z.id===dep.parent):null;
     const notDone=dep.status!=='completed';
-    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:0.5px solid var(--border);border-radius:var(--r);margin-bottom:8px;background:var(--bg);border-left:3px solid '+(notDone?'var(--amber)':'var(--green)')+'">'
-      +'<span style="font-size:16px;flex-shrink:0">'+(notDone?'⚠':'✓')+'</span>'
-      +'<div style="flex:1;min-width:0">'
-        +'<div style="font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)">'+esc(dep.name)+'</div>'
-        +'<div style="font-size:10px;color:var(--text2);margin-top:2px">'
-          +(sec?'<span style="background:var(--lime);color:var(--dark);padding:1px 6px;border-radius:4px;font-weight:700;font-size:9px;margin-right:6px">'+esc(sec.num)+'. '+esc(sec.title.length>20?sec.title.substring(0,20)+'…':sec.title)+'</span>':'')
-          +(parent?'<span style="color:var(--text3)">under '+esc(parent.name.length>25?parent.name.substring(0,25)+'…':parent.name)+'</span>':'')
-          +' Owner: '+esc(dep.owner||'—')
-        +'</div>'
+    const borderColor=notDone?'var(--amber)':'var(--green)';
+    return '<div style="padding:10px 12px;border:0.5px solid var(--border);border-radius:var(--r);margin-bottom:8px;border-left:3px solid '+borderColor+';background:var(--bg)">'
+      +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'
+        +'<span style="font-size:12px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(dep.name)+'</span>'
+        +'<span class="dsel '+dep.status+'" style="font-size:10px;font-weight:700;border-radius:8px;padding:2px 8px;flex-shrink:0">'+STATUS_LBL[dep.status]+'</span>'
       +'</div>'
-      +'<span class="dsel '+dep.status+'" style="font-size:10px;font-weight:700;border-radius:8px;padding:2px 8px;flex-shrink:0;white-space:nowrap">'+STATUS_LBL[dep.status]+'</span>'
-      +'<button onclick="removeDep('+depTaskId+','+did+')" style="flex-shrink:0;background:var(--red-lt);color:var(--red-txt);border:0.5px solid var(--red);border-radius:var(--r);padding:4px 10px;font-size:11px;cursor:pointer;font-weight:600">Remove</button>'
+      +'<div style="display:flex;align-items:center;justify-content:space-between">'
+        +'<span style="font-size:10px;color:var(--text2)">'+(sec?sec.num+'. '+sec.title+' · ':'')+' Owner: '+esc(dep.owner||'—')+'</span>'
+        +'<button onclick="removeDep('+depTaskId+','+did+')" style="background:var(--red-lt);color:var(--red-txt);border:0.5px solid var(--red);border-radius:var(--r);padding:3px 10px;font-size:11px;cursor:pointer;font-weight:600">Remove</button>'
+      +'</div>'
       +'</div>';
   }).join('');
 }
+
+
 function addDep(){
   const val=document.getElementById('dep-select').value;
   if(!val){toast('Select a task first');return;}
