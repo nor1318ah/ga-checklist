@@ -612,7 +612,7 @@ async function doLogin(){
   // Admin login — gets GitHub token access
   if(pass===ADMIN_PASS){
     isAdmin=true;currentEmail=email;currentUser='Admin';_mappedOwner='';
-    GH_TOKEN='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';
+    GH_TOKEN='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';
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app').style.display='block';
     await loadData();
@@ -628,7 +628,7 @@ async function doLogin(){
   // Regular user
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='block';
-  GH_TOKEN='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';
+  GH_TOKEN='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';
   await loadData();
 
   const u=users[email];
