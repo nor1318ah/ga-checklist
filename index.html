@@ -567,6 +567,13 @@ function logChange(taskId,taskName,field,oldVal,newVal){
 function showLoading(v){document.getElementById('loading-bar').style.display=v?'block':'none';}
 
 async function ghGet(){
+  // Always load saved users from localStorage first
+  let localUsers={};
+  try{
+    const u=localStorage.getItem(LS_KEY+'_users');
+    if(u)localUsers=JSON.parse(u);
+  }catch(e){}
+
   // Try GitHub first
   try{
     const headers={'Accept':'application/vnd.github.v3+json','Authorization':'token '+GH_TOKEN};
@@ -577,19 +584,19 @@ async function ghGet(){
       const meta=await r.json();
       GH_SHA=meta.sha;GH_BRANCH=branch;
       const decoded=atob(meta.content.replace(/\n/g,''));
-      return JSON.parse(decoded);
+      const data=JSON.parse(decoded);
+      // ALWAYS merge localUsers on top of GitHub users - local wins
+      data.users=Object.assign({},data.users||{},localUsers);
+      return data;
     }
   }catch(e){console.warn('GitHub read failed, using localStorage:',e);}
-  // Fallback: localStorage
+
+  // Fallback: localStorage only
   try{
     const ls=localStorage.getItem(LS_KEY);
     if(ls){
       const parsed=JSON.parse(ls);
-      // Merge separately stored users
-      try{
-        const savedUsers=localStorage.getItem(LS_KEY+'_users');
-        if(savedUsers)parsed.users=Object.assign({},parsed.users||{},JSON.parse(savedUsers));
-      }catch(e){}
+      parsed.users=Object.assign({},parsed.users||{},localUsers);
       return parsed;
     }
   }catch(e){}
@@ -682,13 +689,11 @@ function save(){clearTimeout(saveTimer);saveTimer=setTimeout(saveNow,1500);}
 
 async function saveNow(){
   const data={version:DATA_VERSION,tasks,sections:SECTIONS,users,activityLog,updated:new Date().toISOString()};
-  // Always save to localStorage first (instant, never fails)
-  try{
-    localStorage.setItem(LS_KEY,JSON.stringify(data));
-    // Also save users separately so they survive version reseeds
-    localStorage.setItem(LS_KEY+'_users',JSON.stringify(users));
-  }catch(e){}
-  // Then push to GitHub
+  // 1. Save users separately FIRST - most important
+  try{localStorage.setItem(LS_KEY+'_users',JSON.stringify(users));}catch(e){}
+  // 2. Save full data to localStorage
+  try{localStorage.setItem(LS_KEY,JSON.stringify(data));}catch(e){}
+  // 3. Push to GitHub (async, best effort)
   try{await ghPut(data);}catch(e){console.warn('GitHub save failed:',e);}
   toast('Saved ✓');
 }
