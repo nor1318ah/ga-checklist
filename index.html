@@ -583,7 +583,15 @@ async function ghGet(){
   // Fallback: localStorage
   try{
     const ls=localStorage.getItem(LS_KEY);
-    if(ls)return JSON.parse(ls);
+    if(ls){
+      const parsed=JSON.parse(ls);
+      // Merge separately stored users
+      try{
+        const savedUsers=localStorage.getItem(LS_KEY+'_users');
+        if(savedUsers)parsed.users=Object.assign({},parsed.users||{},JSON.parse(savedUsers));
+      }catch(e){}
+      return parsed;
+    }
   }catch(e){}
   return null;
 }
@@ -630,6 +638,8 @@ async function ghPut(data){
 
 
 async function loadData(){
+  // Keep any users already in memory (set before loadData by login flow)
+  const preUsers=JSON.parse(JSON.stringify(users||{}));
   tasks=JSON.parse(JSON.stringify(DEF_TASKS));
   SECTIONS=JSON.parse(JSON.stringify(DEF_SECTIONS));
   users={};activityLog=[];
@@ -640,23 +650,31 @@ async function loadData(){
       if(Array.isArray(d.tasks)&&d.tasks.length>=DEF_TASKS.length-15){
         tasks=d.tasks;
         if(d.sections&&d.sections.length)SECTIONS=d.sections;
-        if(d.users)users=d.users;
+        // MERGE users: loaded data wins, but keep any locally-added users
+        if(d.users)users=Object.assign({},d.users);
         if(Array.isArray(d.activityLog))activityLog=d.activityLog;
         tasks.forEach(t=>{
           if(!t.note)t.note='';if(!t.link)t.link='';
-          if(t.flagged===undefined)t.flagged=false;
+          if(t.flagged===undefined)t.flagged=false;if(!t.deps)t.deps=[];
           t.id=Number(t.id);if(t.parent!=null)t.parent=Number(t.parent);
         });
-      }else{await saveNow();}
+      }else{
+        // Task count mismatch — keep users but reseed tasks
+        if(d.users)users=Object.assign({},d.users);
+        await saveNow();
+      }
     }else{
-      // Version mismatch or file missing — reseed from DEF_TASKS
-      console.log('Reseeding: version mismatch or file missing');
+      // Version mismatch or file missing — reseed everything
+      console.log('Reseeding from DEF_TASKS');
       await saveNow();
     }
   }catch(e){
     console.error('Load error:',e);
-    toast('⚠ Could not load from GitHub — using local defaults');
+    // On error fall back to localStorage users if any
+    try{const ls=localStorage.getItem(LS_KEY);if(ls){const ld=JSON.parse(ls);if(ld.users)users=ld.users;}}catch(e2){}
   }
+  // Merge back any pre-existing in-memory users (e.g. from previous admin session)
+  Object.keys(preUsers).forEach(k=>{if(!users[k])users[k]=preUsers[k];});
   showLoading(false);
 }
 
@@ -664,7 +682,14 @@ function save(){clearTimeout(saveTimer);saveTimer=setTimeout(saveNow,1500);}
 
 async function saveNow(){
   const data={version:DATA_VERSION,tasks,sections:SECTIONS,users,activityLog,updated:new Date().toISOString()};
-  await ghPut(data);
+  // Always save to localStorage first (instant, never fails)
+  try{
+    localStorage.setItem(LS_KEY,JSON.stringify(data));
+    // Also save users separately so they survive version reseeds
+    localStorage.setItem(LS_KEY+'_users',JSON.stringify(users));
+  }catch(e){}
+  // Then push to GitHub
+  try{await ghPut(data);}catch(e){console.warn('GitHub save failed:',e);}
   toast('Saved ✓');
 }
 
@@ -737,7 +762,9 @@ async function doLogin(){
   }
 
   isAdmin=false;currentEmail=email;
-  _mappedOwner=u.mappedOwner||'';
+  // Re-read user from freshly loaded data (loadData may have updated it)
+  const freshU=users[email]||u;
+  _mappedOwner=freshU.mappedOwner||u.mappedOwner||'';
   currentUser=_mappedOwner||email;
   u.lastSeen=new Date().toLocaleString();
   const mapped=u.mappedOwner;
