@@ -671,7 +671,7 @@ async function doLogin(){
 
   // Admin login — gets GitHub token access
   if(pass===ADMIN_PASS){
-    isAdmin=true;currentEmail=email;currentUser='Admin';_mappedOwner='';setToken(GH_TOKEN_VALUE);
+    isAdmin=true;currentEmail=email;currentUser='Admin';_mappedOwner='';
     GH_TOKEN='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';
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app').style.display='block';
@@ -1339,7 +1339,7 @@ const LS_USERS= 'ga_cl_users_v9';
 const DATA_VER= 9;
 let _syncTimer=null, _lastSaved='', _sbChannel=null;
 
-function setToken(t){} // no-op for Supabase
+function r Supabase
 
 // ── localStorage helpers ───────────────────────────────────────
 function lsGet(){
