@@ -446,7 +446,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
     </div>
     <div id="user-table-wrap"></div>
     <div class="mactions">
-      <span style="font-size:11px;color:var(--text3)">Saved to Firebase instantly</span>
+      <span style="font-size:11px;color:var(--text3)">Changes save automatically</span>
       <button class="tbtn" onclick="closeM('users-modal')">Done</button>
     </div>
   </div>
@@ -799,35 +799,82 @@ async function openActivity(){
 
 // USERS
 function openUsers(){
+  // Get all unique owners from tasks
   const owners=[...new Set(tasks.map(t=>t.owner).filter(Boolean))].sort();
+  
+  // Populate the "add new user" owner dropdown
   const ownerSel=document.getElementById('new-user-owner');
-  if(ownerSel) ownerSel.innerHTML='<option value="">— Select owner —</option>'+owners.map(o=>'<option value="'+esc(o)+'">'+esc(o)+'</option>').join('');
+  if(ownerSel){
+    ownerSel.innerHTML='<option value="">— Select owner —</option>'+owners.map(o=>'<option value="'+esc(o)+'">'+esc(o)+'</option>').join('');
+  }
 
-  const rows=Object.entries(users).map(function([email,info]){
-    const opts=owners.map(o=>'<option value="'+esc(o)+'"'+(info.mappedOwner===o?' selected':'')+'>'+esc(o)+'</option>').join('');
-    const isThisAdmin=email===currentEmail&&isAdmin;
-    const dot=isThisAdmin?'admin':info.mappedOwner?'mapped':'pending';
-    const signedIn=info.lastSeen
-      ?'<span style="font-size:11px;color:var(--green-txt);font-weight:600">✓ Active</span><div style="font-size:10px;color:var(--text3)">'+info.lastSeen+'</div>'
-      :'<span style="font-size:11px;color:var(--text3)">Not signed in</span>';
-    const access=isThisAdmin
-      ?'<span style="color:var(--blue-txt);font-weight:700">Admin</span>'
-      :info.mappedOwner
-        ?'<span style="color:var(--green-txt);font-weight:700">✓ Can edit</span>'
-        :'<span style="color:var(--amber-txt);font-weight:700">⚠ No access</span>';
-    return '<tr>'
-      +'<td><span class="sdot '+dot+'"></span><span style="font-size:12px">'+esc(email)+'</span></td>'
-      +'<td>'+signedIn+'</td>'
-      +'<td><input type="text" data-em="'+esc(email)+'" value="'+esc(info.password||'')+'" placeholder="password" style="font-size:12px;padding:4px 8px;border:0.5px solid var(--border2);border-radius:var(--r);width:110px" onblur="savePw(this)"></td>'+'</tr>';
-  }).join('');
+  // Build user rows
+  const entries=Object.entries(users);
+  let tableHTML='';
+  
+  if(entries.length===0){
+    tableHTML='<tr><td colspan="6" style="padding:20px;text-align:center;color:var(--text3)">No users yet. Add one above.</td></tr>';
+  }else{
+    entries.forEach(function([email,info]){
+      const isThisAdmin=email===currentEmail&&isAdmin;
+      const hasMapped=!!info.mappedOwner;
+      const rowBg=(!hasMapped&&!isThisAdmin)?'background:#fff5f5':'';
+      
+      // Status cell
+      const statusCell=info.lastSeen
+        ?'<span style="color:var(--green-txt);font-weight:700;font-size:12px">✓ Active</span><br><span style="font-size:10px;color:var(--text3)">'+info.lastSeen+'</span>'
+        :'<span style="font-size:12px;color:var(--text3)">Not signed in</span>';
+      
+      // Password cell  
+      const pwCell='<input type="text" data-em="'+esc(email)+'" value="'+esc(info.password||'')+'" placeholder="set password" '
+        +'style="width:110px;padding:5px 8px;border:0.5px solid var(--border2);border-radius:var(--r);font-size:12px" '
+        +'onblur="savePw(this)">';
+      
+      // Owner dropdown - rebuild every time with current owners list
+      let ownerOpts='<option value="">— Select owner —</option>';
+      owners.forEach(o=>{
+        ownerOpts+='<option value="'+esc(o)+'"'+(info.mappedOwner===o?' selected':'')+'>'+esc(o)+'</option>';
+      });
+      const ownerCell='<select onchange="mapUser(\''+esc(email)+'\'\',this.value)" '
+        +'style="width:100%;padding:5px 8px;border:'+(hasMapped?'0.5px solid var(--border2)':'2px solid var(--red)')+';border-radius:var(--r);font-size:12px;background:'+(hasMapped?'var(--bg)':'#fff0f0')+'">'
+        +ownerOpts+'</select>';
+      
+      // Access cell
+      const accessCell=isThisAdmin
+        ?'<span style="color:var(--blue-txt);font-weight:700">⭐ Admin</span>'
+        :hasMapped
+          ?'<span style="color:var(--green-txt);font-weight:700">✓ Can edit</span>'
+          :'<span style="color:var(--red-txt);font-weight:700">⚠ No access</span>';
+      
+      tableHTML+='<tr style="'+rowBg+'">'
+        +'<td style="padding:10px 8px;font-size:12px"><span class="sdot '+(isThisAdmin?'admin':hasMapped?'mapped':'pending')+'"></span>'+esc(email)+'</td>'
+        +'<td style="padding:10px 8px">'+statusCell+'</td>'
+        +'<td style="padding:10px 8px">'+pwCell+'</td>'
+        +'<td style="padding:10px 8px;min-width:180px">'+ownerCell+'</td>'
+        +'<td style="padding:10px 8px">'+accessCell+'</td>'
+        +'<td style="padding:10px 8px"><button onclick="removeUser(\''+esc(email)+'\')" style="background:var(--red-lt);color:var(--red-txt);border:0.5px solid var(--red);border-radius:var(--r);padding:3px 8px;font-size:11px;cursor:pointer">Remove</button></td>'
+        +'</tr>';
+    });
+  }
 
   document.getElementById('user-table-wrap').innerHTML=
-    '<table class="user-table" style="font-size:12px">'
-    +'<thead><tr><th>Email</th><th>Status</th><th>Password</th><th>Maps to owner</th><th>Access</th><th></th></tr></thead>'
-    +'<tbody>'+(rows||'<tr><td colspan="6" style="color:var(--text3);padding:16px;text-align:center">No users yet. Add one above.</td></tr>')+'</tbody></table>';
+    '<div style="padding:10px 14px;background:var(--amber-lt);border:1px solid var(--amber);border-radius:var(--r);margin-bottom:12px;font-size:12px;color:var(--amber-txt)">'
+    +'<strong>⚠ Important:</strong> Every user must have "Maps to owner" set — this is what gives them edit access to their tasks. Rows highlighted in red need attention.'
+    +'</div>'
+    +'<table style="width:100%;border-collapse:collapse">'
+    +'<thead><tr style="background:var(--bg2);font-size:11px;text-transform:uppercase;color:var(--text2)">'
+    +'<th style="padding:8px;text-align:left">Email</th>'
+    +'<th style="padding:8px;text-align:left">Status</th>'
+    +'<th style="padding:8px;text-align:left">Password</th>'
+    +'<th style="padding:8px;text-align:left">Maps to owner ⬇ required</th>'
+    +'<th style="padding:8px;text-align:left">Access</th>'
+    +'<th style="padding:8px"></th>'
+    +'</tr></thead>'
+    +'<tbody>'+tableHTML+'</tbody></table>';
 
   document.getElementById('users-modal').classList.remove('hidden');
 }
+
 
 function addUser(){
   const email=document.getElementById('new-user-email').value.trim().toLowerCase();
@@ -861,8 +908,11 @@ function setUserPassword(email,val){
 function mapUser(email,val){
   if(!users[email])users[email]={email,password:'',mappedOwner:'',lastSeen:''};
   users[email].mappedOwner=val;
-  if(email===currentEmail){_mappedOwner=val;} // update live if mapping yourself
-  save();openUsers();toast(email+' → '+(val||'no access')+' ✓');
+  if(email===currentEmail){_mappedOwner=val;}
+  save();
+  toast((val?'✓ '+email+' → '+val:'Owner cleared')+'  (saved)');
+  // Refresh the table to show updated access status
+  setTimeout(openUsers, 300);
 }
 
 function removeUser(email){
