@@ -10,6 +10,7 @@
 const GH_REPO = 'nor1318ah/ga-checklist';
 const GH_FILE = 'data.json';
 const GH_BRANCH = 'main';
+const DATA_VERSION = 8; // bump this to force reseed from DEF_TASKS
 let GH_TOKEN = '';  // set after admin login
 let GH_SHA = '';    // current file SHA for updates
 </script>
@@ -115,7 +116,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .t-head{display:grid;grid-template-columns:18px 13px 22px minmax(0,1fr) 100px 58px 62px 108px 82px minmax(0,110px) 28px 28px 28px 92px;gap:4px;padding:4px 14px;background:var(--bg2);border-bottom:0.5px solid var(--border)}
 .th{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.3px;font-weight:700;align-self:center}
 /* PARENT ROW — L2: just title + bar + count */
-.parent-row{display:flex;align-items:center;gap:10px;padding:9px 16px;border-bottom:0.5px solid var(--border);background:var(--bg2);overflow:hidden;min-height:40px}
+.parent-row{display:flex;align-items:center;gap:10px;padding:9px 16px;border-bottom:0.5px solid var(--border);background:var(--bg2);min-height:40px;overflow:visible}
 .parent-row:hover{background:var(--bg3)}
 /* SUBTASK ROW */
 .t-row{display:grid;grid-template-columns:18px 13px 22px minmax(0,1fr) 100px 58px 62px 108px 82px minmax(0,110px) 28px 28px 28px 92px;gap:4px;align-items:start;padding:6px 14px;border-bottom:0.5px solid var(--border);transition:background .1s}
@@ -411,6 +412,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
     <div class="mactions"><button class="tbtn" onclick="closeM('activity-modal')">Close</button></div>
   </div>
 </div>
+<!-- DELETE MAIN TASK MODAL -->
+<div class="overlay hidden" id="del-main-modal" onclick="if(event.target.id=='del-main-modal')closeM('del-main-modal')">
+  <div class="modal" style="width:min(500px,93vw)" onclick="event.stopPropagation()">
+    <h2>🗑 Delete main task</h2>
+    <p id="dmt-name" style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.4"></p>
+    <div class="warn-box">This task has <strong id="dmt-count">0</strong> subtask(s). What should happen to them?</div>
+    <div class="frow">
+      <label>Subtasks:</label>
+      <select class="finput" id="dmt-move-sel">
+        <option value="">— Delete all subtasks too —</option>
+      </select>
+    </div>
+    <div class="mactions">
+      <button class="tbtn" onclick="closeM('del-main-modal')">Cancel</button>
+      <button class="tbtn" onclick="confirmDelMain()" style="background:var(--red);color:#fff;border-color:var(--red)">Delete</button>
+    </div>
+  </div>
+</div>
+
 <!-- DEPENDENCY MODAL -->
 <div class="overlay hidden" id="dep-modal" onclick="if(event.target.id=='dep-modal')closeM('dep-modal')">
   <div class="modal" style="width:min(560px,93vw)" onclick="event.stopPropagation()">
@@ -542,7 +562,7 @@ async function loadData(){
   try{
     showLoading(true);
     const d=await ghGet();
-    if(d){
+    if(d&&d.version===DATA_VERSION){
       if(Array.isArray(d.tasks)&&d.tasks.length>=DEF_TASKS.length-15){
         tasks=d.tasks;
         if(d.sections&&d.sections.length)SECTIONS=d.sections;
@@ -555,7 +575,8 @@ async function loadData(){
         });
       }else{await saveNow();}
     }else{
-      // File doesn't exist yet — create it
+      // Version mismatch or file missing — reseed from DEF_TASKS
+      console.log('Reseeding: version mismatch or file missing');
       await saveNow();
     }
   }catch(e){
@@ -569,7 +590,7 @@ function save(){clearTimeout(saveTimer);saveTimer=setTimeout(saveNow,1500);}
 
 async function saveNow(){
   try{
-    const data={tasks,sections:SECTIONS,users,activityLog,updated:new Date().toISOString()};
+    const data={version:DATA_VERSION,tasks,sections:SECTIONS,users,activityLog,updated:new Date().toISOString()};
     await ghPut(data);
     toast('Saved ✓');
   }catch(e){
@@ -799,7 +820,55 @@ function openLink(id){const t=tasks.find(z=>z.id===id);if(!t||!canEdit(t))return
 function saveLink(){const t=tasks.find(z=>z.id===linkTaskId);if(!t)return;const old=t.link||'';const nv=document.getElementById('link-inp').value.trim();if(nv!==old)logChange(t.id,t.name,'link',old,nv);t.link=nv;save();closeM('link-modal');render();toast('Link saved ✓');}
 
 // DELETE
-function delTask(id){if(!isAdmin)return;const t=tasks.find(z=>z.id===id);if(!t||!confirm('Delete this task and all its subtasks?'))return;logChange(id,t.name,'deleted',t.name,'—');tasks=tasks.filter(z=>z.id!==id&&Number(z.parent)!==id);save();render();toast('Deleted');}
+function delTask(id){
+  if(!isAdmin)return;
+  const t=tasks.find(z=>z.id===id);if(!t)return;
+  const kids=getChildren(t.id);
+  const hasKids=kids.length>0;
+  const isSub=!!t.parent;
+
+  if(hasKids&&!isSub){
+    // Main task with subtasks — show move/delete modal
+    openDelMainTask(id);
+  }else{
+    if(!confirm('Delete "'+t.name.substring(0,50)+'"?'))return;
+    logChange(id,t.name,'deleted',t.name,'—');
+    tasks=tasks.filter(z=>z.id!==id&&Number(z.parent)!==id);
+    save();render();toast('Deleted');
+  }
+}
+
+let _delMainId=null;
+function openDelMainTask(id){
+  _delMainId=id;
+  const t=tasks.find(z=>z.id===id);
+  const kids=getChildren(id);
+  // populate move-to options (other main tasks in same section)
+  const otherMains=tasks.filter(z=>z.section===t.section&&!z.parent&&z.id!==id);
+  const opts=otherMains.map(m=>'<option value="'+m.id+'">'+esc(m.name.length>50?m.name.substring(0,50)+'…':m.name)+'</option>').join('');
+
+  document.getElementById('dmt-name').textContent=t.name;
+  document.getElementById('dmt-count').textContent=kids.length;
+  document.getElementById('dmt-move-sel').innerHTML='<option value="">— Delete all subtasks too —</option>'+opts;
+  document.getElementById('del-main-modal').classList.remove('hidden');
+}
+function confirmDelMain(){
+  const t=tasks.find(z=>z.id===_delMainId);if(!t)return;
+  const moveToId=document.getElementById('dmt-move-sel').value;
+  if(moveToId){
+    // Move subtasks to another main task
+    const newParent=Number(moveToId);
+    tasks.forEach(z=>{if(Number(z.parent)===_delMainId)z.parent=newParent;});
+    toast('Subtasks moved ✓');
+  }else{
+    // Delete subtasks too
+    tasks=tasks.filter(z=>Number(z.parent)!==_delMainId);
+  }
+  logChange(_delMainId,t.name,'deleted',t.name,'—');
+  tasks=tasks.filter(z=>z.id!==_delMainId);
+  save();closeM('del-main-modal');render();toast('Deleted ✓');
+}
+
 
 // SECTIONS
 function startSecRename(id){if(!isAdmin)return;const sec=secById(id);if(!sec)return;const el=document.getElementById('sec-te-'+id);if(!el)return;const inp=document.createElement('input');inp.className='sec-inp';inp.value=sec.title;inp.onblur=()=>{if(inp.value.trim())sec.title=inp.value.trim();save();render();};inp.onkeydown=e=>{if(e.key==='Enter')inp.blur();if(e.key==='Escape')render();e.stopPropagation();};inp.onclick=e=>e.stopPropagation();el.replaceWith(inp);inp.select();}
@@ -884,12 +953,12 @@ function buildParentRow(t,secId){
   const pStatus=computedStatus(t);
   const flagCls=t.flagged?' flagged-row':'';
   let h='<div class="parent-row'+flagCls+'" id="tr-'+t.id+'">';
-  h+='<span '+(isAdmin?'id="ic-name-'+t.id+'" onclick="inlineEdit('+t.id+',\'name\')" style="cursor:pointer"':'')+' style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0;max-width:280px" title="'+esc(t.name)+'">'+esc(t.name)+'</span>';
+  h+='<span '+(isAdmin?'id="ic-name-'+t.id+'" onclick="inlineEdit('+t.id+',\'name\')" style="cursor:pointer"':'')+' style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:100px;max-width:320px" title="'+esc(t.name)+'">'+esc(t.name)+'</span>';
   h+='<div style="flex:1;height:6px;background:var(--border);border-radius:6px;overflow:hidden;margin:0 12px;min-width:60px"><div style="height:100%;width:'+kPct+'%;background:'+(kPct===100?'var(--green)':'var(--blue)')+';border-radius:6px;transition:width .4s"></div></div>';
   h+='<span style="font-size:11px;color:var(--text2);white-space:nowrap;flex-shrink:0">'+kDone+'/'+kids.length+' subtasks · '+kPct+'%</span>';
   h+='<span class="dsel '+pStatus+'" style="font-size:10px;font-weight:700;border-radius:8px;padding:2px 8px;flex-shrink:0;margin-left:8px;white-space:nowrap">'+STATUS_LBL[pStatus]+'</span>';
   h+='<button class="flag-btn'+(t.flagged?' on':'')+'" onclick="toggleFlag('+t.id+')" style="flex-shrink:0;margin-left:8px">🚩</button>';
-  if(isAdmin)h+='<button class="ract del" onclick="delTask('+t.id+')" style="flex-shrink:0;margin-left:4px">✕</button>';
+  if(isAdmin)h+='<button class="ract del" onclick="delTask('+t.id+')" style="flex-shrink:0;margin-left:8px;padding:3px 8px;font-size:11px">🗑 Delete</button>';
   h+='</div>';
   return h;
 }
@@ -1040,12 +1109,30 @@ function openDeps(id){
   document.getElementById('dep-task-name').textContent=t.name;
   // populate current deps
   renderDepList(t);
-  // populate select with all other tasks
-  const opts=tasks
-    .filter(z=>z.id!==id&&(!t.deps||!t.deps.includes(z.id)))
-    .map(z=>'<option value="'+z.id+'">'+esc(z.name.length>60?z.name.substring(0,60)+'…':z.name)+'</option>')
-    .join('');
-  document.getElementById('dep-select').innerHTML='<option value="">— Select a task —</option>'+opts;
+  // Build grouped dropdown: section headers > main tasks (bold) > subtasks (indented)
+  let opts='<option value="">— Select a task —</option>';
+  SECTIONS.forEach(function(sec){
+    const secTasks=tasks.filter(z=>z.section===sec.id&&z.id!==id&&(!t.deps||!t.deps.includes(z.id)));
+    if(!secTasks.length)return;
+    opts+='<optgroup label="'+esc(sec.num)+'. '+esc(sec.title)+'">';
+    // Main tasks first
+    secTasks.filter(z=>!z.parent).forEach(function(m){
+      const label=m.name.length>55?m.name.substring(0,55)+'…':m.name;
+      opts+='<option value="'+m.id+'" style="font-weight:700">'+esc(label)+'</option>';
+      // Then its subtasks indented
+      secTasks.filter(z=>Number(z.parent)===m.id).forEach(function(c,i){
+        const cl=c.name.length>52?c.name.substring(0,52)+'…':c.name;
+        opts+='<option value="'+c.id+'">  '+(i+1)+'. '+esc(cl)+'</option>';
+      });
+    });
+    // Standalone tasks (no parent, no kids)
+    secTasks.filter(z=>!z.parent&&!tasks.some(c=>Number(c.parent)===z.id)).forEach(function(s){
+      const sl=s.name.length>55?s.name.substring(0,55)+'…':s.name;
+      opts+='<option value="'+s.id+'">'+esc(sl)+'</option>';
+    });
+    opts+='</optgroup>';
+  });
+  document.getElementById('dep-select').innerHTML=opts;
   document.getElementById('dep-modal').classList.remove('hidden');
 }
 function renderDepList(t){
