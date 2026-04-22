@@ -10,7 +10,7 @@
 const GH_REPO = 'nor1318ah/ga-checklist';
 const GH_FILE = 'data.json';
 const GH_BRANCH = 'main';
-const DATA_VERSION = 8; // bump this to force reseed from DEF_TASKS
+const DATA_VER = 8; // bump this to force reseed from DEF_TASKS
 let GH_TOKEN = '';  // set after admin login
 let GH_SHA = '';    // current file SHA for updates
 </script>
@@ -567,134 +567,74 @@ function logChange(taskId,taskName,field,oldVal,newVal){
 function showLoading(v){document.getElementById('loading-bar').style.display=v?'block':'none';}
 
 async function ghGet(){
-  // Always load saved users from localStorage first
-  let localUsers={};
-  try{
-    const u=localStorage.getItem(LS_KEY+'_users');
-    if(u)localUsers=JSON.parse(u);
-  }catch(e){}
-
-  // Try GitHub first
-  try{
-    const headers={'Accept':'application/vnd.github.v3+json','Authorization':'token '+GH_TOKEN};
-    for(const branch of [GH_BRANCH,'main','gh-pages','master']){
-      const url='https://api.github.com/repos/'+GH_REPO+'/contents/'+GH_FILE+'?ref='+branch+'&t='+Date.now();
-      const r=await fetch(url,{headers});
-      if(!r.ok)continue;
-      const meta=await r.json();
-      GH_SHA=meta.sha;GH_BRANCH=branch;
-      const decoded=atob(meta.content.replace(/\n/g,''));
-      const data=JSON.parse(decoded);
-      // ALWAYS merge localUsers on top of GitHub users - local wins
-      data.users=Object.assign({},data.users||{},localUsers);
-      return data;
-    }
-  }catch(e){console.warn('GitHub read failed, using localStorage:',e);}
-
-  // Fallback: localStorage only
   try{
     const ls=localStorage.getItem(LS_KEY);
     if(ls){
-      const parsed=JSON.parse(ls);
-      parsed.users=Object.assign({},parsed.users||{},localUsers);
-      return parsed;
+      const data=JSON.parse(ls);
+      // Always merge separately-stored users on top
+      try{
+        const u=localStorage.getItem(LS_USERS_KEY);
+        if(u)data.users=Object.assign({},data.users||{},JSON.parse(u));
+      }catch(e){}
+      return data;
     }
-  }catch(e){}
+  }catch(e){console.warn('localStorage read failed:',e);}
   return null;
 }
 
-
 async function ghPut(data){
-  // PRIMARY: save to localStorage immediately (always works)
   try{
+    // Save users separately first (most critical)
+    localStorage.setItem(LS_USERS_KEY, JSON.stringify(data.users||{}));
+    // Save full data
     localStorage.setItem(LS_KEY, JSON.stringify(data));
-  }catch(e){console.warn('localStorage save failed:',e);}
-
-  // SECONDARY: save to GitHub (async, best effort)
-  if(!GH_TOKEN)return;
-  try{
-    const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(data,null,2))));
-    // Try each branch
-    for(const branch of ['main','gh-pages','master']){
-      const body={message:'GA Checklist update '+new Date().toISOString(),content:encoded,branch};
-      if(GH_SHA)body.sha=GH_SHA;
-      const r=await fetch('https://api.github.com/repos/'+GH_REPO+'/contents/'+GH_FILE,{
-        method:'PUT',
-        headers:{'Authorization':'token '+GH_TOKEN,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
-        body:JSON.stringify(body)
-      });
-      if(r.status===409||r.status===422){
-        // SHA conflict — get fresh SHA
-        const meta=await fetch('https://api.github.com/repos/'+GH_REPO+'/contents/'+GH_FILE+'?ref='+branch,{
-          headers:{'Authorization':'token '+GH_TOKEN,'Accept':'application/vnd.github.v3+json'}
-        });
-        if(meta.ok){const m=await meta.json();GH_SHA=m.sha;GH_BRANCH=branch;body.sha=GH_SHA;
-          const r2=await fetch('https://api.github.com/repos/'+GH_REPO+'/contents/'+GH_FILE,{method:'PUT',headers:{'Authorization':'token '+GH_TOKEN,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},body:JSON.stringify(body)});
-          if(r2.ok){const res=await r2.json();if(res.content)GH_SHA=res.content.sha;GH_BRANCH=branch;return;}
-        }
-        continue;
-      }
-      if(!r.ok)continue;
-      const result=await r.json();
-      if(result.content)GH_SHA=result.content.sha;
-      GH_BRANCH=branch;
-      return;
-    }
-  }catch(e){console.warn('GitHub save failed (using localStorage):',e);}
+  }catch(e){
+    console.error('localStorage save failed:',e);
+    throw new Error('Save failed: '+e.message);
+  }
 }
 
-
 async function loadData(){
-  // Keep any users already in memory (set before loadData by login flow)
-  const preUsers=JSON.parse(JSON.stringify(users||{}));
-  tasks=JSON.parse(JSON.stringify(DEF_TASKS));
-  SECTIONS=JSON.parse(JSON.stringify(DEF_SECTIONS));
-  users={};activityLog=[];
+  const preUsers = JSON.parse(JSON.stringify(users||{}));
+  tasks    = JSON.parse(JSON.stringify(DEF_TASKS));
+  SECTIONS = JSON.parse(JSON.stringify(DEF_SECTIONS));
+  users    = {}; activityLog = [];
+  showLoading(true);
   try{
-    showLoading(true);
-    const d=await ghGet();
-    if(d&&d.version===DATA_VERSION){
-      if(Array.isArray(d.tasks)&&d.tasks.length>=DEF_TASKS.length-15){
-        tasks=d.tasks;
-        if(d.sections&&d.sections.length)SECTIONS=d.sections;
-        // MERGE users: loaded data wins, but keep any locally-added users
-        if(d.users)users=Object.assign({},d.users);
-        if(Array.isArray(d.activityLog))activityLog=d.activityLog;
+    const d = await syncLoad();
+    if(d && d.version === DATA_VER){
+      if(Array.isArray(d.tasks) && d.tasks.length >= DEF_TASKS.length - 20){
+        tasks  = d.tasks;
+        if(d.sections && d.sections.length) SECTIONS = d.sections;
+        users  = d.users || {};
+        if(Array.isArray(d.activityLog)) activityLog = d.activityLog;
         tasks.forEach(t=>{
-          if(!t.note)t.note='';if(!t.link)t.link='';
-          if(t.flagged===undefined)t.flagged=false;if(!t.deps)t.deps=[];
-          t.id=Number(t.id);if(t.parent!=null)t.parent=Number(t.parent);
+          if(!t.note)t.note=''; if(!t.link)t.link='';
+          if(t.flagged===undefined)t.flagged=false;
+          if(!t.deps)t.deps=[];
+          t.id=Number(t.id);
+          if(t.parent!=null)t.parent=Number(t.parent);
         });
-      }else{
-        // Task count mismatch — keep users but reseed tasks
-        if(d.users)users=Object.assign({},d.users);
-        await saveNow();
-      }
-    }else{
-      // Version mismatch or file missing — reseed everything
-      console.log('Reseeding from DEF_TASKS');
+      } else { await saveNow(); }
+    } else {
+      // Version mismatch — reseed, but keep any users
+      if(d && d.users) users = d.users;
       await saveNow();
     }
   }catch(e){
-    console.error('Load error:',e);
-    // On error fall back to localStorage users if any
-    try{const ls=localStorage.getItem(LS_KEY);if(ls){const ld=JSON.parse(ls);if(ld.users)users=ld.users;}}catch(e2){}
+    console.error('loadData error:', e);
   }
-  // Merge back any pre-existing in-memory users (e.g. from previous admin session)
-  Object.keys(preUsers).forEach(k=>{if(!users[k])users[k]=preUsers[k];});
+  // Always merge pre-existing in-memory users
+  Object.keys(preUsers).forEach(k=>{ if(!users[k]) users[k]=preUsers[k]; });
   showLoading(false);
 }
+
 
 function save(){clearTimeout(saveTimer);saveTimer=setTimeout(saveNow,1500);}
 
 async function saveNow(){
-  const data={version:DATA_VERSION,tasks,sections:SECTIONS,users,activityLog,updated:new Date().toISOString()};
-  // 1. Save users separately FIRST - most important
-  try{localStorage.setItem(LS_KEY+'_users',JSON.stringify(users));}catch(e){}
-  // 2. Save full data to localStorage
-  try{localStorage.setItem(LS_KEY,JSON.stringify(data));}catch(e){}
-  // 3. Push to GitHub (async, best effort)
-  try{await ghPut(data);}catch(e){console.warn('GitHub save failed:',e);}
+  const data={version:DATA_VER,tasks,sections:SECTIONS,users,activityLog};
+  await syncSave(data);
   toast('Saved ✓');
 }
 
@@ -731,7 +671,7 @@ async function doLogin(){
 
   // Admin login — gets GitHub token access
   if(pass===ADMIN_PASS){
-    isAdmin=true;currentEmail=email;currentUser='Admin';_mappedOwner='';
+    isAdmin=true;currentEmail=email;currentUser='Admin';_mappedOwner='';setToken(GH_TOKEN_VALUE);
     GH_TOKEN='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';
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app').style.display='block';
@@ -742,7 +682,15 @@ async function doLogin(){
     badge.textContent='⭐ Admin';badge.className='ubadge admin';
     ['add-task-btn','add-cat-btn','users-btn','activity-btn'].forEach(id=>document.getElementById(id).style.display='');
     save();SECTIONS.forEach(s=>sectionOpen[s.id]=true);
-    startPolling();render();return;
+    startSync(function(remote){
+    tasks=remote.tasks; 
+    if(remote.sections&&remote.sections.length)SECTIONS=remote.sections;
+    if(remote.users)users=Object.assign({},users,remote.users);
+    if(Array.isArray(remote.activityLog))activityLog=remote.activityLog;
+    tasks.forEach(t=>{if(!t.note)t.note='';if(!t.link)t.link='';if(t.flagged===undefined)t.flagged=false;if(!t.deps)t.deps=[];t.id=Number(t.id);if(t.parent!=null)t.parent=Number(t.parent);});
+    SECTIONS.forEach(s=>{if(sectionOpen[s.id]===undefined)sectionOpen[s.id]=true;});
+    render();
+  });render();return;
   }
 
   // Regular user
@@ -778,9 +726,17 @@ async function doLogin(){
   else{badge.textContent='👤 '+email+' (no access)';badge.className='ubadge readonly';}
   ['add-task-btn','add-cat-btn','users-btn','activity-btn'].forEach(id=>document.getElementById(id).style.display='none');
   save();SECTIONS.forEach(s=>sectionOpen[s.id]=true);
-  startPolling();render();
+  startSync(function(remote){
+    tasks=remote.tasks; 
+    if(remote.sections&&remote.sections.length)SECTIONS=remote.sections;
+    if(remote.users)users=Object.assign({},users,remote.users);
+    if(Array.isArray(remote.activityLog))activityLog=remote.activityLog;
+    tasks.forEach(t=>{if(!t.note)t.note='';if(!t.link)t.link='';if(t.flagged===undefined)t.flagged=false;if(!t.deps)t.deps=[];t.id=Number(t.id);if(t.parent!=null)t.parent=Number(t.parent);});
+    SECTIONS.forEach(s=>{if(sectionOpen[s.id]===undefined)sectionOpen[s.id]=true;});
+    render();
+  });render();
 }
-function doLogout(){currentUser=null;currentEmail=null;isAdmin=false;GH_TOKEN='';GH_SHA='';if(pollTimer)clearInterval(pollTimer);document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';['login-email','login-pass'].forEach(id=>document.getElementById(id).value='');}
+function doLogout(){currentUser=null;currentEmail=null;isAdmin=false;_mappedOwner='';stopSync();document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';['login-email','login-pass'].forEach(id=>document.getElementById(id).value='');}
 
 document.getElementById('login-email').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('login-pass').focus();});
 document.getElementById('login-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
@@ -806,8 +762,7 @@ function canEdit(task){
 
 // ACTIVITY
 async function openActivity(){
-  // activityLog is already in memory from last loadData/save
-  try{const d=await ghGet();if(d&&Array.isArray(d.activityLog))activityLog=d.activityLog;}catch(e){}
+  // activityLog is in memory
   const el=document.getElementById('activity-list');
   if(!activityLog.length){el.innerHTML='<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px">No activity yet. Changes will appear here.</div>';}
   else{
@@ -1249,14 +1204,8 @@ function expandAll(){SECTIONS.forEach(s=>sectionOpen[s.id]=true);render();}
 // EXCEL EXPORT
 async function exportExcel(){
   toast('Fetching from Firebase…');
+  // Use current in-memory data (always up to date with localStorage)
   let eT=tasks,eS=SECTIONS,eL=activityLog;
-  try{
-    const d=await ghGet();
-    if(d){
-      if(Array.isArray(d.tasks)&&d.tasks.length>0){eT=d.tasks;if(d.sections&&d.sections.length)eS=d.sections;}
-      if(Array.isArray(d.activityLog))eL=d.activityLog;
-    }
-  }catch(e){console.error(e);}
   const secMap={};eS.forEach(s=>secMap[s.id]=s.title);
   const idMap={};eT.forEach(t=>idMap[t.id]=t);
   const total=eT.length,done=eT.filter(t=>t.status==='completed').length;
@@ -1379,4 +1328,112 @@ function toast(msg){const el=document.getElementById('toast');el.textContent=msg
 
 </script>
 </body>
-</html>
+</html// ═══════════════════════════════════════════════════════════
+// SUPABASE SYNC ENGINE — real-time multi-user sync
+// ═══════════════════════════════════════════════════════════
+const SB_URL  = 'https://rugxdowjtvbavsrynobp.supabase.co';
+const SB_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1Z3hkb3dqdHZiYXZzcnlub2JwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4ODI3ODYsImV4cCI6MjA5MjQ1ODc4Nn0.Rd3yxIrY3LsfJSH9c7LlX6V8mjR7yYWO5Xibkq0DkGI';
+const SB_HDR  = {'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'};
+const LS_KEY  = 'ga_cl_v9';
+const LS_USERS= 'ga_cl_users_v9';
+const DATA_VER= 9;
+let _syncTimer=null, _lastSaved='', _sbChannel=null;
+
+function setToken(t){} // no-op for Supabase
+
+// ── localStorage helpers ───────────────────────────────────────
+function lsGet(){
+  try{
+    const raw=localStorage.getItem(LS_KEY);
+    if(!raw)return null;
+    const d=JSON.parse(raw);
+    try{const u=localStorage.getItem(LS_USERS);if(u)d.users=Object.assign({},d.users||{},JSON.parse(u));}catch(e){}
+    return d;
+  }catch(e){return null;}
+}
+function lsSet(data){
+  try{
+    localStorage.setItem(LS_USERS,JSON.stringify(data.users||{}));
+    localStorage.setItem(LS_KEY,JSON.stringify(data));
+  }catch(e){}
+}
+
+// ── Supabase helpers ───────────────────────────────────────────
+async function sbGet(){
+  try{
+    const r=await fetch(SB_URL+'/rest/v1/checklist?key=eq.state&select=value',{headers:SB_HDR});
+    if(!r.ok)return null;
+    const rows=await r.json();
+    if(!rows||!rows.length)return null;
+    const data=rows[0].value;
+    // Merge local users always
+    try{const u=localStorage.getItem(LS_USERS);if(u)data.users=Object.assign({},data.users||{},JSON.parse(u));}catch(e){}
+    return data;
+  }catch(e){return null;}
+}
+
+async function sbSet(data){
+  try{
+    const r=await fetch(SB_URL+'/rest/v1/checklist',{
+      method:'POST',
+      headers:SB_HDR,
+      body:JSON.stringify({key:'state',value:data,updated_at:new Date().toISOString()})
+    });
+    return r.ok||r.status===409;
+  }catch(e){return false;}
+}
+
+// ── Public API ─────────────────────────────────────────────────
+async function syncLoad(){
+  // 1. Return localStorage immediately (fast)
+  let local=lsGet();
+  // 2. Try Supabase
+  try{
+    const remote=await sbGet();
+    if(remote){
+      const localUsers=(local&&local.users)?local.users:{};
+      remote.users=Object.assign({},remote.users||{},localUsers);
+      if(!local||!local.updated||remote.updated>local.updated){
+        lsSet(remote);
+        return remote;
+      }
+      // Local newer — push to Supabase in background
+      if(local)sbSet(local);
+      return local;
+    }
+  }catch(e){console.warn('Supabase load failed, using localStorage:',e);}
+  return local;
+}
+
+async function syncSave(data){
+  data.updated=new Date().toISOString();
+  _lastSaved=data.updated;
+  lsSet(data);
+  try{
+    await sbSet(data);
+  }catch(e){console.warn('Supabase save failed, data in localStorage:',e);}
+}
+
+function startSync(onRemoteChange){
+  if(_syncTimer)clearInterval(_syncTimer);
+  // Poll every 15s for changes from other users
+  _syncTimer=setInterval(async()=>{
+    try{
+      const remote=await sbGet();
+      if(!remote)return;
+      // Merge local users
+      try{const u=localStorage.getItem(LS_USERS);if(u)remote.users=Object.assign({},remote.users||{},JSON.parse(u));}catch(e){}
+      if(remote.updated&&remote.updated>_lastSaved){
+        _lastSaved=remote.updated;
+        lsSet(remote);
+        if(onRemoteChange)onRemoteChange(remote);
+      }
+    }catch(e){}
+  },15000);
+}
+
+function stopSync(){if(_syncTimer){clearInterval(_syncTimer);_syncTimer=null;}}
+
+
+
+>
